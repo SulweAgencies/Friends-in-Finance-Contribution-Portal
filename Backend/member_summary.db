@@ -1,0 +1,12 @@
+CREATE TABLE IF NOT EXISTS member_summary (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+    member_name TEXT NOT NULL,
+    member_email TEXT NOT NULL UNIQUE,
+
+    total_contributions REAL NOT NULL DEFAULT 0,
+    interest_per_member REAL NOT NULL DEFAULT 0,
+    final_payout REAL NOT NULL DEFAULT 0,
+
+    synced_at TEXT DEFAULT CURRENT_TIMESTAMP
+);

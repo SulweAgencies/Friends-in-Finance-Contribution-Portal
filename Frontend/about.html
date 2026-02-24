@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- Site Identity - Custom Icon -->
+    <link rel="icon" type="image/svg+xml" href="/assets/hand-holding-usd-colored.svg">
+    <link rel="apple-touch-icon" href="/assets/hand-holding-usd-colored.svg">
+    <link rel="manifest" href="/assets/site.webmanifest">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-title" content="Friends in Finance">
+    <meta name="application-name" content="Friends in Finance">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Friends in Finance Investment Portal</title>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== HEADER matching chart.html style ===== */
+        .landing-header {
+            background: linear-gradient(135deg, #2C3E50 0%, #1a2530 100%);
+            color: white;
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-section i {
+            font-size: 24px;
+            color: #2563eb;
+        }
+
+        .logo-section h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+            color: white;
+        }
+
+        .logo-section span {
+            color: #2563eb;
+        }
+
+        .main-nav {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .main-nav a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+
+        .main-nav a:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .main-nav a.active {
+            color: white;
+            background: #2563eb;
+        }
+
+        .login-btn-top {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            backdrop-filter: blur(4px);
+            white-space: nowrap;
+        }
+
+        .login-btn-top:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .login-btn-top i {
+            font-size: 1rem;
+        }
+
+        /* ===== CONTENT PAGE STYLES ===== */
+        .content-page {
+            flex: 1;
+            background: #f3f4f6;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, #2C3E50 0%, #1a2530 100%);
+            color: white;
+            padding: 3rem 10%;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .page-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* About Section */
+        .about-section {
+            padding: 3rem 10%;
+        }
+
+        .about-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .about-hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+            margin-bottom: 4rem;
+            background: white;
+            padding: 3rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .about-text h2 {
+            color: #1f2937;
+            margin-bottom: 1.5rem;
+        }
+
+        .about-text p {
+            color: #6b7280;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-badge {
+            background: linear-gradient(135deg, #2C3E50 0%, #1a2530 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .stat-badge i {
+            color: #2563eb;
+        }
+
+        .about-image {
+            text-align: center;
+        }
+
+        .about-image i {
+            font-size: 12rem;
+            color: #2563eb;
+            opacity: 0.5;
+        }
+
+        /* Benefits Section */
+        .benefits-section {
+            margin-bottom: 4rem;
+        }
+
+        .benefits-section h2 {
+            text-align: center;
+            color: #1f2937;
+            margin-bottom: 3rem;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .benefit-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .benefit-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .benefit-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #2C3E50 0%, #1a2530 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .benefit-icon i {
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .benefit-card h3 {
+            margin-bottom: 1rem;
+            color: #1f2937;
+        }
+
+        .benefit-list {
+            list-style: none;
+        }
+
+        .benefit-list li {
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #6b7280;
+        }
+
+        .benefit-list li i {
+            color: #10b981;
+            font-size: 0.9rem;
+        }
+
+        /* Investment Explanation */
+        .investment-explanation {
+            background: white;
+            padding: 3rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 4rem;
+        }
+
+        .investment-explanation h2 {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: #1f2937;
+        }
+
+        .explanation-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .explanation-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .explanation-item {
+            text-align: center;
+            padding: 2rem;
+            background: #f3f4f6;
+            border-radius: 10px;
+        }
+
+        .explanation-item h3 {
+            color: #2563eb;
+            margin-bottom: 1rem;
+        }
+
+        .explanation-item p {
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        /* Security Showcase */
+        .security-showcase {
+            background: linear-gradient(135deg, #2C3E50 0%, #1a2530 100%);
+            color: white;
+            padding: 3rem;
+            border-radius: 10px;
+            margin-bottom: 4rem;
+            text-align: center;
+        }
+
+        .security-showcase h2 {
+            margin-bottom: 2rem;
+        }
+
+        .security-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .security-stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #fbbf24;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .security-note {
+            max-width: 600px;
+            margin: 2rem auto 0;
+            opacity: 0.9;
+        }
+
+        /* Commitment Box */
+        .commitment-box {
+            background: white;
+            padding: 3rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 4rem;
+            text-align: center;
+        }
+
+        .commitment-box h3 {
+            color: #1f2937;
+            margin-bottom: 2rem;
+        }
+
+        .commitment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .commitment-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: #f3f4f6;
+            border-radius: 10px;
+        }
+
+        .commitment-item i {
+            color: #10b981;
+            font-size: 1.2rem;
+        }
+
+        .commitment-item span {
+            color: #4b5563;
+            font-size: 0.95rem;
+        }
+
+        /* Team Section */
+        .team-section {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .team-section h2 {
+            color: #1f2937;
+            margin-bottom: 1rem;
+        }
+
+        .team-section>p {
+            color: #6b7280;
+            max-width: 600px;
+            margin: 0 auto 3rem;
+        }
+
+        .team-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .team-card {
+            padding: 2rem;
+            background: #f3f4f6;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .team-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .team-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #2C3E50 0%, #1a2530 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+        }
+
+        .team-icon i {
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .team-card h3 {
+            margin-bottom: 1rem;
+            color: #1f2937;
+        }
+
+        .team-card p {
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        /* ===== FOOTER ===== */
+        .landing-footer {
+            background: linear-gradient(135deg, #2C3E50 0%, #1a2530 100%);
+            color: white;
+            padding: 40px 0 20px;
+            margin-top: 40px;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            text-align: center;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .footer-logo i {
+            font-size: 24px;
+            color: #2563eb;
+        }
+
+        .footer-logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+            color: white;
+        }
+
+        .footer-logo span {
+            color: #2563eb;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.2s;
+            cursor: pointer;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .copyright {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            margin-top: 20px;
+        }
+
+        /* Login Modal */
+        .login-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .login-modal.active {
+            display: flex;
+        }
+
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #64748b;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h3 {
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #475569;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-family: inherit;
+        }
+
+        .password-input-container {
+            position: relative;
+        }
+
+        .password-toggle-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            font-size: 16px;
+        }
+
+        .password-toggle-btn:hover {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .password-toggle-btn:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 5px;
+            color: white;
+            font-weight: 500;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+        }
+
+        .notification.success {
+            background: #10b981;
+        }
+
+        .notification.error {
+            background: #ef4444;
+        }
+
+        .notification.warning {
+            background: #f59e0b;
+            color: #1f2937;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        /* ===== MOBILE RESPONSIVE STYLES - Three Layer Layout ===== */
+        @media (max-width: 992px) {
+            /* Header - Three distinct layers */
+            .landing-header .header-content {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                padding: 15px;
+            }
+            
+            /* LAYER 1 - Logo only, centered */
+            .landing-header .logo-section {
+                width: 100%;
+                justify-content: center;
+                order: 1;
+                margin: 0;
+                padding: 0;
+            }
+            
+            .landing-header .logo-section i {
+                color: #2563eb;
+                font-size: 24px;
+            }
+            
+            .landing-header .logo-section h1 {
+                color: white;
+                font-size: 1.5rem;
+                font-weight: 700;
+                margin: 0;
+            }
+            
+            .landing-header .logo-section span {
+                color: #2563eb;
+            }
+            
+            /* LAYER 2 - Navigation only, full width, even spacing */
+            .landing-header .main-nav {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                order: 2;
+                margin: 0;
+                padding: 0;
+                background: transparent;
+                gap: 5px;
+            }
+            
+            .landing-header .main-nav a {
+                flex: 1;
+                text-align: center;
+                padding: 10px 5px;
+                font-size: 0.95rem;
+                white-space: nowrap;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 30px;
+                color: rgba(255, 255, 255, 0.9);
+                border: 1px solid transparent;
+            }
+            
+            .landing-header .main-nav a:hover {
+                background: rgba(255, 255, 255, 0.2);
+                color: white;
+            }
+            
+            .landing-header .main-nav a.active {
+                background: #2563eb;
+                color: white;
+                border-color: #3b82f6;
+            }
+            
+            /* LAYER 3 - Member Login button only, full width */
+            .landing-header .login-btn-top {
+                width: 100%;
+                order: 3;
+                margin: 0;
+                padding: 12px 20px;
+                font-size: 1rem;
+                justify-content: center;
+                background: rgba(255, 255, 255, 0.2);
+                color: white;
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                border-radius: 30px;
+                display: flex;
+            }
+            
+            /* Page header adjustments */
+            .page-header {
+                padding: 2rem 5%;
+            }
+            
+            .page-header h1 {
+                font-size: 2rem;
+            }
+            
+            .page-subtitle {
+                font-size: 1rem;
+            }
+            
+            /* About section */
+            .about-section {
+                padding: 2rem 5%;
+            }
+            
+            .about-hero {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                padding: 2rem;
+                text-align: center;
+            }
+            
+            .hero-stats {
+                justify-content: center;
+            }
+            
+            .about-image i {
+                font-size: 8rem;
+            }
+            
+            /* Benefits section */
+            .benefits-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .benefit-card {
+                padding: 1.5rem;
+            }
+            
+            /* Investment explanation */
+            .investment-explanation {
+                padding: 2rem;
+            }
+            
+            .explanation-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            /* Security showcase */
+            .security-showcase {
+                padding: 2rem;
+            }
+            
+            .security-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+            }
+            
+            .stat-number {
+                font-size: 2rem;
+            }
+            
+            /* Commitment box */
+            .commitment-box {
+                padding: 2rem;
+            }
+            
+            .commitment-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            /* Team section */
+            .team-section {
+                padding: 2rem;
+            }
+            
+            .team-info {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            /* Footer */
+            .footer-links {
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 20px;
+                justify-content: center;
+            }
+            
+            .footer-links a {
+                flex: 0 1 auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .landing-header .main-nav a {
+                font-size: 0.85rem;
+                padding: 8px 3px;
+            }
+            
+            .landing-header .login-btn-top {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+            
+            .page-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .security-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stat-badge {
+                font-size: 0.8rem;
+                padding: 0.4rem 0.8rem;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+        }
+
+        /* Tablet adjustments */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .landing-header .main-nav a {
+                font-size: 0.9rem;
+            }
+            
+            .about-hero {
+                grid-template-columns: 1fr;
+            }
+            
+            .benefits-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .team-info {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- HEADER with three-layer mobile layout matching chart.html -->
+    <header class="landing-header">
+        <div class="header-content">
+            <!-- LAYER 1: Logo only -->
+            <a href="chart.html" class="logo-section">
+                <i class="fas fa-hand-holding-usd"></i>
+                <h1>Friends in Finance <span>Investment</span> Portal</h1>
+            </a>
+            
+            <!-- LAYER 2: Navigation only -->
+            <nav class="main-nav">
+                <a href="chart.html">Home</a>
+                <a href="about.html" class="active">About</a>
+                <a href="faq.html">FAQ</a>
+                <a href="contact.html">Contact</a>
+            </nav>
+            
+            <!-- LAYER 3: Member Login button only -->
+            <button class="login-btn-top" id="openLoginModal">
+                <i class="fas fa-sign-in-alt"></i> Member Login
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="content-page">
+        <div class="page-header">
+            <h1>Your Financial Security, Our Priority</h1>
+            <p class="page-subtitle">A transparent, secure, and accountable platform for group investment management</p>
+        </div>
+
+        <!-- Member-Focused Mission -->
+        <section class="about-section">
+            <div class="about-container">
+                <div class="about-hero">
+                    <div class="about-text">
+                        <h2>Built for You, the Member</h2>
+                        <p>Every feature in this system is designed with one goal: <strong>to protect your money and
+                                give you complete visibility into your investment journey.</strong> No more guessing, no
+                                more uncertainty - just clear, real-time information about your hard-earned contributions.
+                        </p>
+                        <div class="hero-stats">
+                            <div class="stat-badge">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>Bank-Level Security</span>
+                            </div>
+                            <div class="stat-badge">
+                                <i class="fas fa-eye"></i>
+                                <span>100% Transparency</span>
+                            </div>
+                            <div class="stat-badge">
+                                <i class="fas fa-history"></i>
+                                <span>Full Audit Trail</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="about-image">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                </div>
+
+                <!-- What Members Get - The Core Benefits -->
+                <div class="benefits-section">
+                    <h2>What This System Means for YOU</h2>
+
+                    <div class="benefits-grid">
+                        <div class="benefit-card">
+                            <div class="benefit-icon">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            <h3>Your Money is Secure</h3>
+                            <ul class="benefit-list">
+                                <li><i class="fas fa-check-circle"></i> Passwords encrypted - even admins can't see them
+                                </li>
+                                <li><i class="fas fa-check-circle"></i> 8-digit gateway code keeps unauthorized access
+                                    out</li>
+                                <li><i class="fas fa-check-circle"></i> Failed login attempts are tracked and monitored
+                                </li>
+                                <li><i class="fas fa-check-circle"></i> Automatic logout protects your session</li>
+                            </ul>
+                        </div>
+
+                        <div class="benefit-card">
+                            <div class="benefit-icon">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <h3>Complete Transparency</h3>
+                            <ul class="benefit-list">
+                                <li><i class="fas fa-check-circle"></i> See every contribution you've ever made</li>
+                                <li><i class="fas fa-check-circle"></i> Track your share of the total investment pool
+                                </li>
+                                <li><i class="fas fa-check-circle"></i> View how your money is allocated (Mansa-X vs
+                                    I&M)</li>
+                                <li><i class="fas fa-check-circle"></i> Watch your investment grow in real-time</li>
+                            </ul>
+                        </div>
+
+                        <div class="benefit-card">
+                            <div class="benefit-icon">
+                                <i class="fas fa-clipboard-list"></i>
+                            </div>
+                            <h3>Full Accountability</h3>
+                            <ul class="benefit-list">
+                                <li><i class="fas fa-check-circle"></i> Every change to your account is permanently
+                                    logged</li>
+                                <li><i class="fas fa-check-circle"></i> Know exactly when and why your password changes
+                                </li>
+                                <li><i class="fas fa-check-circle"></i> Track who accessed your information</li>
+                                <li><i class="fas fa-check-circle"></i> Complete history of all system activity</li>
+                            </ul>
+                        </div>
+
+                        <div class="benefit-card">
+                            <div class="benefit-icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <h3>Documents Never Lost</h3>
+                            <ul class="benefit-list">
+                                <li><i class="fas fa-check-circle"></i> All MOUs stored securely online</li>
+                                <li><i class="fas fa-check-circle"></i> Profile photos kept for identification</li>
+                                <li><i class="fas fa-check-circle"></i> Download documents anytime, anywhere</li>
+                                <li><i class="fas fa-check-circle"></i> No more lost paperwork or damaged files</li>
+                            </ul>
+                        </div>
+
+                        <div class="benefit-card">
+                            <div class="benefit-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <h3>24/7 Access</h3>
+                            <ul class="benefit-list">
+                                <li><i class="fas fa-check-circle"></i> Check your balance anytime, day or night</li>
+                                <li><i class="fas fa-check-circle"></i> Access from phone, tablet, or computer</li>
+                                <li><i class="fas fa-check-circle"></i> See updates immediately after contributions</li>
+                                <li><i class="fas fa-check-circle"></i> No waiting for monthly statements</li>
+                            </ul>
+                        </div>
+
+                        <div class="benefit-card">
+                            <div class="benefit-icon">
+                                <i class="fas fa-calculator"></i>
+                            </div>
+                            <h3>Error-Free Calculations</h3>
+                            <ul class="benefit-list">
+                                <li><i class="fas fa-check-circle"></i> Automated calculations - no human math errors
+                                </li>
+                                <li><i class="fas fa-check-circle"></i> Duplicate entries prevented</li>
+                                <li><i class="fas fa-check-circle"></i> Standardized date formats</li>
+                                <li><i class="fas fa-check-circle"></i> Accurate running totals</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="investment-explanation">
+                    <h2>How Your Money Works</h2>
+                    <div class="explanation-grid">
+                        <div class="explanation-item">
+                            <div class="benefit-icon" style="margin: 0 auto 1.5rem;">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <h3>Monthly Contributions</h3>
+                            <p>You contribute a set amount each month. Every contribution is recorded with date and
+                                amount - you can see your complete history anytime.</p>
+                        </div>
+                        <div class="explanation-item">
+                            <div class="benefit-icon" style="margin: 0 auto 1.5rem;">
+                                <i class="fas fa-chart-pie"></i>
+                            </div>
+                            <h3>Mansa-X Investments</h3>
+                            <p>A portion of the total fund is allocated to Mansa-X investments. Your share is tracked
+                                proportionally.</p>
+                        </div>
+                        <div class="explanation-item">
+                            <div class="benefit-icon" style="margin: 0 auto 1.5rem;">
+                                <i class="fas fa-university"></i>
+                            </div>
+                            <h3>I&M Balance</h3>
+                            <p>The remainder stays in I&M accounts. The system automatically calculates: <strong>I&M =
+                                    Total Contributions - Cumulative Mansa-X</strong></p>
+                        </div>
+                        <div class="explanation-item">
+                            <div class="benefit-icon" style="margin: 0 auto 1.5rem;">
+                                <i class="fas fa-coins"></i>
+                            </div>
+                            <h3>Total Invested</h3>
+                            <p>All money is invested - there's no idle cash. Your total invested = Cumulative Mansa-X +
+                                I&M Balance.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Features Highlight -->
+                <div class="security-showcase">
+                    <h2>Your Security, By the Numbers</h2>
+                    <div class="security-grid">
+                        <div class="security-stat">
+                            <div class="stat-number">256-bit</div>
+                            <div class="stat-label">Encryption</div>
+                        </div>
+                        <div class="security-stat">
+                            <div class="stat-number">8-digit</div>
+                            <div class="stat-label">Gateway Code</div>
+                        </div>
+                        <div class="security-stat">
+                            <div class="stat-number">24hr</div>
+                            <div class="stat-label">Session Protection</div>
+                        </div>
+                        <div class="security-stat">
+                            <div class="stat-number">100%</div>
+                            <div class="stat-label">Audit Trail</div>
+                        </div>
+                    </div>
+                    <p class="security-note">Every login attempt, every password change, every document access is logged
+                        and monitored. Nothing happens without a record.</p>
+                </div>
+
+                <!-- Our Commitment -->
+                <div class="commitment-box">
+                    <h3>Our Commitment to You</h3>
+                    <div class="commitment-grid">
+                        <div class="commitment-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Your money will be accurately tracked</span>
+                        </div>
+                        <div class="commitment-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Your data will remain private</span>
+                        </div>
+                        <div class="commitment-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Your access will be secure</span>
+                        </div>
+                        <div class="commitment-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Your questions can be answered with real data</span>
+                        </div>
+                        <div class="commitment-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Your investment journey will be transparent</span>
+                        </div>
+                        <div class="commitment-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Your trust will be earned every day</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Powered by Sulwe Digitals -->
+                <div class="team-section">
+                    <h2>Powered by Sulwe Digitals</h2>
+                    <p>Friends in Finance Investment Portal is proudly developed and maintained by Sulwe Digitals, a
+                        technology company specializing in secure financial solutions and digital transformation.</p>
+
+                    <div class="team-info">
+                        <div class="team-card">
+                            <div class="team-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <h3>Security-First Development</h3>
+                            <p>Built with modern security practices to protect your financial data.</p>
+                        </div>
+                        <div class="team-card">
+                            <div class="team-icon">
+                                <i class="fas fa-headset"></i>
+                            </div>
+                            <h3>Continuous Support</h3>
+                            <p>Regular updates and dedicated support to ensure system stability.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="landing-footer">
+        <div class="footer-content">
+            <a href="chart.html" class="footer-logo">
+                <i class="fas fa-hand-holding-usd"></i>
+                <h1>Friends in Finance <span>Investment</span> Portal</h1>
+            </a>
+
+            <div class="footer-links">
+                <a href="about.html"><i class="fas fa-info-circle"></i> About</a>
+                <a href="faq.html"><i class="fas fa-question-circle"></i> FAQ</a>
+                <a href="contact.html"><i class="fas fa-envelope"></i> Contact</a>
+            </div>
+
+            <p class="copyright">© 2026 Design by Sulwe Digitals. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div class="login-modal" id="loginModal">
+        <div class="login-box">
+            <button class="close-modal" id="closeLoginModal">&times;</button>
+            <div class="login-header">
+                <h3>Member Login</h3>
+                <p>Access your investment dashboard</p>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Email</label>
+                    <input type="email" id="username" class="form-control" placeholder="you@domain.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="password-input-container">
+                        <input type="password" id="password" class="form-control" placeholder="Enter your password"
+                            required>
+                        <button type="button" class="password-toggle-btn" onclick="togglePassword('password')" title="Toggle password visibility">
+                            <i class="far fa-eye" id="password-toggle-icon"></i>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" class="btn">Login to Dashboard</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Show notification function
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 5000);
+        }
+
+        // Check authentication status on page load
+        async function checkAuthStatus() {
+            try {
+                const response = await fetch('http://localhost:3000/api/auth/status');
+                const data = await response.json();
+
+                const loginBtn = document.getElementById('openLoginModal');
+                if (loginBtn) {
+                    // When authenticated, hide the button, otherwise show it
+                    loginBtn.style.display = data.authenticated ? 'none' : 'flex';
+                }
+            } catch (error) {
+                console.error('Auth status check failed:', error);
+            }
+        }
+
+        // Handle login form submission
+        async function handleLogin(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+
+            try {
+                const response = await fetch('http://localhost:3000/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Save email to localStorage for next time
+                    localStorage.setItem('lastLoginEmail', email);
+
+                    showNotification('Login successful! Redirecting...', 'success');
+
+                    // Successful login - redirect to appropriate dashboard
+                    setTimeout(() => {
+                        window.location.href = data.redirectTo;
+                    }, 1000);
+                } else {
+                    // Failed login - show error
+                    showNotification(data.message || 'Login failed', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showNotification('Network error. Please try again.', 'error');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        }
+
+        // Modal functionality
+        (function () {
+            const modal = document.getElementById('loginModal');
+            const openBtn = document.getElementById('openLoginModal');
+            const closeBtn = document.getElementById('closeLoginModal');
+
+            if (openBtn && modal) {
+                openBtn.addEventListener('click', () => {
+                    modal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                });
+
+                const closeModal = () => {
+                    modal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                };
+
+                if (closeBtn) closeBtn.addEventListener('click', closeModal);
+                window.addEventListener('click', (e) => {
+                    if (e.target === modal) closeModal();
+                });
+            }
+        })();
+
+        // Auto-fill last used email
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuthStatus();
+            const lastEmail = localStorage.getItem('lastLoginEmail');
+            if (lastEmail) {
+                document.getElementById('username').value = lastEmail;
+            }
+
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', handleLogin);
+            }
+        });
+
+        // Password toggle function
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(inputId + '-toggle-icon');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('far', 'fa-eye');
+                icon.classList.add('far', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('far', 'fa-eye-slash');
+                icon.classList.add('far', 'fa-eye');
+            }
+        }
+    </script>
+</body>
+
+</html>

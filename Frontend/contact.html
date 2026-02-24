@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- Site Identity - Custom Icon -->
+    <link rel="icon" type="image/svg+xml" href="/assets/hand-holding-usd-colored.svg">
+    <link rel="apple-touch-icon" href="/assets/hand-holding-usd-colored.svg">
+    <link rel="manifest" href="/assets/site.webmanifest">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-title" content="Friends in Finance">
+    <meta name="application-name" content="Friends in Finance">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Friends in Finance Investment Portal</title>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== HEADER matching chart.html style ===== */
+        .landing-header {
+            background: linear-gradient(135deg, #2C3E50 0%, #1a2530 100%);
+            color: white;
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-section i {
+            font-size: 24px;
+            color: #2563eb;
+        }
+
+        .logo-section h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+            color: white;
+        }
+
+        .logo-section span {
+            color: #2563eb;
+        }
+
+        .main-nav {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .main-nav a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+
+        .main-nav a:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .main-nav a.active {
+            color: white;
+            background: #2563eb;
+        }
+
+        .login-btn-top {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            backdrop-filter: blur(4px);
+            white-space: nowrap;
+        }
+
+        .login-btn-top:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .login-btn-top i {
+            font-size: 1rem;
+        }
+
+        /* ===== CONTENT PAGE STYLES ===== */
+        .content-page {
+            flex: 1;
+            background: #f3f4f6;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, #2C3E50 0%, #1a2530 100%);
+            color: white;
+            padding: 3rem 10%;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .page-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Contact Section */
+        .contact-section {
+            padding: 3rem 10%;
+        }
+
+        .contact-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .contact-info {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .info-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .info-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #2C3E50 0%, #1a2530 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+        }
+
+        .info-icon i {
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .info-card h3 {
+            margin-bottom: 0.5rem;
+            color: #1f2937;
+        }
+
+        .info-card p {
+            color: #6b7280;
+            margin-bottom: 1rem;
+        }
+
+        .info-card a {
+            color: #2563eb;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .info-card a:hover {
+            text-decoration: underline;
+        }
+
+        .response-note {
+            font-size: 0.85rem;
+            color: #9ca3af;
+            margin-top: 0.5rem;
+        }
+
+        .contact-form-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-header {
+            margin-bottom: 2rem;
+        }
+
+        .form-header h2 {
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-header p {
+            color: #6b7280;
+        }
+
+        .contact-form {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 0;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .password-input-container {
+            position: relative;
+        }
+
+        .password-toggle-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            font-size: 16px;
+        }
+
+        .password-toggle-btn:hover {
+            color: #2563eb;
+            background: rgba(37, 99, 235, 0.1);
+        }
+
+        .password-toggle-btn:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3);
+        }
+
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 12px;
+            padding-right: 2.5rem;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            margin-right: 0.5rem;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .submit-btn {
+            background: #2563eb;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .submit-btn:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .support-pathways {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .support-pathways h3 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #1f2937;
+        }
+
+        .pathway-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .pathway-item {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+            padding: 1rem;
+            background: #f3f4f6;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .pathway-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .pathway-number {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, #2C3E50 0%, #1a2530 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .pathway-content h4 {
+            margin-bottom: 0.25rem;
+            color: #1f2937;
+        }
+
+        .pathway-content p {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        .emergency-notice {
+            background: #fff3cd;
+            border: 2px solid #fbbf24;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .notice-icon {
+            color: #b45309;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .notice-content h3 {
+            color: #92400e;
+            margin-bottom: 0.5rem;
+        }
+
+        .notice-content p {
+            color: #92400e;
+            margin-bottom: 0.5rem;
+        }
+
+        .response-time {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .response-time h3 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #1f2937;
+        }
+
+        .response-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .response-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: #f3f4f6;
+            border-radius: 10px;
+        }
+
+        .response-item h4 {
+            margin-bottom: 0.5rem;
+            color: #1f2937;
+        }
+
+        .response-item p {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2563eb;
+            margin-bottom: 0.5rem;
+        }
+
+        .response-item small {
+            color: #6b7280;
+        }
+
+        .security-contact {
+            background: linear-gradient(135deg, #2C3E50 0%, #1a2530 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .security-contact h3 {
+            margin-bottom: 1rem;
+        }
+
+        .security-contact p {
+            margin-bottom: 1rem;
+            opacity: 0.9;
+        }
+
+        .security-email {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem !important;
+        }
+
+        .security-email i {
+            margin-right: 0.5rem;
+        }
+
+        /* ===== FOOTER ===== */
+        .landing-footer {
+            background: linear-gradient(135deg, #2C3E50 0%, #1a2530 100%);
+            color: white;
+            padding: 40px 0 20px;
+            margin-top: 40px;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            text-align: center;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .footer-logo i {
+            font-size: 24px;
+            color: #2563eb;
+        }
+
+        .footer-logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+            color: white;
+        }
+
+        .footer-logo span {
+            color: #2563eb;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.2s;
+            cursor: pointer;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .copyright {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            margin-top: 20px;
+        }
+
+        /* Login Modal */
+        .login-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .login-modal.active {
+            display: flex;
+        }
+
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #64748b;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h3 {
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #475569;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-family: inherit;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 5px;
+            color: white;
+            font-weight: 500;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+        }
+
+        .notification.success {
+            background: #10b981;
+        }
+
+        .notification.error {
+            background: #ef4444;
+        }
+
+        .notification.warning {
+            background: #f59e0b;
+            color: #1f2937;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        /* ===== MOBILE RESPONSIVE STYLES - Three Layer Layout ===== */
+        @media (max-width: 992px) {
+            /* Header - Three distinct layers */
+            .landing-header .header-content {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                padding: 15px;
+            }
+            
+            /* LAYER 1 - Logo only, centered */
+            .landing-header .logo-section {
+                width: 100%;
+                justify-content: center;
+                order: 1;
+                margin: 0;
+                padding: 0;
+            }
+            
+            .landing-header .logo-section i {
+                color: #2563eb;
+                font-size: 24px;
+            }
+            
+            .landing-header .logo-section h1 {
+                color: white;
+                font-size: 1.5rem;
+                font-weight: 700;
+                margin: 0;
+            }
+            
+            .landing-header .logo-section span {
+                color: #2563eb;
+            }
+            
+            /* LAYER 2 - Navigation only, full width, even spacing */
+            .landing-header .main-nav {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                order: 2;
+                margin: 0;
+                padding: 0;
+                background: transparent;
+                gap: 5px;
+            }
+            
+            .landing-header .main-nav a {
+                flex: 1;
+                text-align: center;
+                padding: 10px 5px;
+                font-size: 0.95rem;
+                white-space: nowrap;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 30px;
+                color: rgba(255, 255, 255, 0.9);
+                border: 1px solid transparent;
+            }
+            
+            .landing-header .main-nav a:hover {
+                background: rgba(255, 255, 255, 0.2);
+                color: white;
+            }
+            
+            .landing-header .main-nav a.active {
+                background: #2563eb;
+                color: white;
+                border-color: #3b82f6;
+            }
+            
+            /* LAYER 3 - Member Login button only, full width */
+            .landing-header .login-btn-top {
+                width: 100%;
+                order: 3;
+                margin: 0;
+                padding: 12px 20px;
+                font-size: 1rem;
+                justify-content: center;
+                background: rgba(255, 255, 255, 0.2);
+                color: white;
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                border-radius: 30px;
+                display: flex;
+            }
+            
+            /* Page header adjustments */
+            .page-header {
+                padding: 2rem 5%;
+            }
+            
+            .page-header h1 {
+                font-size: 2rem;
+            }
+            
+            .page-subtitle {
+                font-size: 1rem;
+            }
+            
+            /* Contact section */
+            .contact-section {
+                padding: 2rem 5%;
+            }
+            
+            .contact-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .info-card {
+                padding: 1.5rem;
+            }
+            
+            .contact-form-container {
+                padding: 1.5rem;
+            }
+            
+            .support-pathways {
+                padding: 1.5rem;
+            }
+            
+            .pathway-item {
+                padding: 0.75rem;
+            }
+            
+            .emergency-notice {
+                padding: 1.25rem;
+            }
+            
+            .response-time {
+                padding: 1.5rem;
+            }
+            
+            .response-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .security-contact {
+                padding: 1.5rem;
+            }
+            
+            /* Footer */
+            .footer-links {
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 20px;
+                justify-content: center;
+            }
+            
+            .footer-links a {
+                flex: 0 1 auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .landing-header .main-nav a {
+                font-size: 0.85rem;
+                padding: 8px 3px;
+            }
+            
+            .landing-header .login-btn-top {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+            
+            .page-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            
+            .emergency-notice {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .pathway-item {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .pathway-number {
+                margin: 0 auto;
+            }
+        }
+
+        /* Tablet adjustments */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .landing-header .main-nav a {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- HEADER with three-layer mobile layout matching chart.html -->
+    <header class="landing-header">
+        <div class="header-content">
+            <!-- LAYER 1: Logo only -->
+            <a href="chart.html" class="logo-section">
+                <i class="fas fa-hand-holding-usd"></i>
+                <h1>Friends in Finance <span>Investment</span> Portal</h1>
+            </a>
+            
+            <!-- LAYER 2: Navigation only -->
+            <nav class="main-nav">
+                <a href="chart.html">Home</a>
+                <a href="about.html">About</a>
+                <a href="faq.html">FAQ</a>
+                <a href="contact.html" class="active">Contact</a>
+            </nav>
+            
+            <!-- LAYER 3: Member Login button only -->
+            <button class="login-btn-top" id="openLoginModal">
+                <i class="fas fa-sign-in-alt"></i> Member Login
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="content-page">
+        <div class="page-header">
+            <h1>Contact Us</h1>
+            <p class="page-subtitle">We're here to help with your investment journey</p>
+        </div>
+
+        <section class="contact-section">
+            <div class="contact-container">
+                <div class="contact-info">
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <h3>Email Support</h3>
+                        <p>For technical issues and inquiries:</p>
+                        <a href="mailto:agenciessulwe@gmail.com">agenciessulwe@gmail.com</a>
+                        <p class="response-note">Response within 24 hours</p>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <i class="fas fa-phone-alt"></i>
+                        </div>
+                        <h3>Phone Support</h3>
+                        <p>Available during business hours:</p>
+                        <a href="tel:+254757589594">+254 757 589 594</a>
+                        <p class="response-note">Mon-Fri: 8AM - 5PM EAT</p>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <h3>Location</h3>
+                        <p>Sulwe Digitals</p>
+                        <p>Nairobi, Kenya</p>
+                        <p class="response-note">Remote support available worldwide</p>
+                    </div>
+                </div>
+
+                <div class="contact-form-container">
+                    <div class="form-header">
+                        <h2>Send Us a Message</h2>
+                        <p>Fill out the form below and we'll get back to you as soon as possible.</p>
+                    </div>
+
+                    <form id="contactForm" class="contact-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="name">Full Name *</label>
+                                <input type="text" id="name" name="name" class="form-control" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="email">Email Address *</label>
+                                <input type="email" id="email" name="email" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="subject">Subject *</label>
+                            <input type="text" id="subject" name="subject" class="form-control" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="category">Issue Category *</label>
+                            <select id="category" name="category" class="form-control" required>
+                                <option value="">Select a category</option>
+                                <option value="technical">Technical Support</option>
+                                <option value="account">Account Access (Locked/Password)</option>
+                                <option value="contributions">Contribution Questions</option>
+                                <option value="investment">Investment/Mansa-X Questions</option>
+                                <option value="documents">Document/MOU Issues</option>
+                                <option value="security">Security Concerns</option>
+                                <option value="feedback">Feedback & Suggestions</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="priority">Priority Level</label>
+                            <select id="priority" name="priority" class="form-control">
+                                <option value="normal">Normal</option>
+                                <option value="high">High (Urgent)</option>
+                                <option value="low">Low (General Inquiry)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="message">Message *</label>
+                            <textarea id="message" name="message" class="form-control" rows="5" required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="newsletter" checked>
+                                <span>Receive occasional updates about system features and improvements</span>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="submit-btn">
+                            <i class="fas fa-paper-plane"></i> Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="support-pathways">
+                <h3>How to Get Help Fast</h3>
+                <div class="pathway-grid">
+                    <div class="pathway-item">
+                        <div class="pathway-number">1</div>
+                        <div class="pathway-content">
+                            <h4>Account Issues (Locked/Password)</h4>
+                            <p>Contact your Group Administrator first - they can unlock accounts immediately</p>
+                        </div>
+                    </div>
+                    <div class="pathway-item">
+                        <div class="pathway-number">2</div>
+                        <div class="pathway-content">
+                            <h4>Contribution Discrepancies</h4>
+                            <p>Check your contribution history first, then contact admin if you spot errors</p>
+                        </div>
+                    </div>
+                    <div class="pathway-item">
+                        <div class="pathway-number">3</div>
+                        <div class="pathway-content">
+                            <h4>Technical Problems</h4>
+                            <p>Use this contact form or email support directly with screenshots if possible</p>
+                        </div>
+                    </div>
+                    <div class="pathway-item">
+                        <div class="pathway-number">4</div>
+                        <div class="pathway-content">
+                            <h4>Investment Questions</h4>
+                            <p>Check FAQ first, then contact support with specific questions</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="emergency-notice">
+                <div class="notice-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="notice-content">
+                    <h3>⚠️ Important: Account Issues</h3>
+                    <p><strong>For urgent account-related issues</strong> (login problems, forgotten passwords, locked
+                        accounts), please contact your <strong>group administrator directly</strong> - they can resolve
+                        these issues immediately without waiting for technical support.</p>
+                    <p>System-wide technical issues will be addressed by our support team within 2-4 hours.</p>
+                </div>
+            </div>
+
+            <div class="response-time">
+                <h3>Expected Response Times</h3>
+                <div class="response-grid">
+                    <div class="response-item">
+                        <h4>🔴 Urgent Issues</h4>
+                        <p>2-4 hours</p>
+                        <small>Login problems, security concerns</small>
+                    </div>
+                    <div class="response-item">
+                        <h4>🟡 Account Support</h4>
+                        <p>4-8 hours</p>
+                        <small>Password resets, profile updates</small>
+                    </div>
+                    <div class="response-item">
+                        <h4>🟢 General Inquiry</h4>
+                        <p>24 hours</p>
+                        <small>Questions, feedback, suggestions</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="security-contact">
+                <h3>🔒 Report a Security Concern</h3>
+                <p>If you suspect unauthorized access or a security breach, contact us immediately:</p>
+                <p class="security-email"><i class="fas fa-envelope"></i> agenciessulwe@gmail.com</p>
+                <p class="security-note">All security reports are treated with highest priority.</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="landing-footer">
+        <div class="footer-content">
+            <a href="chart.html" class="footer-logo">
+                <i class="fas fa-hand-holding-usd"></i>
+                <h1>Friends in Finance <span>Investment</span> Portal</h1>
+            </a>
+
+            <div class="footer-links">
+                <a href="about.html"><i class="fas fa-info-circle"></i> About</a>
+                <a href="faq.html"><i class="fas fa-question-circle"></i> FAQ</a>
+                <a href="contact.html"><i class="fas fa-envelope"></i> Contact</a>
+            </div>
+
+            <p class="copyright">© 2026 Design by Sulwe Digitals. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div class="login-modal" id="loginModal">
+        <div class="login-box">
+            <button class="close-modal" id="closeLoginModal">&times;</button>
+            <div class="login-header">
+                <h3>Member Login</h3>
+                <p>Access your investment dashboard</p>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Email</label>
+                    <input type="email" id="username" class="form-control" placeholder="you@domain.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="password-input-container">
+                        <input type="password" id="password" class="form-control" placeholder="Enter your password"
+                            required>
+                        <button type="button" class="password-toggle-btn" onclick="togglePassword('password')" title="Toggle password visibility">
+                            <i class="far fa-eye" id="password-toggle-icon"></i>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" class="btn">Login to Dashboard</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Show notification function
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 5000);
+        }
+
+        // Check authentication status on page load
+        async function checkAuthStatus() {
+            try {
+                const response = await fetch('http://localhost:3000/api/auth/status');
+                const data = await response.json();
+
+                const loginBtn = document.getElementById('openLoginModal');
+                if (loginBtn) {
+                    // When authenticated, hide the button, otherwise show it
+                    loginBtn.style.display = data.authenticated ? 'none' : 'flex';
+                }
+            } catch (error) {
+                console.error('Auth status check failed:', error);
+            }
+        }
+
+        // Handle login form submission
+        async function handleLogin(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+
+            try {
+                const response = await fetch('http://localhost:3000/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Save email to localStorage for next time
+                    localStorage.setItem('lastLoginEmail', email);
+
+                    showNotification('Login successful! Redirecting...', 'success');
+
+                    // Successful login - redirect to appropriate dashboard
+                    setTimeout(() => {
+                        window.location.href = data.redirectTo;
+                    }, 1000);
+                } else {
+                    // Failed login - show error
+                    showNotification(data.message || 'Login failed', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showNotification('Network error. Please try again.', 'error');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        }
+
+        // Modal functionality
+        (function () {
+            const modal = document.getElementById('loginModal');
+            const openBtn = document.getElementById('openLoginModal');
+            const closeBtn = document.getElementById('closeLoginModal');
+
+            if (openBtn && modal) {
+                openBtn.addEventListener('click', () => {
+                    modal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                });
+
+                const closeModal = () => {
+                    modal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                };
+
+                if (closeBtn) closeBtn.addEventListener('click', closeModal);
+                window.addEventListener('click', (e) => {
+                    if (e.target === modal) closeModal();
+                });
+            }
+        })();
+
+        // Auto-fill last used email
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuthStatus();
+            const lastEmail = localStorage.getItem('lastLoginEmail');
+            if (lastEmail) {
+                document.getElementById('username').value = lastEmail;
+            }
+
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', handleLogin);
+            }
+        });
+
+        // Contact Form Submission with API endpoint
+        document.getElementById('contactForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            // Get form data
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                subject: document.getElementById('subject').value,
+                category: document.getElementById('category').value,
+                priority: document.getElementById('priority').value,
+                message: document.getElementById('message').value,
+                newsletter: document.querySelector('input[name="newsletter"]').checked
+            };
+
+            // Show loading state
+            const submitBtn = this.querySelector('.submit-btn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch('http://localhost:3000/api/contact', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    // Show success message
+                    showNotification(data.message, 'success');
+
+                    // Reset form
+                    this.reset();
+
+                    // Special message for account issues
+                    if (formData.category === 'account') {
+                        setTimeout(() => {
+                            showNotification('🔑 For account issues, please also contact your group administrator for faster resolution', 'warning');
+                        }, 1000);
+                    }
+                } else {
+                    // Show error message
+                    showNotification(data.error || 'Failed to send message', 'error');
+                }
+            } catch (error) {
+                console.error('Contact form error:', error);
+                showNotification('Network error. Please try again later.', 'error');
+            } finally {
+                // Restore button state
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Password toggle function
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(inputId + '-toggle-icon');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('far', 'fa-eye');
+                icon.classList.add('far', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('far', 'fa-eye-slash');
+                icon.classList.add('far', 'fa-eye');
+            }
+        }
+    </script>
+</body>
+
+</html>

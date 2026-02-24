@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- Site Identity - Custom Icon -->
+    <link rel="icon" type="image/svg+xml" href="/assets/hand-holding-usd-colored.svg">
+    <link rel="apple-touch-icon" href="/assets/hand-holding-usd-colored.svg">
+    <link rel="manifest" href="/assets/site.webmanifest">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-title" content="Friends in Finance">
+    <meta name="application-name" content="Friends in Finance">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ - Friends in Finance Investment Portal</title>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== HEADER matching chart.html style ===== */
+        .landing-header {
+            background: linear-gradient(135deg, #2C3E50 0%, #1a2530 100%);
+            color: white;
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-section i {
+            font-size: 24px;
+            color: #2563eb;
+        }
+
+        .logo-section h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+            color: white;
+        }
+
+        .logo-section span {
+            color: #2563eb;
+        }
+
+        .main-nav {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .main-nav a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+
+        .main-nav a:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .main-nav a.active {
+            color: white;
+            background: #2563eb;
+        }
+
+        .login-btn-top {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            backdrop-filter: blur(4px);
+            white-space: nowrap;
+        }
+
+        .login-btn-top:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .login-btn-top i {
+            font-size: 1rem;
+        }
+
+        /* ===== CONTENT PAGE STYLES ===== */
+        .content-page {
+            flex: 1;
+            background: #f3f4f6;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, #2C3E50 0%, #1a2530 100%);
+            color: white;
+            padding: 3rem 10%;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .page-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            padding: 3rem 10%;
+        }
+
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-search {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .faq-search input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 30px;
+            font-size: 1rem;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .faq-search input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .faq-search i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+        }
+
+        .faq-categories {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .category-btn {
+            padding: 0.5rem 1.5rem;
+            border: 2px solid #2563eb;
+            background: transparent;
+            color: #2563eb;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .category-btn:hover,
+        .category-btn.active {
+            background: linear-gradient(135deg, #2C3E50 0%, #1a2530 100%);
+            color: white;
+            border-color: transparent;
+            transform: translateY(-2px);
+        }
+
+        .faq-list {
+            margin-bottom: 3rem;
+        }
+
+        .faq-item {
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .faq-item:hover {
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .faq-question {
+            padding: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .faq-question h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: #1f2937;
+            flex: 1;
+        }
+
+        .faq-question i {
+            color: #2563eb;
+            transition: all 0.3s ease;
+        }
+
+        .faq-item.active .faq-question i {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            padding: 0 1.5rem 1.5rem;
+            display: none;
+            color: #6b7280;
+            line-height: 1.8;
+        }
+
+        .faq-item.active .faq-answer {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .faq-answer ul {
+            margin: 1rem 0 0 1.5rem;
+        }
+
+        .faq-answer li {
+            margin-bottom: 0.5rem;
+        }
+
+        .faq-contact-cta {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .faq-contact-cta h3 {
+            color: #1f2937;
+            margin-bottom: 1rem;
+        }
+
+        .faq-contact-cta p {
+            color: #6b7280;
+            margin-bottom: 2rem;
+        }
+
+        .faq-contact-cta .btn {
+            display: inline-block;
+            padding: 0.75rem 2rem;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .faq-contact-cta .btn:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        /* ===== FOOTER ===== */
+        .landing-footer {
+            background: linear-gradient(135deg, #2C3E50 0%, #1a2530 100%);
+            color: white;
+            padding: 40px 0 20px;
+            margin-top: 40px;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            text-align: center;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .footer-logo i {
+            font-size: 24px;
+            color: #2563eb;
+        }
+
+        .footer-logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+            color: white;
+        }
+
+        .footer-logo span {
+            color: #2563eb;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.2s;
+            cursor: pointer;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .copyright {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            margin-top: 20px;
+        }
+
+        /* Login Modal */
+        .login-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .login-modal.active {
+            display: flex;
+        }
+
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #64748b;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h3 {
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #475569;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-family: inherit;
+        }
+
+        .password-input-container {
+            position: relative;
+        }
+
+        .password-toggle-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            font-size: 16px;
+        }
+
+        .password-toggle-btn:hover {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .password-toggle-btn:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 5px;
+            color: white;
+            font-weight: 500;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+        }
+
+        .notification.success {
+            background: #10b981;
+        }
+
+        .notification.error {
+            background: #ef4444;
+        }
+
+        .notification.warning {
+            background: #f59e0b;
+            color: #1f2937;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        /* ===== MOBILE RESPONSIVE STYLES - Three Layer Layout ===== */
+        @media (max-width: 992px) {
+            /* Header - Three distinct layers */
+            .landing-header .header-content {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                padding: 15px;
+            }
+            
+            /* LAYER 1 - Logo only, centered */
+            .landing-header .logo-section {
+                width: 100%;
+                justify-content: center;
+                order: 1;
+                margin: 0;
+                padding: 0;
+            }
+            
+            .landing-header .logo-section i {
+                color: #2563eb;
+                font-size: 24px;
+            }
+            
+            .landing-header .logo-section h1 {
+                color: white;
+                font-size: 1.5rem;
+                font-weight: 700;
+                margin: 0;
+            }
+            
+            .landing-header .logo-section span {
+                color: #2563eb;
+            }
+            
+            /* LAYER 2 - Navigation only, full width, even spacing */
+            .landing-header .main-nav {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                order: 2;
+                margin: 0;
+                padding: 0;
+                background: transparent;
+                gap: 5px;
+            }
+            
+            .landing-header .main-nav a {
+                flex: 1;
+                text-align: center;
+                padding: 10px 5px;
+                font-size: 0.95rem;
+                white-space: nowrap;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 30px;
+                color: rgba(255, 255, 255, 0.9);
+                border: 1px solid transparent;
+            }
+            
+            .landing-header .main-nav a:hover {
+                background: rgba(255, 255, 255, 0.2);
+                color: white;
+            }
+            
+            .landing-header .main-nav a.active {
+                background: #2563eb;
+                color: white;
+                border-color: #3b82f6;
+            }
+            
+            /* LAYER 3 - Member Login button only, full width */
+            .landing-header .login-btn-top {
+                width: 100%;
+                order: 3;
+                margin: 0;
+                padding: 12px 20px;
+                font-size: 1rem;
+                justify-content: center;
+                background: rgba(255, 255, 255, 0.2);
+                color: white;
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                border-radius: 30px;
+                display: flex;
+            }
+            
+            /* Page header adjustments */
+            .page-header {
+                padding: 2rem 5%;
+            }
+            
+            .page-header h1 {
+                font-size: 2rem;
+            }
+            
+            .page-subtitle {
+                font-size: 1rem;
+            }
+            
+            /* FAQ section */
+            .faq-section {
+                padding: 2rem 5%;
+            }
+            
+            .faq-categories {
+                gap: 0.5rem;
+            }
+            
+            .category-btn {
+                padding: 0.4rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .faq-question h3 {
+                font-size: 1rem;
+            }
+            
+            .faq-answer {
+                font-size: 0.9rem;
+            }
+            
+            .faq-contact-cta {
+                padding: 2rem;
+            }
+            
+            /* Footer */
+            .footer-links {
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 20px;
+                justify-content: center;
+            }
+            
+            .footer-links a {
+                flex: 0 1 auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .faq-categories {
+                flex-wrap: wrap;
+            }
+            
+            .category-btn {
+                flex: 1 1 auto;
+                min-width: 120px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .landing-header .main-nav a {
+                font-size: 0.85rem;
+                padding: 8px 3px;
+            }
+            
+            .landing-header .login-btn-top {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+            
+            .page-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .category-btn {
+                font-size: 0.8rem;
+                padding: 0.3rem 0.8rem;
+                min-width: 100px;
+            }
+            
+            .faq-question {
+                padding: 1rem;
+            }
+            
+            .faq-answer {
+                padding: 0 1rem 1rem;
+                font-size: 0.85rem;
+            }
+            
+            .faq-contact-cta {
+                padding: 1.5rem;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+        }
+
+        /* Tablet adjustments */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .landing-header .main-nav a {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- HEADER with three-layer mobile layout matching chart.html -->
+    <header class="landing-header">
+        <div class="header-content">
+            <!-- LAYER 1: Logo only -->
+            <a href="chart.html" class="logo-section">
+                <i class="fas fa-hand-holding-usd"></i>
+                <h1>Friends in Finance <span>Investment</span> Portal</h1>
+            </a>
+            
+            <!-- LAYER 2: Navigation only -->
+            <nav class="main-nav">
+                <a href="chart.html">Home</a>
+                <a href="about.html">About</a>
+                <a href="faq.html" class="active">FAQ</a>
+                <a href="contact.html">Contact</a>
+            </nav>
+            
+            <!-- LAYER 3: Member Login button only -->
+            <button class="login-btn-top" id="openLoginModal">
+                <i class="fas fa-sign-in-alt"></i> Member Login
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="content-page">
+        <div class="page-header">
+            <h1>Frequently Asked Questions</h1>
+            <p class="page-subtitle">Everything you need to know about your investment account</p>
+        </div>
+
+        <section class="faq-section">
+            <div class="faq-container">
+                <div class="faq-search">
+                    <input type="text" id="faqSearch" placeholder="Search questions...">
+                    <i class="fas fa-search"></i>
+                </div>
+
+                <div class="faq-categories">
+                    <button class="category-btn active" data-category="all">All Questions</button>
+                    <button class="category-btn" data-category="account">Account & Login</button>
+                    <button class="category-btn" data-category="contributions">Contributions</button>
+                    <button class="category-btn" data-category="investment">Investment & Mansa-X</button>
+                    <button class="category-btn" data-category="security">Security & Privacy</button>
+                    <button class="category-btn" data-category="documents">Documents & MOUs</button>
+                </div>
+
+                <div class="faq-list">
+                    <!-- Account & Login Questions -->
+                    <div class="faq-item" data-category="account">
+                        <div class="faq-question">
+                            <h3>How do I log in for the first time?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Your administrator will create your account and provide your email. Use the 8-digit
+                                gateway code on the login page, then enter your email and the default password:
+                                <strong>password123</strong>. You'll be prompted to change your password immediately.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item" data-category="account">
+                        <div class="faq-question">
+                            <h3>I forgot my password. What should I do?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Contact your group administrator to reset your password. For security reasons, password
+                                resets can only be performed by administrators. Once reset, you'll receive a temporary
+                                password that you must change on first login.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item" data-category="account">
+                        <div class="faq-question">
+                            <h3>Can I change my own password?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Yes! Once logged in, go to your member dashboard and click on "Change Password." You'll
+                                need to enter your current password and then your new password (minimum 6 characters).
+                                The system will notify you when the change is successful.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item" data-category="account">
+                        <div class="faq-question">
+                            <h3>Why was I locked out of my account?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>The system automatically locks accounts after multiple failed login attempts to protect
+                                against unauthorized access. Contact your administrator to unlock your account. They can
+                                verify your identity and restore access.</p>
+                        </div>
+                    </div>
+
+                    <!-- Contributions Questions -->
+                    <div class="faq-item" data-category="contributions">
+                        <div class="faq-question">
+                            <h3>How do I make a contribution?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>After logging in, navigate to your member dashboard. Select the current month from the
+                                contributions section, enter the amount, and submit. The system will update your total
+                                immediately and record the transaction in your history.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item" data-category="contributions">
+                        <div class="faq-question">
+                            <h3>Can I see my contribution history?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Absolutely! Your dashboard displays a complete history of every contribution you've made,
+                                organized by month and year. You can see exactly when you paid and how much, with
+                                running totals showing your cumulative investment.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item" data-category="contributions">
+                        <div class="faq-question">
+                            <h3>What if I miss a month?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Missed months are recorded as KES 0 in the system. You can catch up by making larger
+                                contributions in subsequent months, subject to your group's rules. The system will
+                                accurately track all contributions regardless of timing.</p>
+                        </div>
+                    </div>
+
+                    <!-- Investment & Mansa-X Questions -->
+                    <div class="faq-item" data-category="investment">
+                        <div class="faq-question">
+                            <h3>How does the Mansa-X investment work?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Each month, a portion of the total contributions is allocated to Mansa-X investments. The
+                                system tracks:
+                            <ul>
+                                <li><strong>Cumulative Mansa-X:</strong> Running total of all Mansa-X investments to
+                                    date</li>
+                                <li><strong>I&M Balance:</strong> Total contributions minus Cumulative Mansa-X</li>
+                                <li><strong>Total Invested:</strong> Cumulative Mansa-X + I&M Balance (all money is
+                                    invested)</li>
+                            </ul>
+                            Your share is proportional to your contributions.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item" data-category="investment">
+                        <div class="faq-question">
+                            <h3>How can I track my investment growth?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Your member dashboard shows:
+                            <ul>
+                                <li>Your total contributions to date</li>
+                                <li>Your percentage share of the total fund</li>
+                                <li>Estimated I&M balance attributable to you</li>
+                                <li>Your portion of Mansa-X investments</li>
+                                <li>Running total of your invested amount</li>
+                            </ul>
+                            All figures update in real-time.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Security & Privacy Questions -->
+                    <div class="faq-item" data-category="security">
+                        <div class="faq-question">
+                            <h3>How secure is my data?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Your data is protected by multiple security layers:
+                            <ul>
+                                <li><strong>Encryption:</strong> All passwords are hashed using bcrypt - even
+                                    administrators cannot see them</li>
+                                <li><strong>Gateway Code:</strong> 8-digit code required for system access</li>
+                                <li><strong>Session Management:</strong> Automatic logout after inactivity</li>
+                                <li><strong>Login Tracking:</strong> Failed attempts are monitored and can trigger
+                                    account locks</li>
+                            </ul>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item" data-category="security">
+                        <div class="faq-question">
+                            <h3>What is the audit log?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>The audit log is a complete record of every significant action in the system. This
+                                includes:
+                            <ul>
+                                <li>Login attempts (successful and failed)</li>
+                                <li>Password changes</li>
+                                <li>Gateway code updates</li>
+                                <li>Document uploads and deletions</li>
+                                <li>Contribution changes</li>
+                                <li>Investment updates</li>
+                            </ul>
+                            Every action is timestamped and linked to the user who performed it.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item" data-category="security">
+                        <div class="faq-question">
+                            <h3>Can other members see my contributions?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>No. Members can only see their own contribution history and personal information.
+                                Administrators have access to all data for management purposes, but individual member
+                                privacy is protected - you cannot see other members' specific contributions.</p>
+                        </div>
+                    </div>
+
+                    <!-- Documents & MOUs Questions -->
+                    <div class="faq-item" data-category="documents">
+                        <div class="faq-question">
+                            <h3>What documents are stored in the system?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>The system stores two types of documents:
+                            <ul>
+                                <li><strong>Profile Photos:</strong> Your member photo for identification</li>
+                                <li><strong>MOU Documents:</strong> Legal agreements between members and the group</li>
+                            </ul>
+                            All documents are securely stored and can be accessed anytime.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item" data-category="documents">
+                        <div class="faq-question">
+                            <h3>How do I upload or update my profile photo?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>From your member dashboard, click on your profile picture or the "Update Photo" button.
+                                Select an image file (JPG, PNG, or GIF) from your computer. The system will
+                                automatically resize and store it securely. Old photos are archived for audit purposes.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item" data-category="documents">
+                        <div class="faq-question">
+                            <h3>Can I download my MOU documents?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Yes! In the documents section of your dashboard, you'll see all your MOU documents with
+                                download links. You can save them to your computer anytime you need them. The system
+                                tracks download counts for audit purposes.</p>
+                        </div>
+                    </div>
+
+                    <!-- Gateway Code Questions -->
+                    <div class="faq-item" data-category="security">
+                        <div class="faq-question">
+                            <h3>What is the gateway code for?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>The 8-digit gateway code is the first layer of security. You need it to access the login
+                                page. This prevents automated bots and unauthorized users from even reaching the login
+                                screen. The code is managed by administrators and changed periodically.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item" data-category="security">
+                        <div class="faq-question">
+                            <h3>Will I be notified if the gateway code changes?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Yes. When administrators update the gateway code, a notification is sent to all members'
+                                email addresses. This ensures everyone has the current code and maintains security
+                                awareness.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-contact-cta">
+                    <h3>Still have questions?</h3>
+                    <p>Can't find the answer you're looking for? Our support team is ready to help.</p>
+                    <a href="contact.html" class="btn">Contact Support</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="landing-footer">
+        <div class="footer-content">
+            <a href="chart.html" class="footer-logo">
+                <i class="fas fa-hand-holding-usd"></i>
+                <h1>Friends in Finance <span>Investment</span> Portal</h1>
+            </a>
+
+            <div class="footer-links">
+                <a href="about.html"><i class="fas fa-info-circle"></i> About</a>
+                <a href="faq.html"><i class="fas fa-question-circle"></i> FAQ</a>
+                <a href="contact.html"><i class="fas fa-envelope"></i> Contact</a>
+            </div>
+
+            <p class="copyright">© 2026 Design by Sulwe Digitals. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div class="login-modal" id="loginModal">
+        <div class="login-box">
+            <button class="close-modal" id="closeLoginModal">&times;</button>
+            <div class="login-header">
+                <h3>Member Login</h3>
+                <p>Access your investment dashboard</p>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Email</label>
+                    <input type="email" id="username" class="form-control" placeholder="you@domain.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="password-input-container">
+                        <input type="password" id="password" class="form-control" placeholder="Enter your password"
+                            required>
+                        <button type="button" class="password-toggle-btn" onclick="togglePassword('password')" title="Toggle password visibility">
+                            <i class="far fa-eye" id="password-toggle-icon"></i>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" class="btn">Login to Dashboard</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Show notification function
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 5000);
+        }
+
+        // Check authentication status on page load
+        async function checkAuthStatus() {
+            try {
+                const response = await fetch('http://localhost:3000/api/auth/status');
+                const data = await response.json();
+
+                const loginBtn = document.getElementById('openLoginModal');
+                if (loginBtn) {
+                    // When authenticated, hide the button, otherwise show it
+                    loginBtn.style.display = data.authenticated ? 'none' : 'flex';
+                }
+            } catch (error) {
+                console.error('Auth status check failed:', error);
+            }
+        }
+
+        // Handle login form submission
+        async function handleLogin(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+
+            try {
+                const response = await fetch('http://localhost:3000/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Save email to localStorage for next time
+                    localStorage.setItem('lastLoginEmail', email);
+
+                    showNotification('Login successful! Redirecting...', 'success');
+
+                    // Successful login - redirect to appropriate dashboard
+                    setTimeout(() => {
+                        window.location.href = data.redirectTo;
+                    }, 1000);
+                } else {
+                    // Failed login - show error
+                    showNotification(data.message || 'Login failed', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showNotification('Network error. Please try again.', 'error');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        }
+
+        // Modal functionality
+        (function () {
+            const modal = document.getElementById('loginModal');
+            const openBtn = document.getElementById('openLoginModal');
+            const closeBtn = document.getElementById('closeLoginModal');
+
+            if (openBtn && modal) {
+                openBtn.addEventListener('click', () => {
+                    modal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                });
+
+                const closeModal = () => {
+                    modal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                };
+
+                if (closeBtn) closeBtn.addEventListener('click', closeModal);
+                window.addEventListener('click', (e) => {
+                    if (e.target === modal) closeModal();
+                });
+            }
+        })();
+
+        // Auto-fill last used email
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuthStatus();
+            const lastEmail = localStorage.getItem('lastLoginEmail');
+            if (lastEmail) {
+                document.getElementById('username').value = lastEmail;
+            }
+
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', handleLogin);
+            }
+        });
+
+    // Password toggle function
+    function togglePassword(inputId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(inputId + '-toggle-icon');
+        
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('far', 'fa-eye');
+            icon.classList.add('far', 'fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('far', 'fa-eye-slash');
+            icon.classList.add('far', 'fa-eye');
+        }
+    }
+
+        // FAQ Search and Category functionality
+        document.addEventListener('DOMContentLoaded', function () {
+            // Category filtering
+            const categoryBtns = document.querySelectorAll('.category-btn');
+            const faqItems = document.querySelectorAll('.faq-item');
+
+            categoryBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Remove active class from all buttons
+                    categoryBtns.forEach(b => b.classList.remove('active'));
+                    // Add active class to clicked button
+                    btn.classList.add('active');
+
+                    const category = btn.dataset.category;
+
+                    faqItems.forEach(item => {
+                        if (category === 'all' || item.dataset.category === category) {
+                            item.style.display = 'block';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+            });
+
+            // Search functionality
+            const searchInput = document.getElementById('faqSearch');
+            if (searchInput) {
+                searchInput.addEventListener('input', function () {
+                    const searchTerm = this.value.toLowerCase();
+
+                    faqItems.forEach(item => {
+                        const question = item.querySelector('.faq-question h3').textContent.toLowerCase();
+                        const answer = item.querySelector('.faq-answer').textContent.toLowerCase();
+
+                        if (question.includes(searchTerm) || answer.includes(searchTerm)) {
+                            item.style.display = 'block';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+
+                    // Reset category buttons when searching
+                    categoryBtns.forEach(b => b.classList.remove('active'));
+                    document.querySelector('[data-category="all"]').classList.add('active');
+                });
+            }
+
+            // FAQ accordion
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question');
+                question.addEventListener('click', () => {
+                    item.classList.toggle('active');
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

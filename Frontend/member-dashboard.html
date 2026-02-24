@@ -1,0 +1,3329 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- Site Identity - Custom Icon -->
+    <link rel="icon" type="image/svg+xml" href="/assets/hand-holding-usd-colored.svg">
+    <link rel="apple-touch-icon" href="/assets/hand-holding-usd-colored.svg">
+    <link rel="manifest" href="/assets/site.webmanifest">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-title" content="Friends in Finance">
+    <meta name="application-name" content="Friends in Finance">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Dashboard - Friends in Finance Group</title>
+
+    <!-- Chart.js for visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Shared notifications -->
+    <script src="js/notifications.js"></script>
+    <!-- html2canvas and jsPDF for exports -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;600&family=Roboto:wght@300;400;500&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary-color: #2C3E50;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --text-color: #1f2937;
+            --light-bg: #f3f4f6;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            line-height: 1.5;
+        }
+
+        /* Loading Screen */
+        .member-loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-size: 18px;
+            color: var(--secondary-color);
+            background: var(--light-bg);
+        }
+
+        .member-loading i {
+            font-size: 24px;
+            margin-bottom: 10px;
+            display: block;
+            text-align: center;
+        }
+
+        .member-loading p {
+            text-align: center;
+        }
+
+        /* Header - Matching admin dashboard */
+        .admin-header {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, #1a2530 100%);
+            color: white;
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-section i {
+            font-size: 24px;
+            color: var(--primary-color);
+        }
+
+        .logo-section h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+            color: white;
+        }
+
+        .logo-section span {
+            color: var(--primary-color);
+        }
+
+        .nav-admin-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 30px;
+        }
+
+        .nav-admin-info i {
+            color: var(--primary-color);
+        }
+
+        .nav-admin-info strong {
+            color: white;
+            margin-left: 4px;
+        }
+
+        .main-nav {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        /* Dashboard Navigation Menu */
+        .dashboard-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 6px;
+            border-radius: 40px;
+            backdrop-filter: blur(4px);
+        }
+
+        .dashboard-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 30px;
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+
+        .dashboard-nav-item i {
+            font-size: 1rem;
+        }
+
+        .dashboard-nav-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .dashboard-nav-item.active {
+            background: #2563eb;
+            color: white;
+            border-color: #3b82f6;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .login-btn-top {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .login-btn-top:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Container */
+        .member-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Member Overview */
+        .member-overview {
+            display: flex;
+            gap: 30px;
+            align-items: stretch;
+            background: linear-gradient(90deg, rgba(48, 63, 159, 0.95), var(--secondary-color));
+            padding: 30px;
+            border-radius: 12px;
+            color: white;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .member-photo-container {
+            position: relative;
+            width: 280px;
+            height: auto;
+            min-height: 280px;
+            flex-shrink: 0;
+            align-self: stretch;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .member-photo {
+            max-width: 100%;
+            max-height: 400px;
+            width: auto;
+            height: auto;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+        }
+
+        .photo-status {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background: rgba(46, 204, 113, 0.9);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .photo-status.visible {
+            display: block;
+        }
+
+        .member-info {
+            flex: 1;
+        }
+
+        .member-info h2 {
+            margin: 0 0 10px 0;
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .member-email {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            margin-bottom: 20px;
+            font-weight: 400;
+        }
+
+        .member-email i {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .member-stats {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .member-stat-item {
+            text-align: center;
+        }
+
+        .member-stat-label {
+            display: block;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .member-stat-value {
+            display: block;
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .member-documents h3 {
+            margin: 0 0 15px 0;
+            font-size: 18px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .document-items {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .document-item {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+            min-width: 200px;
+        }
+
+        .document-item:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .document-item i {
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .document-name {
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .document-status {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .document-status.available {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ECC71;
+        }
+
+        .document-status.pending {
+            background: rgba(241, 196, 15, 0.2);
+            color: #F1C40F;
+        }
+
+        /* Results Container */
+        .results-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .result-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .result-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .result-card h3 {
+            font-size: 16px;
+            color: #6b7280;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .result-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin-bottom: 8px;
+        }
+
+        .result-subtext {
+            font-size: 14px;
+            color: #9ca3af;
+        }
+
+        /* Charts Container */
+        .charts-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 1024px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .chart-card h3 {
+            font-size: 18px;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+
+        /* History Table */
+        .history-table {
+            background: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            margin-bottom: 40px;
+            overflow: hidden;
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, #1a2530 100%);
+            color: white;
+            padding: 20px 25px;
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .member-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .member-table thead {
+            background-color: #f8fafc;
+        }
+
+        .member-table th {
+            padding: 15px 20px;
+            text-align: left;
+            font-weight: 600;
+            color: #4b5563;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .member-table td {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .member-table tbody tr:hover {
+            background-color: #f9fafb;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge.paid {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-badge.pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-badge.partial {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        /* Modal */
+        .member-photo-container {
+            position: relative;
+            width: 280px;
+            height: auto;
+            min-height: 280px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f9fafb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            align-self: stretch;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10001;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow: auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            font-size: 1.5rem;
+            color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+
+        .close-btn:hover {
+            background-color: #f3f4f6;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--secondary-color);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-message {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .form-message.success {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .form-message.error {
+            background-color: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background-color: #f3f4f6;
+            color: var(--secondary-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #e5e7eb;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        /* Footer */
+        .landing-footer {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, #1a2530 100%);
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .footer-logo {
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .copyright {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            margin-top: 20px;
+        }
+
+        /* Download Options & Dropdown */
+        .download-options {
+            position: relative;
+            display: inline-block;
+        }
+
+        .download-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .download-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .download-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 110%;
+            background: white;
+            min-width: 260px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .download-dropdown.show {
+            display: block;
+        }
+
+        .download-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #1e293b;
+            font-weight: 500;
+            text-align: left;
+        }
+
+        .download-option:hover {
+            background: #f1f5f9;
+        }
+
+        .download-option.print i {
+            color: #d24726;
+        }
+
+        /* Download Progress Modal */
+        .download-progress {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+            z-index: 10000;
+            text-align: center;
+            min-width: 320px;
+        }
+
+        .download-progress.active {
+            display: block;
+        }
+
+        .progress-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid #f1f5f9;
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .progress-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+
+        .progress-subtext {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        /* Export Effects */
+        .export-timestamp {
+            display: none;
+            text-align: right;
+            color: #64748b;
+            font-size: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+
+        .member-container.downloading .export-timestamp {
+            display: block;
+        }
+
+        .download-watermark {
+            display: none;
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            color: rgba(102, 126, 234, 0.1);
+            font-size: 60px;
+            font-weight: 800;
+            transform: rotate(-15deg);
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .member-container.downloading .download-watermark {
+            display: block;
+        }
+
+        /* What-If / Achievements Styles */
+        .scenario-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .scenario-card {
+            background: var(--card-bg);
+            padding: 18px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .scenario-title {
+            display: block;
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+
+        .scenario-value {
+            display: block;
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--success-color);
+            margin-bottom: 6px;
+        }
+
+        .scenario-value.negative {
+            color: var(--danger-color);
+        }
+
+        .scenario-payout {
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .badge-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .badge-item {
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px;
+            background: var(--card-bg);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            min-width: 110px;
+        }
+
+        .badge-item.earned {
+            border-color: var(--success-color);
+            background: #f0fdf4;
+        }
+
+        .badge-item.locked {
+            opacity: 0.7;
+            filter: grayscale(1);
+        }
+
+        .badge-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .badge-name {
+            font-weight: 700;
+            color: var(--secondary-color);
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .badge-progress {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .next-goal {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.06), rgba(37, 99, 235, 0.03));
+            padding: 12px;
+            border-radius: 10px;
+        }
+
+        .goal-progress {
+            margin-top: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e6eefc;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), #764ba2);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .member-quote {
+            text-align: center;
+            margin-top: 18px;
+            padding: 16px;
+            background: #f8fafc;
+            border-radius: 12px;
+            color: #475569;
+        }
+
+        /* Risk Exposure styles */
+        .risk-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+
+        .risk-item {
+            background: var(--card-bg);
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .risk-item span {
+            display: block;
+            color: #6b7280;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        .risk-item strong {
+            display: block;
+            font-size: 20px;
+            color: var(--secondary-color);
+            margin-bottom: 6px;
+        }
+
+        .risk-level {
+            display: inline-block !important;
+            padding: 6px 12px;
+            border-radius: 40px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .risk-level.HIGH {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .risk-level.MEDIUM {
+            background: #fef9c3;
+            color: #854d0e;
+        }
+
+        .risk-level.LOW {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        #achievementsSection .member-section,
+        #riskSection .member-section {
+            background: var(--card-bg);
+            padding: 25px 25px 40px 25px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .password-requirements {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 5px;
+            padding-left: 5px;
+        }
+
+        .password-requirements ul {
+            margin: 5px 0 0 20px;
+        }
+
+        .password-requirements li {
+            margin-bottom: 2px;
+        }
+
+        .password-requirements li.valid {
+            color: #10b981;
+        }
+
+        .password-requirements li.invalid {
+            color: #ef4444;
+        }
+
+        /* ===== MOBILE RESPONSIVE STYLES - Matching Admin Dashboard ===== */
+        @media (max-width: 768px) {
+            /* Header - Three row layout matching admin dashboard */
+            .admin-header .header-content {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                padding: 10px 15px;
+            }
+            
+            .admin-header .logo-section {
+                width: 100%;
+                justify-content: center;
+                order: 1;
+            }
+            
+            .admin-header .logo-section i {
+                color: #2563eb;
+                font-size: 24px;
+            }
+            
+            .admin-header .logo-section h1 {
+                color: white;
+                font-size: 1.5rem;
+                font-weight: 700;
+                margin: 0;
+            }
+            
+            .admin-header .logo-section span {
+                color: #2563eb;
+            }
+            
+            /* Member info in second row - matching admin nav-info style */
+            .admin-header .nav-admin-info {
+                width: 100%;
+                justify-content: center;
+                order: 2;
+                margin: 5px 0;
+                padding: 8px 16px;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 30px;
+                font-size: 14px;
+            }
+            
+            .admin-header .nav-admin-info i {
+                color: #2563eb;
+            }
+            
+            .admin-header .nav-admin-info strong {
+                color: white;
+            }
+            
+            /* Dashboard navigation menu - matching chart.html style */
+            .admin-header .dashboard-nav {
+                width: 100%;
+                justify-content: center;
+                order: 2;
+                margin: 5px 0;
+                display: flex;
+                gap: 5px;
+                background: rgba(255, 255, 255, 0.15);
+                padding: 6px;
+                border-radius: 40px;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .admin-header .dashboard-nav-item {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+                white-space: nowrap;
+                display: inline-flex;
+                border-radius: 30px;
+                flex: 0 0 auto;
+            }
+            
+            .admin-header .dashboard-nav-item.active {
+                background: #2563eb;
+            }
+            
+            /* Action buttons in third row - in one row with equal spacing */
+            .admin-header > .header-content > div:last-child {
+                width: 100%;
+                display: flex;
+                flex-direction: row;
+                flex-wrap: nowrap;
+                gap: 5px;
+                order: 3;
+                justify-content: space-between;
+            }
+            
+            .admin-header .download-options {
+                flex: 1;
+                min-width: 0;
+            }
+            
+            .admin-header .download-btn {
+                width: 100%;
+                padding: 8px 5px;
+                font-size: 0.8rem;
+                justify-content: center;
+                white-space: nowrap;
+                background: rgba(255, 255, 255, 0.2);
+                color: white;
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                border-radius: 6px;
+            }
+            
+            .admin-header .login-btn-top {
+                flex: 1;
+                padding: 8px 5px;
+                font-size: 0.8rem;
+                justify-content: center;
+                white-space: nowrap;
+                background: rgba(255, 255, 255, 0.2);
+                color: white;
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                border-radius: 6px;
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                margin: 0;
+            }
+            
+            /* Main container */
+            .member-container {
+                padding: 15px;
+                width: 100%;
+            }
+            
+            /* Member overview - centered with photo at desktop size */
+            .member-overview {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                padding: 20px;
+                width: 100%;
+            }
+            
+            /* Photo container adjusts to photo size in mobile */
+            .member-photo-container {
+                width: 280px;
+                height: auto;
+                min-height: 280px;
+                margin: 0 auto 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .member-photo {
+                max-width: 100%;
+                max-height: 400px;
+                width: auto;
+                height: auto;
+                font-size: 48px;
+                object-fit: contain;
+            }
+            
+            .member-info {
+                width: 100%;
+            }
+            
+            .member-info h2 {
+                font-size: 22px;
+                text-align: center;
+            }
+            
+            .member-email {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            /* Member stats - 2-column grid */
+            .member-stats {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+                width: 100%;
+                margin-bottom: 25px;
+            }
+            
+            .member-stat-item {
+                text-align: center;
+                background: rgba(255, 255, 255, 0.1);
+                padding: 12px 8px;
+                border-radius: 8px;
+                width: 100%;
+            }
+            
+            .member-stat-label {
+                font-size: 11px;
+                margin-bottom: 4px;
+            }
+            
+            .member-stat-value {
+                font-size: 18px;
+            }
+            
+            /* Documents section - buttons full width */
+            .member-documents {
+                width: 100%;
+            }
+            
+            .member-documents h3 {
+                text-align: center;
+                margin-bottom: 15px;
+            }
+            
+            .document-items {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 10px;
+                width: 100%;
+            }
+            
+            .document-item {
+                width: 100%;
+                min-width: auto;
+                padding: 15px 12px;
+                justify-content: space-between;
+                background: rgba(255, 255, 255, 0.15);
+            }
+            
+            .document-item i {
+                font-size: 16px;
+            }
+            
+            .document-name {
+                font-size: 14px;
+                text-align: left;
+            }
+            
+            .document-status {
+                font-size: 11px;
+                padding: 4px 10px;
+                white-space: nowrap;
+            }
+            
+            /* Results container - full width cards */
+            .results-container {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .result-card {
+                padding: 20px;
+                width: 100%;
+            }
+            
+            .result-value {
+                font-size: 24px;
+            }
+            
+            /* Charts */
+            .charts-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .chart-card {
+                padding: 20px;
+                width: 100%;
+            }
+            
+            .chart-container {
+                min-height: 250px;
+                height: auto;
+                width: 100%;
+            }
+            
+            /* History table */
+            .history-table {
+                overflow-x: auto;
+                width: 100%;
+            }
+            
+            .member-table {
+                min-width: 600px;
+                width: 100%;
+            }
+            
+            .member-table th,
+            .member-table td {
+                padding: 10px 8px;
+                font-size: 13px;
+                white-space: nowrap;
+            }
+            
+            .table-header {
+                padding: 15px 20px;
+                font-size: 16px;
+            }
+            
+            /* Achievements section */
+            #achievementsSection .member-section {
+                padding: 20px;
+                width: 100%;
+            }
+            
+            .badge-container {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+                justify-content: center;
+            }
+            
+            .badge-item {
+                min-width: auto;
+                width: 100%;
+                padding: 12px 8px;
+            }
+            
+            .badge-icon {
+                font-size: 22px;
+            }
+            
+            .badge-name {
+                font-size: 11px;
+            }
+            
+            .badge-progress {
+                font-size: 10px;
+            }
+            
+            .next-goal {
+                padding: 12px;
+                width: 100%;
+            }
+            
+            .goal-progress span {
+                font-size: 12px;
+            }
+            
+            /* Risk section */
+            #riskSection .member-section {
+                padding: 20px;
+                width: 100%;
+            }
+            
+            .risk-metrics {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .risk-item {
+                padding: 15px;
+                width: 100%;
+            }
+            
+            .risk-item strong {
+                font-size: 18px;
+            }
+            
+            /* Quote section */
+            #quoteSection .member-quote {
+                padding: 16px;
+                width: 100%;
+                font-size: 14px;
+            }
+            
+            /* Modal */
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+            
+            .modal-header h2 {
+                font-size: 20px;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .btn-group .btn {
+                width: 100%;
+            }
+            
+            /* Download dropdown */
+            .download-dropdown {
+                right: auto;
+                left: 0;
+                width: 280px;
+            }
+            
+            .download-btn {
+                width: 100%;
+                padding: 8px 5px;
+                font-size: 0.8rem;
+                justify-content: center;
+                white-space: nowrap;
+                background: rgba(255, 255, 255, 0.2);
+                color: white;
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                border-radius: 6px;
+            }
+            
+            .login-btn-top {
+                flex: 1;
+                padding: 8px 5px;
+                font-size: 0.8rem;
+                justify-content: center;
+                white-space: nowrap;
+                background: rgba(255, 255, 255, 0.2);
+                color: white;
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                border-radius: 6px;
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+            }
+            
+            /* MOU modal */
+            #mouResourcesList {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+        /* Tablet adjustments (769px - 1024px) */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .admin-header .header-content {
+                flex-wrap: wrap;
+            }
+            
+            .member-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .results-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .risk-metrics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .badge-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .document-items {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Small mobile adjustments (max-width: 480px) */
+        @media (max-width: 480px) {
+            /* Header adjustments */
+            .admin-header .logo-section h1 {
+                font-size: 1.2rem;
+            }
+            
+            .admin-header .download-btn,
+            .admin-header .login-btn-top {
+                padding: 6px 3px;
+                font-size: 0.7rem;
+                gap: 3px;
+            }
+            
+            .admin-header .nav-admin-info {
+                font-size: 13px;
+                padding: 6px 12px;
+            }
+            
+            /* Photo container adjusts to photo size on small screens */
+            .member-photo-container {
+                width: 260px;
+                height: auto;
+                min-height: 260px;
+                margin: 0 auto 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .member-photo {
+                max-width: 100%;
+                max-height: 350px;
+                width: auto;
+                height: auto;
+                font-size: 40px;
+                object-fit: contain;
+            }
+            
+            /* Member stats - stacked on very small screens */
+            .member-stats {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            
+            .member-stat-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 12px;
+            }
+            
+            .member-stat-label {
+                margin-bottom: 0;
+                font-size: 12px;
+            }
+            
+            .member-stat-value {
+                font-size: 16px;
+            }
+            
+            /* Document items */
+            .document-item {
+                padding: 12px 10px;
+            }
+            
+            .document-name {
+                font-size: 13px;
+            }
+            
+            .document-status {
+                font-size: 10px;
+                padding: 3px 8px;
+            }
+            
+            /* Results cards */
+            .result-card {
+                padding: 15px;
+            }
+            
+            .result-value {
+                font-size: 20px;
+            }
+            
+            .result-card h3 {
+                font-size: 14px;
+            }
+            
+            /* Chart cards */
+            .chart-card {
+                padding: 15px;
+            }
+            
+            .chart-card h3 {
+                font-size: 16px;
+            }
+            
+            .chart-container {
+                min-height: 200px;
+            }
+            
+            /* Achievements */
+            .badge-container {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+            
+            .badge-item {
+                padding: 10px 5px;
+            }
+            
+            .badge-icon {
+                font-size: 20px;
+                margin-bottom: 4px;
+            }
+            
+            .badge-name {
+                font-size: 10px;
+            }
+            
+            .badge-progress {
+                font-size: 9px;
+            }
+            
+            /* Table */
+            .member-table th,
+            .member-table td {
+                padding: 8px 6px;
+                font-size: 12px;
+            }
+            
+            .table-header {
+                padding: 12px 15px;
+                font-size: 15px;
+            }
+            
+            /* Risk section */
+            .risk-item {
+                padding: 12px;
+            }
+            
+            .risk-item strong {
+                font-size: 16px;
+            }
+            
+            .risk-item span {
+                font-size: 12px;
+            }
+            
+            /* Quote */
+            .member-quote {
+                padding: 12px;
+                font-size: 13px;
+            }
+        }
+
+        /* Ensure all sections are full width */
+        .member-section,
+        .member-overview,
+        .results-container,
+        .charts-container,
+        .history-table,
+        #achievementsSection,
+        #riskSection,
+        #quoteSection {
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Document items - ensure full width and proper spacing */
+        .document-items {
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .document-item {
+            flex: 1 1 auto;
+            min-width: 200px;
+        }
+
+        /* Stats cards - ensure proper spacing */
+        .member-stats {
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .member-stat-item {
+            flex: 1 1 auto;
+            min-width: 120px;
+        }
+
+        /* Results cards - full width grid */
+        .results-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            width: 100%;
+        }
+
+        .result-card {
+            width: 100%;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="member-loading">
+        <div style="text-align: center;">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Loading your dashboard...</p>
+        </div>
+    </div>
+
+    <!-- MOU Upload / Replace Modal -->
+    <div class="modal" id="mouUploadModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-upload"></i> Replace / Upload Signed MOU</h2>
+                <button class="close-btn" id="closeMouModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="mouUploadForm">
+                    <div class="form-group">
+                        <label for="mouDocumentTitle">Document Title</label>
+                        <input type="text" id="mouDocumentTitle" name="document_title"
+                            placeholder="Signed MOU - Member Agreement" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="mouFile">Select Signed MOU (PDF/DOC/DOCX)</label>
+                        <input type="file" id="mouFile" name="mouFile" accept=".pdf,.doc,.docx" required />
+                    </div>
+                    <div id="mouUploadMessage" class="form-message" style="display:none"></div>
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Upload and
+                            Replace</button>
+                        <button type="button" class="btn btn-secondary" id="cancelMouUpload">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MOU Resources Picker Modal -->
+    <div class="modal" id="mouResourcesModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-folder-open"></i> MOU Resources</h2>
+                <button class="close-btn" id="closeMouResourcesModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="mouResourcesList"
+                    style="display:grid;grid-template-columns:1fr;gap:10px;max-height:50vh;overflow:auto"></div>
+                <div style="margin-top:12px;text-align:right">
+                    <button class="btn btn-secondary" id="closeMouResourcesBtn">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Password Change Modal -->
+    <div class="modal" id="changePasswordModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-key"></i> Change Password</h2>
+                <button class="close-btn" id="closePasswordModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="changePasswordForm">
+                    <div class="form-group">
+                        <label for="currentPassword">
+                            <i class="fas fa-lock"></i> Current Password
+                        </label>
+                        <input type="password" id="currentPassword" name="currentPassword" required
+                            placeholder="Enter your current password">
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword">
+                            <i class="fas fa-key"></i> New Password
+                        </label>
+                        <input type="password" id="newPassword" name="newPassword" required
+                            placeholder="Enter new password (min. 6 characters)">
+                        <div class="password-requirements" id="passwordRequirements">
+                            <ul>
+                                <li id="reqLength" class="invalid">At least 6 characters</li>
+                                <li id="reqMatch" class="invalid">Passwords match</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">
+                            <i class="fas fa-check-circle"></i> Confirm New Password
+                        </label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" required
+                            placeholder="Confirm your new password">
+                    </div>
+                    <div id="passwordMessage" class="form-message" style="display: none;"></div>
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-primary" id="updatePasswordBtn">
+                            <i class="fas fa-check"></i> Update Password
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="cancelPasswordBtn">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="dashboardMain" style="display: none;">
+        <!-- Header - Matching admin dashboard style -->
+        <header class="admin-header" style="margin-bottom: 30px;">
+            <div class="header-content">
+                <div class="logo-section">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    <h1>Friends in Finance <span>Contribution</span> Portal</h1>
+                </div>
+                
+                <span class="nav-admin-info">
+                    <i class="fas fa-user-circle"></i>
+                    Member: <strong id="headerMemberName">Loading...</strong>
+                </span>
+
+
+                <div style="display:flex;gap:8px;align-items:center;">
+                    <div class="download-options" id="downloadOptions">
+                        <button class="download-btn" onclick="toggleDownloadDropdown()">
+                            <i class="fas fa-download"></i> Export Report
+                        </button>
+                        <div class="download-dropdown" id="downloadDropdown">
+                            <div class="download-option pdf" onclick="exportDashboard('pdf')">
+                                <i class="fas fa-file-pdf"></i> Download as PDF
+                                <span style="margin-left: auto; font-size: 12px; color: #64748b;">Report</span>
+                            </div>
+                            <div class="download-option png" onclick="exportDashboard('png')">
+                                <i class="fas fa-file-image"></i> Download as PNG
+                                <span style="margin-left: auto; font-size: 12px; color: #64748b;">Image</span>
+                            </div>
+                            <div class="download-option print" onclick="exportDashboard('print')">
+                                <i class="fas fa-print"></i> Print Dashboard
+                                <span style="margin-left: auto; font-size: 12px; color: #64748b;">Paper</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="login-btn-top" id="changePasswordBtn" title="Change Password">
+                        <i class="fas fa-key"></i> Change Password
+                    </button>
+                    <button class="login-btn-top" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="member-container">
+            <!-- Member Overview -->
+            <section class="member-overview">
+                <!-- Member Photo -->
+                <div class="member-photo-container">
+                    <div class="member-photo" id="memberPhoto">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="photo-status" id="photoStatus">
+                        <i class="fas fa-check-circle"></i> Default Avatar
+                    </div>
+                </div>
+
+                <!-- Member Information -->
+                <div class="member-info">
+                    <h2 id="fullMemberName">Loading...</h2>
+                    <div class="member-email">
+                        <i class="fas fa-envelope"></i>
+                        <span id="memberEmail">Loading...</span>
+                    </div>
+
+                    <!-- Member Stats -->
+                    <div class="member-stats">
+                        <div class="member-stat-item">
+                            <span class="member-stat-label">Total Contribution</span>
+                            <span class="member-stat-value" id="overviewTotalContribution">Kshs. 0</span>
+                        </div>
+                        <div class="member-stat-item">
+                            <span class="member-stat-label">Months Active</span>
+                            <span class="member-stat-value" id="monthsActive">0</span>
+                        </div>
+                        <div class="member-stat-item">
+                            <span class="member-stat-label">Interest Projected</span>
+                            <span class="member-stat-value" id="totalInterestEarned">Kshs. 0</span>
+                        </div>
+                        <div class="member-stat-item">
+                            <span class="member-stat-label">Projected Payout</span>
+                            <span class="member-stat-value" id="projectedPayout">Kshs. 0</span>
+                        </div>
+                    </div>
+
+                    <!-- Documents Section -->
+                    <div class="member-documents">
+                        <h3><i class="fas fa-file-contract"></i> Your Documents</h3>
+                        <div class="document-items">
+                            <a href="#" class="document-item" id="contributionOverviewDoc"
+                                onclick="downloadContributionReport()">
+                                <i class="fas fa-chart-pie"></i>
+                                <span class="document-name">Contribution Report</span>
+                                <span class="document-status available" id="contributionOverviewStatus">Download</span>
+                            </a>
+                            <a href="#" class="document-item" id="mouDocument" onclick="downloadMOU()">
+                                <i class="fas fa-handshake"></i>
+                                <span class="document-name">MOU Document</span>
+                                <span class="document-status" id="mouStatus">Checking...</span>
+                            </a>
+                            <a href="#" class="document-item" id="statementDoc" onclick="downloadStatement()">
+                                <i class="fas fa-file-invoice-dollar"></i>
+                                <span class="document-name">Monthly Statement</span>
+                                <span class="document-status available">Download</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Stats Panel -->
+            <div class="results-container">
+                <div class="result-card">
+                    <h3><i class="fas fa-wallet"></i> Total Contributions</h3>
+                    <div class="result-value" id="myTotalContributions">Kshs. 0</div>
+                    <div class="result-subtext">Sum of all your contributions</div>
+                </div>
+                <div class="result-card">
+                    <h3><i class="fas fa-percentage"></i> Interest Earned</h3>
+                    <div class="result-value" id="myTotalInterest">Kshs. 0</div>
+                    <div class="result-subtext">Total interest (8% annually)</div>
+                </div>
+                <div class="result-card">
+                    <h3><i class="fas fa-calendar-check"></i> Active Months</h3>
+                    <div class="result-value" id="myActiveMonths">0</div>
+                    <div class="result-subtext">Months with contributions</div>
+                </div>
+                <div class="result-card">
+                    <h3><i class="fas fa-money-check-alt"></i> Final Payout</h3>
+                    <div class="result-value" id="myFinalPayout">Kshs. 0</div>
+                    <div class="result-subtext">Contributions + Interest</div>
+                </div>
+            </div>
+
+            <!-- Visualization Charts -->
+            <!-- Achievements placeholder -->
+            <div id="achievementsSection"></div>
+
+            <div class="charts-container">
+                <!-- Bar Chart: Monthly Contributions -->
+                <div class="chart-card">
+                    <h3><i class="fas fa-chart-bar"></i> Your Monthly Contributions</h3>
+                    <div class="chart-container">
+                        <canvas id="memberMonthlyChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Line Chart: Interest Growth -->
+                <div class="chart-card">
+                    <h3><i class="fas fa-chart-line"></i> Interest Growth (8%)</h3>
+                    <div class="chart-container">
+                        <canvas id="memberInterestChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contribution History -->
+            <!-- Risk placeholder -->
+            <div id="riskSection"></div>
+
+            <div class="history-table">
+                <div class="table-header">
+                    <i class="fas fa-history"></i> Your Contribution History
+                </div>
+                <table class="member-table">
+                    <thead>
+                        <tr>
+                            <th>Month</th>
+                            <th>Contribution Amount</th>
+                            <th>Interest (8%)</th>
+                            <th>Cumulative Total</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="contributionHistory">
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 20px; color: #6b7280;">
+                                <i class="fas fa-spinner fa-spin"></i> Loading your contribution history...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Quote placeholder -->
+            <div id="quoteSection"></div>
+
+        </div>
+        <!-- Footer -->
+        <footer class="landing-footer">
+            <div class="footer-content">
+                <div class="logo-section footer-logo">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    <h1>Friends in Finance <span>Contribution</span> Portal</h1>
+                </div>
+                <div class="footer-links">
+                    <a href="about.html"><i class="fas fa-info-circle"></i> About</a>
+                    <a href="faq.html"><i class="fas fa-question-circle"></i> FAQ</a>
+                    <a href="contact.html"><i class="fas fa-envelope"></i> Contact</a>
+                </div>
+                <p class="copyright"> 2026 Friends in Finance Group. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Configuration
+        const API_BASE = 'http://localhost:3000';
+
+        // Store member data
+        let memberData = null;
+        let currentUser = null;
+        let memberCharts = {
+            monthly: null,
+            interest: null
+        };
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('Member dashboard initializing...');
+
+            // Check if this is an admin view with valid token
+            const urlParams = new URLSearchParams(window.location.search);
+            const adminToken = urlParams.get('admin_token');
+            const adminView = urlParams.get('admin_view') === 'true';
+            const requestedEmail = urlParams.get('email');
+
+            // Simple admin token validation (you can make this more secure)
+            function validateAdminToken(token) {
+                if (!token) return false;
+                try {
+                    const decoded = atob(token);
+                    return decoded.startsWith('admin_view_');
+                } catch {
+                    return false;
+                }
+            }
+
+            if (adminView && validateAdminToken(adminToken) && requestedEmail) {
+                // This is an admin viewing a member dashboard
+                // Skip normal authentication and load the requested member's data
+                console.log('Admin viewing member dashboard for:', requestedEmail);
+
+                // Hide loading, show dashboard with the requested member's data
+                document.getElementById('loadingScreen').style.display = 'none';
+                document.getElementById('dashboardMain').style.display = 'block';
+
+                // Load data for the specific member
+                loadMemberData(requestedEmail);
+
+                // Show admin view indicator
+                const headerIndicator = document.createElement('div');
+                headerIndicator.style.cssText = `
+                    background: #2563eb;
+                    color: white;
+                    padding: 8px 16px;
+                    text-align: center;
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    z-index: 1001;
+                    font-size: 14px;
+                `;
+                headerIndicator.innerHTML = `
+                    <i class="fas fa-eye"></i> 
+                    Admin View - Viewing ${requestedEmail}'s Dashboard 
+                    <button onclick="this.parentElement.remove()" style="margin-left: 20px; background: transparent; border: 1px solid white; color: white; padding: 2px 8px; border-radius: 4px; cursor: pointer;">Close</button>
+                `;
+                document.body.prepend(headerIndicator);
+
+                return; // Skip normal authentication
+            }
+
+            // Check authentication first
+            checkAuth();
+
+            // Setup event listeners
+            setupEventListeners();
+
+            // Setup password validation
+            setupPasswordValidation();
+        });
+
+        // Check if user is authenticated
+        async function checkAuth() {
+            try {
+                const response = await fetch(`${API_BASE}/api/auth/status`, {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+
+                if (!data.authenticated) {
+                    console.log('Not authenticated, redirecting to gateway');
+                    window.location.href = 'chart.html';
+                    return;
+                }
+
+                // Store current user
+                currentUser = data.user;
+                console.log('Authenticated as:', currentUser);
+
+                // Load member data using the authenticated user's email
+                loadMemberData(currentUser.email);
+
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                showNotification('Authentication failed. Please login again.', 'error');
+                setTimeout(() => {
+                    window.location.href = 'chart.html';
+                }, 2000);
+            }
+        }
+
+        // Load member data from database
+        async function loadMemberData(email) {
+            try {
+                // Show loading state
+                document.getElementById('loadingScreen').style.display = 'flex';
+                document.getElementById('dashboardMain').style.display = 'none';
+
+                // First, get contributions data
+                const response = await fetch(`${API_BASE}/contributions`);
+                if (!response.ok) {
+                    throw new Error(`Database error: ${response.status}`);
+                }
+
+                const allData = await response.json();
+                // make full members list available for risk calculations
+                window.allMembersData = allData;
+
+                // Find member data by email
+                const member = allData.find(m => (m.member_email && m.member_email.toLowerCase()) === (email && email.toLowerCase()));
+
+                if (!member) {
+                    showError('Member data not found. Please contact administrator.');
+                    return;
+                }
+
+                memberData = member;
+
+                // Hide loading screen, show dashboard
+                document.getElementById('loadingScreen').style.display = 'none';
+                document.getElementById('dashboardMain').style.display = 'block';
+
+                // Try to enrich memberData with user record (to get photo_url)
+                try {
+                    const usersResp = await fetch(`${API_BASE}/users`);
+                    if (usersResp.ok) {
+                        const users = await usersResp.json();
+                        const userRecord = users.find(u =>
+                            (u.member_email && u.member_email.toLowerCase()) === (email && email.toLowerCase()) ||
+                            (u.member_email && u.member_email.toLowerCase()) === (member.member_email && member.member_email.toLowerCase())
+                        );
+                        if (userRecord && userRecord.photo_url) {
+                            memberData.photo_url = userRecord.photo_url;
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Could not fetch user record for photo:', e);
+                }
+
+                // Try to fetch MOU record
+                try {
+                    const mouResp = await fetch(`${API_BASE}/mou`);
+                    if (mouResp.ok) {
+                        const mous = await mouResp.json();
+                        const myMOU = mous.find(m => m.member_email && m.member_email.toLowerCase() === email.toLowerCase());
+                        if (myMOU) {
+                            memberData.mou = myMOU;
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Could not fetch MOU record:', e);
+                }
+
+                // Update UI with member data
+                updateMemberUI();
+
+                // Create charts
+                createMemberCharts();
+
+                // Update contribution history
+                updateContributionHistory();
+
+                // If this page was opened from the admin dashboard (opener), notify it to refresh
+                try {
+                    if (window.opener && !window.opener.closed && typeof window.opener.initializeDashboard === 'function') {
+                        // Give opener a short moment to be ready, then call its refresh
+                        setTimeout(() => {
+                            try { window.opener.initializeDashboard(); } catch (e) { console.warn('Opener refresh failed', e); }
+                        }, 300);
+                    }
+                } catch (e) {
+                    console.warn('Error notifying opener:', e);
+                }
+
+            } catch (error) {
+                console.error('Error loading member data:', error);
+                showError('Failed to load member data: ' + error.message);
+            }
+        }
+
+        // Update UI with member data
+        function updateMemberUI() {
+            if (!memberData) return;
+
+            // Update header
+            const name = memberData.member_name || 'Member';
+            document.getElementById('headerMemberName').textContent = name;
+            document.getElementById('fullMemberName').textContent = name;
+            document.getElementById('memberEmail').textContent = memberData.member_email;
+
+            // Calculate statistics
+            const monthlyColumns = getMonthColumns(memberData);
+            const totalContributions = memberData.total_contributions || 0;
+            const interest = memberData.interest_per_member || (totalContributions * 0.08);
+            const finalPayout = memberData.final_payout || (totalContributions + interest);
+            const activeMonths = countActiveMonths(memberData);
+
+            // Update overview stats
+            document.getElementById('overviewTotalContribution').textContent =
+                'Kshs. ' + formatNumber(totalContributions);
+            document.getElementById('monthsActive').textContent = activeMonths;
+            document.getElementById('totalInterestEarned').textContent =
+                'Kshs. ' + formatNumber(interest);
+            document.getElementById('projectedPayout').textContent =
+                'Kshs. ' + formatNumber(finalPayout);
+
+            // Update quick stats
+            document.getElementById('myTotalContributions').textContent =
+                'Kshs. ' + formatNumber(totalContributions);
+            document.getElementById('myTotalInterest').textContent =
+                'Kshs. ' + formatNumber(interest);
+            document.getElementById('myActiveMonths').textContent = activeMonths;
+            document.getElementById('myFinalPayout').textContent =
+                'Kshs. ' + formatNumber(finalPayout);
+
+            const photoElement = document.getElementById('memberPhoto');
+
+            // If a photo_url exists (from users table), render it; otherwise show initials with gradient
+            if (memberData.photo_url) {
+                // Resolve absolute URL for the photo (prefix API_BASE if path is relative)
+                const photoSrc = (memberData.photo_url && (memberData.photo_url.startsWith('http://') || memberData.photo_url.startsWith('https://')))
+                    ? memberData.photo_url
+                    : (API_BASE + memberData.photo_url);
+                console.log('Member photo URL resolved:', photoSrc);
+
+                // Render image with error fallback
+                photoElement.innerHTML = `<img src="${photoSrc}" alt="${name}" style="width:100%;height:100%;border-radius:8px;object-fit:cover;display:block">`;
+                const img = photoElement.querySelector('img');
+                if (img) img.onerror = function () {
+                    const avatar = document.createElement('div');
+                    avatar.style = `width:100%;height:100%;border-radius:8px;display:flex;align-items:center;justify-content:center;background:${getAvatarColor(name)};color:#fff;font-weight:700;font-size:48px;`;
+                    avatar.textContent = (name || '').charAt(0).toUpperCase();
+                    this.replaceWith(avatar);
+                };
+                // show status
+                const statusEl = document.getElementById('photoStatus');
+                if (statusEl) {
+                    statusEl.classList.add('visible');
+                    statusEl.innerHTML = '<i class="fas fa-check-circle"></i> Uploaded Photo';
+                }
+                photoElement.style.background = 'transparent';
+            } else {
+                // Update member photo with initial
+                const initial = name.charAt(0).toUpperCase();
+                photoElement.innerHTML = `<span style="font-size: 48px; font-weight: bold;">${initial}</span>`;
+
+                // Generate color based on name
+                const colors = [
+                    '#667eea', '#764ba2', '#f093fb', '#f5576c',
+                    '#4facfe', '#00f2fe', '#43e97b', '#38f9d7',
+                    '#fa709a', '#fee140', '#ffecd2', '#fcb69f'
+                ];
+                const colorIndex = name.length % colors.length;
+                photoElement.style.background = `linear-gradient(135deg, ${colors[colorIndex]}, ${colors[(colorIndex + 1) % colors.length]})`;
+
+                const statusEl = document.getElementById('photoStatus');
+                if (statusEl) {
+                    statusEl.classList.remove('visible');
+                    statusEl.innerHTML = '<i class="fas fa-check-circle"></i> Default Avatar';
+                }
+            }
+
+            // Update MOU status
+            checkMOUAvailability();
+
+            // Render additional member sections (What-If, Achievements, Quote)
+            try { renderMemberExtraSections(); } catch (e) { console.warn('Extra sections render failed', e); }
+        }
+
+        // Get month columns from member data
+        function getMonthColumns(data) {
+            const standardColumns = ['id', 'member_name', 'member_email', 'total_contributions',
+                'interest_per_member', 'final_payout', 'synced_at'];
+            return Object.keys(data)
+                .filter(key => !standardColumns.includes(key))
+                .sort((a, b) => {
+                    const monthMap = {
+                        'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6,
+                        'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec': 12
+                    };
+                    const [monthA, yearA] = a.split('-');
+                    const [monthB, yearB] = b.split('-');
+                    const yearDiff = parseInt(yearA) - parseInt(yearB);
+                    if (yearDiff !== 0) return yearDiff;
+                    return (monthMap[monthA] || 0) - (monthMap[monthB] || 0);
+                });
+        }
+
+        // Count active months (months with contributions)
+        function countActiveMonths(data) {
+            const months = getMonthColumns(data);
+            return months.reduce((count, month) => {
+                return count + (parseFloat(data[month]) > 0 ? 1 : 0);
+            }, 0);
+        }
+
+        // Create charts for member data
+        function createMemberCharts() {
+            if (!memberData) return;
+
+            const months = getMonthColumns(memberData);
+            const contributions = months.map(month => parseFloat(memberData[month]) || 0);
+
+            // Create monthly contributions chart
+            createMonthlyChart(months, contributions);
+
+            // Create interest growth chart
+            createInterestChart(months, contributions);
+        }
+
+        // Create monthly contributions bar chart
+        function createMonthlyChart(months, contributions) {
+            const ctx = document.getElementById('memberMonthlyChart').getContext('2d');
+
+            // Destroy existing chart
+            if (memberCharts.monthly) {
+                memberCharts.monthly.destroy();
+            }
+
+            memberCharts.monthly = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Your Contribution (Kshs.)',
+                        data: contributions,
+                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    return 'Kshs. ' + context.parsed.y.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function (value) {
+                                    return 'Kshs. ' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Create interest growth line chart
+        function createInterestChart(months, contributions) {
+            const ctx = document.getElementById('memberInterestChart').getContext('2d');
+
+            // Calculate cumulative interest (8% annually, pro-rated monthly)
+            let cumulativeTotal = 0;
+            const interestData = [];
+            const cumulativeTotalData = [];
+
+            contributions.forEach((contribution, index) => {
+                cumulativeTotal += contribution;
+                const monthlyInterest = cumulativeTotal * 0.08 / 12; // 8% annual, monthly pro-rated
+                interestData.push(monthlyInterest);
+                cumulativeTotalData.push(cumulativeTotal);
+            });
+
+            // Calculate cumulative interest
+            const cumulativeInterest = [];
+            let runningInterest = 0;
+            interestData.forEach(interest => {
+                runningInterest += interest;
+                cumulativeInterest.push(runningInterest);
+            });
+
+            // Destroy existing chart
+            if (memberCharts.interest) {
+                memberCharts.interest.destroy();
+            }
+
+            memberCharts.interest = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: 'Monthly Interest (Kshs.)',
+                            data: interestData,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Cumulative Interest (Kshs.)',
+                            data: cumulativeInterest,
+                            borderColor: 'rgba(153, 102, 255, 1)',
+                            backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                            borderWidth: 2,
+                            fill: false,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    return context.dataset.label + ': Kshs. ' + context.parsed.y.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function (value) {
+                                    return 'Kshs. ' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update contribution history table
+        function updateContributionHistory() {
+            if (!memberData) return;
+
+            const tbody = document.getElementById('contributionHistory');
+            const months = getMonthColumns(memberData);
+
+            tbody.innerHTML = '';
+
+            let cumulativeTotal = 0;
+            let cumulativeInterest = 0;
+
+            months.forEach(month => {
+                const contribution = parseFloat(memberData[month]) || 0;
+                if (contribution === 0) return; // Skip months with no contributions
+
+                cumulativeTotal += contribution;
+                const monthlyInterest = cumulativeTotal * 0.08 / 12;
+                cumulativeInterest += monthlyInterest;
+                const totalWithInterest = cumulativeTotal + cumulativeInterest;
+
+                const row = document.createElement('tr');
+
+                // Determine status - All transactions should be paid
+                let status = 'paid';
+                let statusText = 'Paid';
+                let statusClass = 'paid';
+
+                row.innerHTML = `
+                    <td><strong>${month}</strong></td>
+                    <td>Kshs. ${formatNumber(contribution)}</td>
+                    <td>Kshs. ${formatNumber(monthlyInterest)}</td>
+                    <td>Kshs. ${formatNumber(totalWithInterest)}</td>
+                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                `;
+
+                tbody.appendChild(row);
+            });
+
+            // Add summary row
+            if (tbody.children.length > 0) {
+                const totalContribution = memberData.total_contributions || 0;
+                const totalInterest = memberData.interest_per_member || (totalContribution * 0.08);
+                const finalPayout = memberData.final_payout || (totalContribution + totalInterest);
+
+                const summaryRow = document.createElement('tr');
+                summaryRow.style.backgroundColor = '#f8fafc';
+                summaryRow.style.fontWeight = 'bold';
+                summaryRow.innerHTML = `
+                    <td><strong>TOTAL</strong></td>
+                    <td>Kshs. ${formatNumber(totalContribution)}</td>
+                    <td>Kshs. ${formatNumber(totalInterest)}</td>
+                    <td>Kshs. ${formatNumber(finalPayout)}</td>
+                    <td><span class="status-badge paid">Complete</span></td>
+                `;
+                tbody.appendChild(summaryRow);
+            } else {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 30px; color: #6b7280;">
+                            <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 10px; display: block; opacity: 0.5;"></i>
+                            <p>No contributions recorded yet.</p>
+                            <p style="font-size: 14px; margin-top: 10px;">Start contributing to see your history here.</p>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // Setup password validation
+        function setupPasswordValidation() {
+            const newPassword = document.getElementById('newPassword');
+            const confirmPassword = document.getElementById('confirmPassword');
+
+            function validatePassword() {
+                const lengthReq = document.getElementById('reqLength');
+                const matchReq = document.getElementById('reqMatch');
+
+                // Check length
+                if (newPassword.value.length >= 6) {
+                    lengthReq.className = 'valid';
+                } else {
+                    lengthReq.className = 'invalid';
+                }
+
+                // Check match
+                if (newPassword.value && newPassword.value === confirmPassword.value) {
+                    matchReq.className = 'valid';
+                } else {
+                    matchReq.className = 'invalid';
+                }
+            }
+
+            newPassword.addEventListener('input', validatePassword);
+            confirmPassword.addEventListener('input', validatePassword);
+        }
+
+        // Change password function
+        async function changePassword() {
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const messageElement = document.getElementById('passwordMessage');
+            const submitBtn = document.getElementById('updatePasswordBtn');
+
+            // Reset message
+            messageElement.className = 'form-message';
+            messageElement.style.display = 'none';
+
+            // Validation
+            if (newPassword.length < 6) {
+                showPasswordMessage('New password must be at least 6 characters long.', 'error');
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                showPasswordMessage('New passwords do not match.', 'error');
+                return;
+            }
+
+            // Disable button during request
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+
+            try {
+                const response = await fetch(`${API_BASE}/api/member/change-password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        currentPassword,
+                        newPassword
+                    }),
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showPasswordMessage('✅ Password updated successfully!', 'success');
+
+                    // Clear form and close modal after 2 seconds
+                    setTimeout(() => {
+                        document.getElementById('changePasswordModal').classList.remove('active');
+                        resetPasswordForm();
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-check"></i> Update Password';
+                    }, 2000);
+                } else {
+                    showPasswordMessage('❌ ' + data.message, 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-check"></i> Update Password';
+                }
+            } catch (error) {
+                console.error('Password change error:', error);
+                showPasswordMessage('❌ Network error. Please try again.', 'error');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-check"></i> Update Password';
+            }
+        }
+
+        // Show password message
+        function showPasswordMessage(message, type) {
+            const messageElement = document.getElementById('passwordMessage');
+            messageElement.textContent = message;
+            messageElement.className = `form-message ${type}`;
+            messageElement.style.display = 'block';
+        }
+
+        // Reset password form
+        function resetPasswordForm() {
+            document.getElementById('changePasswordForm').reset();
+            const messageElement = document.getElementById('passwordMessage');
+            messageElement.className = 'form-message';
+            messageElement.style.display = 'none';
+
+            // Reset validation indicators
+            document.getElementById('reqLength').className = 'invalid';
+            document.getElementById('reqMatch').className = 'invalid';
+        }
+
+        // Extra member utilities: Scenarios, Achievements
+        function calculateStreakFromMemberData(data) {
+            if (!data) return 0;
+            // check for the three recent months used in contributions sample
+            const monthsToCheck = ['Nov-2025', 'Dec-2025', 'Jan-2026'];
+            let streak = 0;
+            for (let m of monthsToCheck) {
+                const amt = parseFloat(data[m]) || 0;
+                if (amt >= 25000) streak++; else break;
+            }
+            return streak;
+        }
+
+        function getReliabilityScoreForMember(data) {
+            const contributions = getMonthColumns(data).map(m => parseFloat(data[m]) || 0).filter(v => v > 0);
+            const expectedMonths = 3;
+            const paidMonths = contributions.length;
+            const fullAmountMonths = contributions.filter(a => a >= 25000).length;
+            const totalContributed = data.total_contributions || 0;
+            const expectedTotal = expectedMonths * 25000;
+
+            const timelinessScore = (paidMonths / expectedMonths) * 40;
+            const amountScore = (totalContributed / expectedTotal) * 40;
+            const consistencyScore = (fullAmountMonths / expectedMonths) * 20;
+            const totalScore = timelinessScore + amountScore + consistencyScore;
+
+            let grade = 'F';
+            if (totalScore >= 90) grade = 'A';
+            else if (totalScore >= 80) grade = 'B';
+            else if (totalScore >= 70) grade = 'C';
+            else if (totalScore >= 60) grade = 'D';
+
+            return {
+                score: Math.round(totalScore),
+                grade,
+                perfectStreak: calculateStreakFromMemberData(data),
+                paidMonths,
+                expectedMonths,
+                totalContributed
+            };
+        }
+
+        function getScenariosForMember(data) {
+            const currentTotal = data.total_contributions || 0;
+            const currentPayout = data.final_payout || (currentTotal + (data.interest_per_member || currentTotal * 0.08));
+            const monthsRemaining = 11;
+
+            return {
+                adjustContribution: {
+                    increase_5000: {
+                        monthly: 30000,
+                        total: currentTotal + (5000 * monthsRemaining),
+                        payout: currentPayout + (5000 * monthsRemaining * 1.18),
+                        gain: Math.round(5000 * monthsRemaining * 1.18)
+                    },
+                    decrease_5000: {
+                        monthly: 20000,
+                        total: currentTotal - (5000 * monthsRemaining),
+                        payout: currentPayout - (5000 * monthsRemaining * 1.18),
+                        loss: Math.round(5000 * monthsRemaining * 1.18)
+                    },
+                    stop_contributing: {
+                        monthly: 0,
+                        total: currentTotal,
+                        payout: Math.round(currentTotal * 1.08),
+                        loss: Math.round(currentPayout - (currentTotal * 1.08))
+                    }
+                },
+                missOneMonth: {
+                    cost: Math.round(25000 * 0.18 / 12),
+                    newPayout: Math.round(currentPayout - (25000 * 0.18 / 12))
+                }
+            };
+        }
+
+        function getAchievementsForMember(data) {
+            const total = data.total_contributions || 0;
+            const streak = calculateStreakFromMemberData(data);
+            const monthsActive = countActiveMonths(data);
+            const badges = [];
+
+            if (total >= 25000) badges.push({ name: '25K Club', earned: true, date: 'Nov-2025', icon: '🥉' });
+            if (total >= 50000) badges.push({ name: '50K Club', earned: true, date: 'Dec-2025', icon: '🥈' });
+            if (total >= 75000) badges.push({ name: '75K Club', earned: true, date: 'Jan-2026', icon: '🥇' });
+            if (total < 100000) badges.push({ name: '100K Club', earned: false, needed: 100000 - total, icon: '💎' });
+
+            if (streak >= 3) badges.push({ name: 'Perfect Streak', earned: true, value: `${streak} months`, icon: '🔥' });
+            else badges.push({ name: 'Perfect Streak', earned: false, needed: 3 - streak, icon: '🔥' });
+
+            if (monthsActive >= 3) badges.push({ name: 'Charter Member', earned: true, since: 'Nov 2025', icon: '🗝️' });
+
+            const nextTarget = 100000;
+            return {
+                badges,
+                nextMilestone: {
+                    name: '100K Club',
+                    current: total,
+                    target: nextTarget,
+                    remaining: Math.max(0, nextTarget - total),
+                    projectedDate: projectMilestoneDateForMember(data, nextTarget)
+                },
+                streak,
+                totalBadges: badges.filter(b => b.earned).length
+            };
+        }
+
+        function getConcentrationForMember(data, allMembers) {
+            const totalPool = (allMembers || []).reduce((s, m) => s + (m.total_contributions || 0), 0) || 0;
+            const myTotal = data.total_contributions || 0;
+            const myPercentage = totalPool ? ((myTotal / totalPool) * 100).toFixed(1) : '0.0';
+
+            const topMembers = [...(allMembers || [])].sort((a, b) => (b.total_contributions || 0) - (a.total_contributions || 0)).slice(0, 5);
+            const top5Total = topMembers.reduce((s, m) => s + (m.total_contributions || 0), 0);
+            const top5Percentage = totalPool ? ((top5Total / totalPool) * 100).toFixed(1) : '0.0';
+
+            const top3 = topMembers.slice(0, 3);
+            const top3Total = top3.reduce((s, m) => s + (m.total_contributions || 0), 0);
+            const reducedPool = Math.max(0, totalPool - top3Total);
+            const reducedMyPercentage = reducedPool ? ((myTotal / reducedPool) * 100).toFixed(1) : '0.0';
+            const reducedPayout = Math.round((data.final_payout || (myTotal + (data.interest_per_member || myTotal * 0.08))) * (reducedPool / (totalPool || 1)));
+
+            return {
+                myPercentage,
+                myRank: (allMembers || []).filter(m => (m.total_contributions || 0) > myTotal).length + 1,
+                totalMembers: (allMembers || []).length,
+                top5Percentage,
+                top5Names: topMembers.map(m => (m.member_name || '').split(' ')[0]).join(', '),
+                concentrationLevel: top5Percentage > 60 ? 'HIGH' : top5Percentage > 40 ? 'MEDIUM' : 'LOW',
+                stressTest: {
+                    top3Leaving: top3.map(m => (m.member_name || '').split(' ')[0]).join(', '),
+                    reducedPool,
+                    myNewPercentage: reducedMyPercentage,
+                    myNewPayout: reducedPayout,
+                    impact: totalPool ? (((reducedPayout - (data.final_payout || (myTotal + (data.interest_per_member || myTotal * 0.08)))) / (data.final_payout || 1)) * 100).toFixed(1) : '0.0'
+                }
+            };
+        }
+
+        function projectMilestoneDateForMember(data, target) {
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const avgMonthly = (function () {
+                const cols = getMonthColumns(data);
+                const vals = cols.map(c => parseFloat(data[c]) || 0);
+                const nonZero = vals.filter(v => v > 0);
+                const avg = nonZero.length ? (nonZero.reduce((s, v) => s + v, 0) / nonZero.length) : 25000;
+                return avg;
+            })();
+            const monthsNeeded = Math.ceil((target - (data.total_contributions || 0)) / avgMonthly);
+            const now = new Date();
+            const targetMonthIndex = (now.getMonth() + monthsNeeded) % 12;
+            const targetYear = now.getFullYear() + Math.floor((now.getMonth() + monthsNeeded) / 12);
+            return `${months[targetMonthIndex]} ${targetYear}`;
+        }
+
+        function renderMemberExtraSections() {
+            if (!memberData) return;
+            const reliability = getReliabilityScoreForMember(memberData);
+            const scenarios = getScenariosForMember(memberData);
+            const achievements = getAchievementsForMember(memberData);
+            const concentration = getConcentrationForMember(memberData, window.allMembersData || []);
+
+            // Risk HTML -> rendered above the contribution history table
+            const riskHtml = `
+                <div class="member-section">
+                    <div class="section-header">
+                        <div class="section-icon">⚠️</div>
+                        <h3 class="section-title">Your Risk Exposure</h3>
+                    </div>
+                    <div class="risk-metrics">
+                        <div class="risk-item">
+                            <span>Your share of pool</span>
+                            <strong>${concentration.myPercentage}%</strong>
+                            <span>Rank #${concentration.myRank} of ${concentration.totalMembers}</span>
+                        </div>
+                        <div class="risk-item">
+                            <span>Top 5 concentration</span>
+                            <strong>${concentration.top5Percentage}%</strong>
+                            <span class="risk-level ${concentration.concentrationLevel}">${concentration.concentrationLevel} RISK</span>
+                        </div>
+                        <div class="risk-item">
+                            <span>If top 3 leave</span>
+                            <strong>KES ${Number(concentration.stressTest.myNewPayout).toLocaleString()}</strong>
+                            <span class="negative">${concentration.stressTest.impact}% impact</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Achievements HTML -> rendered above the charts
+            const achievementsHtml = `
+                <div class="member-section">
+                    <div class="section-header">
+                        <div class="section-icon">🏆</div>
+                        <h3 class="section-title">Your Achievements</h3>
+                    </div>
+                    <div class="badge-container">
+                        ${achievements.badges.map(badge => `
+                            <div class="badge-item ${badge.earned ? 'earned' : 'locked'}">
+                                <span class="badge-icon">${badge.icon}</span>
+                                <span class="badge-name">${badge.name}</span>
+                                ${!badge.earned && badge.needed ? `<span class="badge-progress">Need KES ${badge.needed.toLocaleString()}</span>` : ''}
+                                ${badge.earned && badge.date ? `<span class="badge-progress">Earned ${badge.date}</span>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="next-goal">
+                        <strong>🎯 Next Goal:</strong> ${achievements.nextMilestone.name}
+                        <div class="goal-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${(achievements.nextMilestone.current / achievements.nextMilestone.target * 100)}%"></div>
+                            </div>
+                            <span>${(achievements.nextMilestone.current / achievements.nextMilestone.target * 100).toFixed(0)}% complete • Projected: ${achievements.nextMilestone.projectedDate}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Quote HTML -> rendered immediately after the contribution history table
+            const quoteHtml = `
+                <div class="member-quote">
+                    ${reliability.perfectStreak >= 3 ?
+                    '🔥 On fire! Perfect contribution streak!' :
+                    (memberData.total_contributions === 0 ?
+                        '⏳ Ready to start your investment journey?' :
+                        '💪 Keep going! Every contribution builds your future.')}
+                </div>
+            `;
+
+            const riskContainer = document.getElementById('riskSection');
+            if (riskContainer) riskContainer.innerHTML = riskHtml;
+
+            const achContainer = document.getElementById('achievementsSection');
+            if (achContainer) achContainer.innerHTML = achievementsHtml;
+
+            const quoteContainer = document.getElementById('quoteSection');
+            if (quoteContainer) quoteContainer.innerHTML = quoteHtml;
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Logout button
+            document.getElementById('logoutBtn').addEventListener('click', async function () {
+                try {
+                    await fetch(`${API_BASE}/api/logout`, {
+                        method: 'POST',
+                        credentials: 'include'
+                    });
+                } catch (e) {
+                    console.error('Logout error:', e);
+                }
+                window.location.href = 'chart.html';
+            });
+
+            // Change password modal
+            const changePasswordBtn = document.getElementById('changePasswordBtn');
+            const changePasswordModal = document.getElementById('changePasswordModal');
+            const closePasswordModal = document.getElementById('closePasswordModal');
+            const cancelPasswordBtn = document.getElementById('cancelPasswordBtn');
+
+            changePasswordBtn.addEventListener('click', function () {
+                changePasswordModal.classList.add('active');
+                document.getElementById('currentPassword').focus();
+            });
+
+            closePasswordModal.addEventListener('click', function () {
+                changePasswordModal.classList.remove('active');
+                resetPasswordForm();
+            });
+
+            cancelPasswordBtn.addEventListener('click', function () {
+                changePasswordModal.classList.remove('active');
+                resetPasswordForm();
+            });
+
+            // Close modal when clicking outside
+            changePasswordModal.addEventListener('click', function (e) {
+                if (e.target === changePasswordModal) {
+                    changePasswordModal.classList.remove('active');
+                    resetPasswordForm();
+                }
+            });
+
+            // Password form submission
+            document.getElementById('changePasswordForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+                changePassword();
+            });
+        }
+
+        // Helper functions
+        function formatNumber(num) {
+            return Math.round(num).toLocaleString();
+        }
+
+        function getNextMonthName(currentDate) {
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'];
+            const nextMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+            return monthNames[nextMonth.getMonth()] + ' ' + nextMonth.getFullYear();
+        }
+
+        function getAvatarColor(name) {
+            const colors = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe', '#43e97b', '#38f9d7', '#fa709a', '#fee140'];
+            const index = (name || '').length % colors.length;
+            return colors[index];
+        }
+
+        function showError(message) {
+            showNotification(message, 'error');
+        }
+
+        function showNotification(message, type = 'info') {
+            // Simple notification implementation
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 5000);
+        }
+
+        // Download handlers
+        function downloadContributionReport() {
+            if (!memberData) return;
+            const report = generateContributionReport();
+            const blob = new Blob([report], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `contribution-report-${memberData.member_name || 'member'}-${Date.now()}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showNotification('Contribution report downloaded successfully!', 'success');
+        }
+
+        function downloadStatement() {
+            const statement = generateMonthlyStatement();
+            const blob = new Blob([statement], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `monthly-statement-${memberData.member_name || 'member'}-${Date.now()}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showNotification('Monthly statement downloaded successfully!', 'success');
+        }
+
+        // Toggle download dropdown
+        function toggleDownloadDropdown() {
+            const dropdown = document.getElementById('downloadDropdown');
+            dropdown.classList.toggle('show');
+            document.addEventListener('click', function closeDropdown(e) {
+                if (!e.target.closest('.download-options')) {
+                    dropdown.classList.remove('show');
+                    document.removeEventListener('click', closeDropdown);
+                }
+            });
+        }
+
+        // Export dashboard
+        async function exportDashboard(format) {
+            const dd = document.getElementById('downloadDropdown');
+            if (dd) dd.classList.remove('show');
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+            const filename = `Member_Report_${memberData?.member_name || 'Member'}_${timestamp}`;
+
+            switch (format) {
+                case 'pdf': await exportToPDF(filename); break;
+                case 'png': await exportToPNG(filename); break;
+                case 'csv': exportToCSV(filename); break;
+                case 'print': printMemberDashboard(); break;
+                case 'pptx': await exportToPPTX(filename); break;
+            }
+        }
+
+        async function exportToPDF(filename) {
+            try {
+                showNotification('Generating PDF...', 'info');
+                const container = document.querySelector('.member-container');
+                container.classList.add('downloading');
+                const ts = document.createElement('div');
+                ts.className = 'export-timestamp';
+                ts.innerHTML = `Report generated: ${new Date().toLocaleString()} • Member Portal`;
+                container.insertBefore(ts, container.firstChild);
+
+                const canvas = await html2canvas(container, { scale: 2, backgroundColor: '#ffffff', logging: false, useCORS: true });
+                ts.remove();
+                container.classList.remove('downloading');
+
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'pt', 'a4');
+                const imgData = canvas.toDataURL('image/png');
+                const imgWidth = 595.28;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+                window.open(pdf.output('bloburl'), '_blank');
+                hideProgress();
+                showNotification('PDF preview opened in new tab!');
+            } catch (e) {
+                console.error(e);
+                showNotification('Error generating PDF', 'error');
+            }
+        }
+
+        async function exportToPNG(filename) {
+            try {
+                showNotification('Generating PNG...', 'info');
+                const container = document.querySelector('.member-container');
+                container.classList.add('downloading');
+                const canvas = await html2canvas(container, { scale: 2, backgroundColor: '#ffffff' });
+                container.classList.remove('downloading');
+                const imgData = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.download = `${filename}.png`;
+                link.href = imgData;
+                link.click();
+                showNotification('PNG report downloaded successfully!');
+            } catch (e) {
+                console.error(e);
+                showNotification('Error generating PNG', 'error');
+            }
+        }
+
+        function exportToCSV(filename) {
+            if (!memberData) return;
+            const report = generateContributionReport();
+            const blob = new Blob([report], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            window.open(url, '_blank');
+            showNotification('Data opened in new tab!', 'success');
+        }
+
+        async function exportToPPTX(filename) {
+            try {
+                if (!window.PptxGenJS) { showNotification('PPTX library not loaded', 'error'); return; }
+                showNotification('Generating PPTX...', 'info');
+
+                const pptx = new PptxGenJS();
+                pptx.layout = 'LAYOUT_WIDE';
+                const slide = pptx.addSlide();
+                slide.addText(`Contribution Report: ${memberData.member_name}`, { x: 0.5, y: 0.5, w: 9, fontSize: 24, bold: true, color: '2563eb' });
+                slide.addText(`Total Contributions: Kshs. ${memberData.total_contributions.toLocaleString()}`, { x: 0.5, y: 1.5, w: 9, fontSize: 18 });
+                slide.addText(`Generated: ${new Date().toLocaleString()}`, { x: 0.5, y: 6.5, w: 9, fontSize: 10, color: '666666' });
+
+                pptx.writeFile({ fileName: `${filename}.pptx` });
+                showNotification('PPTX generated successfully!');
+            } catch (e) {
+                console.error(e);
+                showNotification('Error generating PPTX', 'error');
+            }
+        }
+
+        function printMemberDashboard() {
+            const dashboard = document.querySelector('.member-container');
+            const ts = document.createElement('div');
+            ts.className = 'export-timestamp';
+            ts.style.display = 'block';
+            ts.textContent = `Report generated: ${new Date().toLocaleString()}`;
+            dashboard.insertBefore(ts, dashboard.firstChild);
+            setTimeout(() => { window.print(); ts.remove(); }, 300);
+        }
+
+        function showProgress(message, submessage) {
+            // Simple progress indicator
+            console.log(message, submessage);
+        }
+
+        function hideProgress() {
+            // Hide progress
+        }
+
+        // Report Generation
+        function generateContributionReport() {
+            const totalContributions = memberData.total_contributions || 0;
+            const interest = memberData.interest_per_member || (totalContributions * 0.08);
+            const finalPayout = memberData.final_payout || (totalContributions + interest);
+            const months = getMonthColumns(memberData);
+
+            let report = `CONTRIBUTION REPORT\n==================\n\n`;
+            report += `Member: ${memberData.member_name}\nEmail: ${memberData.member_email}\nReport Date: ${new Date().toLocaleDateString()}\n\n`;
+            report += `SUMMARY\n-------\n`;
+            report += `Total Contributions: Kshs. ${formatNumber(totalContributions)}\n`;
+            report += `Interest Earned (8%): Kshs. ${formatNumber(interest)}\n`;
+            report += `Projected Final Payout: Kshs. ${formatNumber(finalPayout)}\n`;
+            report += `Active Months: ${countActiveMonths(memberData)}\n\n`;
+            report += `MONTHLY BREAKDOWN\n----------------\n`;
+
+            months.forEach(month => {
+                const amount = parseFloat(memberData[month]) || 0;
+                if (amount > 0) report += `${month}: Kshs. ${formatNumber(amount)}\n`;
+            });
+
+            report += `\nCalculated at 8% annual interest rate, pro-rated monthly.\nReport generated by Friends in Finance Contribution Portal.\n`;
+            return report;
+        }
+
+        function generateMonthlyStatement() {
+            const currentDate = new Date();
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            const currentMonth = monthNames[currentDate.getMonth()];
+            const currentYear = currentDate.getFullYear();
+            const totalContributions = memberData.total_contributions || 0;
+            const interest = memberData.interest_per_member || (totalContributions * 0.08);
+            const finalPayout = memberData.final_payout || (totalContributions + interest);
+
+            let statement = `MONTHLY CONTRIBUTION STATEMENT\n===============================\n\n`;
+            statement += `Statement Period: ${currentMonth} ${currentYear}\nMember: ${memberData.member_name}\nMember ID: ${memberData.member_email}\nStatement Date: ${currentDate.toLocaleDateString()}\n\n`;
+            statement += `ACCOUNT SUMMARY\n---------------\n`;
+            statement += `Opening Balance: Kshs. ${formatNumber(totalContributions - (memberData.total_contributions || 0))}\n`;
+            statement += `Monthly Contributions: Kshs. ${formatNumber(memberData.total_contributions || 0)}\n`;
+            statement += `Interest Earned: Kshs. ${formatNumber(interest)}\n`;
+            statement += `Closing Balance: Kshs. ${formatNumber(finalPayout)}\n\n`;
+            statement += `TRANSACTIONS\n-----------\n`;
+
+            const months = getMonthColumns(memberData);
+            months.forEach(month => {
+                const amount = parseFloat(memberData[month]) || 0;
+                if (amount > 0) statement += `${month}: Kshs. ${formatNumber(amount)}\n`;
+            });
+
+            statement += `\nCalculated at 8% annual interest rate, pro-rated monthly.\nStatement generated by Friends in Finance Contribution Portal.\n`;
+            return statement;
+        }
+
+        async function checkMOUAvailability() {
+            if (!memberData) return;
+            try {
+                const response = await fetch(`${API_BASE}/mou?email=${encodeURIComponent(memberData.member_email)}`);
+                if (!response.ok) throw new Error('Network error');
+                const data = await response.json();
+                const mouDocument = data.find(doc =>
+                    doc.document_type === 'mou' && doc.status === 'active' && doc.member_email === memberData.member_email
+                );
+                const mouStatus = document.getElementById('mouStatus');
+                const mouButton = document.getElementById('mouDocument');
+                if (mouDocument) {
+                    mouStatus.textContent = 'Preview Available';
+                    mouStatus.className = 'document-status available';
+                    mouButton.onclick = downloadMOU;
+                } else {
+                    mouStatus.textContent = 'Not Available';
+                    mouStatus.className = 'document-status pending';
+                    mouButton.onclick = () => showNotification('No MOU document available', 'info');
+                }
+            } catch (error) {
+                console.error('MOU check error:', error);
+                const mouStatus = document.getElementById('mouStatus');
+                mouStatus.textContent = 'Error';
+                mouStatus.className = 'document-status pending';
+            }
+        }
+
+        async function downloadMOU() {
+            if (!memberData) return;
+            try {
+                const response = await fetch(`${API_BASE}/mou?email=${encodeURIComponent(memberData.member_email)}`);
+                if (!response.ok) throw new Error('Failed to fetch MOU');
+                const data = await response.json();
+                const mouDocument = data.find(doc =>
+                    doc.document_type === 'mou' &&
+                    doc.status === 'active' &&
+                    doc.member_email === memberData.member_email
+                );
+                if (!mouDocument) {
+                    showNotification('No MOU document available', 'info');
+                    return;
+                }
+                let fileUrl;
+                if (mouDocument.id === null) {
+                    // Default unsigned MOU
+                    fileUrl = `${API_BASE}/uploads/mou/${mouDocument.file_name}`;
+                } else if (mouDocument.file_path && mouDocument.file_path.includes('Backend\\uploads')) {
+                    // Path contains internal structure, extract public portion
+                    const publicPath = mouDocument.file_path.split('Backend')[1].replace(/\\/g, '/');
+                    fileUrl = `${API_BASE}${publicPath}`;
+                } else {
+                    // Fallback to ID-based download or direct path if properly formatted
+                    fileUrl = mouDocument.id ? `${API_BASE}/mou/${mouDocument.id}/download` : `${API_BASE}/uploads/mou/${mouDocument.file_name}`;
+                }
+
+                window.open(fileUrl, '_blank');
+                showNotification('MOU document opened in new tab!', 'success');
+            } catch (error) {
+                console.error('MOU download error:', error);
+                showNotification('Failed to open MOU document', 'error');
+            }
+        }
+    </script>
+</body>
+
+</html>

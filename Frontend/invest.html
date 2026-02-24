@@ -1,0 +1,3564 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- Site Identity - Custom Icon -->
+    <link rel="icon" type="image/svg+xml" href="/assets/hand-holding-usd-colored.svg">
+    <link rel="apple-touch-icon" href="/assets/hand-holding-usd-colored.svg">
+    <link rel="manifest" href="/assets/site.webmanifest">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-title" content="Friends in Finance">
+    <meta name="application-name" content="Friends in Finance">
+    
+    <!-- Site Identity - Hand Holding USD Icon -->
+    
+    
+    
+    
+    <meta name="apple-mobile-web-app-title" content="Friends in Finance">
+    <meta name="application-name" content="Friends in Finance">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investment Performance Analysis - Mansa-X (18%) vs I&M (8%)</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <!-- Add html2canvas and jsPDF for export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Add PptxGenJS for PowerPoint export -->
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@2.5.0/dist/pptxgen.bundle.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #FFEAD7;
+            color: #1f2937;
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 35px;
+            margin-bottom: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            font-size: 36px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #0f172a, #334155);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #475569;
+            font-size: 16px;
+            margin-bottom: 25px;
+        }
+
+        /* Dashboard-style header (matches member/admin dashboards) */
+        .admin-header {
+            background: linear-gradient(135deg, #2C3E50 0%, #1a2530 100%);
+            color: white;
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        /* Logo Section - EXACT match to chart.html */
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-section i {
+            font-size: 24px;
+            color: #2563eb;
+        }
+
+        .logo-section h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+            color: white;
+        }
+
+        .logo-section span {
+            color: #2563eb;
+        }
+
+        /* Dashboard Navigation Menu */
+        .dashboard-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 6px;
+            border-radius: 40px;
+            backdrop-filter: blur(4px);
+        }
+
+        .dashboard-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 30px;
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+
+        .dashboard-nav-item i {
+            font-size: 1rem;
+        }
+
+        .dashboard-nav-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .dashboard-nav-item.active {
+            background: #2563eb;
+            color: white;
+            border-color: #3b82f6;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .main-nav {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .main-nav a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        .main-nav a:hover {
+            color: white;
+        }
+
+        .login-btn-top {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .login-btn-top:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .download-options {
+            position: relative;
+            display: inline-block;
+        }
+
+        .download-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .download-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .download-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 110%;
+            background: white;
+            min-width: 260px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .download-dropdown.show {
+            display: block;
+        }
+
+        .download-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #1e293b;
+            font-weight: 500;
+        }
+
+        .download-option:hover {
+            background: #f1f5f9;
+        }
+
+        .download-option.pdf i {
+            color: #dc2626;
+        }
+
+        .download-option.png i {
+            color: #2563eb;
+        }
+
+        .download-option.print i {
+            color: #7c3aed;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 30px 20px;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Footer Styles */
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 5px;
+            color: white;
+            font-weight: 500;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+        }
+
+        .notification.success {
+            background: #10b981;
+        }
+
+        .notification.error {
+            background: #ef4444;
+        }
+
+        .notification.warning {
+            background: #f59e0b;
+            color: #1f2937;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        .landing-footer {
+            background: linear-gradient(135deg, #2C3E50 0%, #1a2530 100%);
+            color: white;
+            padding: 40px 0 20px;
+            margin-top: 40px;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            text-align: center;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .footer-logo i {
+            font-size: 24px;
+            color: #2563eb;
+        }
+
+        .footer-logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .footer-logo span {
+            color: #2563eb;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .copyright {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            margin-top: 20px;
+        }
+
+        .header-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 35px;
+            margin-bottom: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            font-size: 36px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #0f172a, #334155);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #475569;
+            font-size: 16px;
+            margin-bottom: 25px;
+        }
+
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-section i {
+            font-size: 24px;
+            color: #2563eb;
+        }
+
+        .logo-section h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+            color: white;
+        }
+
+        .logo-section h1 span {
+            color: #2563eb;
+        }
+
+        /* Download Button with Dropdown - Same style as member dashboard */
+        .download-options {
+            position: relative;
+            display: inline-block;
+        }
+
+        .download-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .download-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .download-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 110%;
+            background: white;
+            min-width: 260px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .download-dropdown.show {
+            display: block;
+        }
+
+        .download-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #1e293b;
+            font-weight: 500;
+        }
+
+        .download-option:hover {
+            background: #f1f5f9;
+        }
+
+        .download-option i {
+            font-size: 20px;
+        }
+
+        /* Download Progress Modal */
+        .download-progress {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+            z-index: 10000;
+            text-align: center;
+            min-width: 320px;
+        }
+
+        .download-progress.active {
+            display: block;
+        }
+
+        .progress-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid #f1f5f9;
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .progress-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+
+        .progress-subtext {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        /* Export timestamp */
+        .export-timestamp {
+            display: none;
+            text-align: right;
+            color: #64748b;
+            font-size: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+
+        .dashboard-container.downloading .export-timestamp {
+            display: block;
+        }
+
+        /* Watermark */
+        .download-watermark {
+            display: none;
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            color: rgba(102, 126, 234, 0.1);
+            font-size: 60px;
+            font-weight: 800;
+            transform: rotate(-15deg);
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .dashboard-container.downloading .download-watermark {
+            display: block;
+        }
+
+        .rate-badges {
+            display: flex;
+            gap: 20px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+
+        .rate-badge {
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 18px;
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.2);
+        }
+
+        .mansa-rate {
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: white;
+            border: 2px solid #34d399;
+        }
+
+        .iandm-rate {
+            background: linear-gradient(135deg, #d97706, #f59e0b);
+            color: white;
+            border: 2px solid #fbbf24;
+        }
+
+        .current-allocation {
+            background: #f1f5f9;
+            padding: 20px;
+            border-radius: 20px;
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            align-items: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        .allocation-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .allocation-bar {
+            width: 200px;
+            height: 12px;
+            background: #e2e8f0;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .allocation-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #34d399);
+            border-radius: 20px;
+        }
+
+        .allocation-fill.iandm {
+            background: linear-gradient(90deg, #f59e0b, #fbbf24);
+        }
+
+        .insight-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .insight-card {
+            background: white;
+            padding: 25px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            border: 1px solid #f1f5f9;
+            transition: all 0.3s;
+        }
+
+        .insight-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(16, 185, 129, 0.15);
+            border-color: #10b981;
+        }
+
+        .insight-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .insight-value {
+            font-size: 36px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 10px;
+        }
+
+        .insight-desc {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .highlight {
+            background: #fef9c3;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+            color: #854d0e;
+            display: inline-block;
+            margin-top: 8px;
+        }
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin-bottom: 30px;
+            align-items: stretch;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 25px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            border: 1px solid #f1f5f9;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .chart-question {
+            font-size: 12px;
+            color: #64748b;
+            background: #f1f5f9;
+            padding: 6px 12px;
+            border-radius: 20px;
+        }
+
+        .chart-container {
+            height: 100%;
+            min-height: 300px;
+            position: relative;
+            flex: 1;
+        }
+
+        .analysis-section {
+            background: white;
+            border-radius: 24px;
+            padding: 35px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .qa-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .qa-item {
+            background: #f8fafc;
+            padding: 25px;
+            border-radius: 20px;
+            border-left: 6px solid;
+        }
+
+        .qa-item.mansa {
+            border-left-color: #10b981;
+        }
+
+        .qa-item.iandm {
+            border-left-color: #f59e0b;
+        }
+
+        .qa-item.mixed {
+            border-left-color: #667eea;
+        }
+
+        .qa-question {
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .qa-answer {
+            color: #334155;
+            line-height: 1.7;
+            font-size: 15px;
+        }
+
+        .qa-answer strong {
+            color: #059669;
+        }
+
+        .metric-highlight {
+            background: linear-gradient(135deg, #667eea10, #764ba210);
+            padding: 15px;
+            border-radius: 16px;
+            margin: 15px 0;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .comparison-table th {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: white;
+            padding: 18px 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .comparison-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+            background: white;
+        }
+
+        .comparison-table tr:hover td {
+            background: #f8fafc;
+        }
+
+        .return-positive {
+            color: #059669;
+            font-weight: 700;
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+            border-bottom: 1px dashed #94a3b8;
+        }
+
+        .recommendation-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+        }
+
+        .recommendation-card {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s;
+        }
+
+        .recommendation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(16, 185, 129, 0.1);
+            border-color: #10b981;
+        }
+
+        .recommendation-icon {
+            font-size: 36px;
+            margin-bottom: 15px;
+        }
+
+        .recommendation-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+
+        .recommendation-desc {
+            color: #475569;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .data-table th {
+            background: #f1f5f9;
+            padding: 15px;
+            text-align: left;
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 14px;
+        }
+
+        .data-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .mansa-bg {
+            background: #f0fdf4;
+        }
+
+        .iandm-bg {
+            background: #fef9c3;
+        }
+
+        .login-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .login-modal.active {
+            display: flex;
+        }
+
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #64748b;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h3 {
+            color: #1e293b;
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #475569;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        .password-input-container {
+            position: relative;
+        }
+
+        .password-toggle-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            font-size: 16px;
+        }
+
+        .password-toggle-btn:hover {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .password-toggle-btn:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .landing-footer {
+            background: linear-gradient(135deg, #2C3E50 0%, #1a2530 100%);
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .copyright {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            margin-top: 20px;
+        }
+
+        /* Custom Legend Styles */
+        .custom-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            justify-content: center;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            background: white;
+            border-radius: 40px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 8px;
+        }
+
+        .legend-label {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .legend-value {
+            color: #64748b;
+            font-size: 13px;
+            margin-left: 8px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 16px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .stat-number {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .stat-trend {
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .positive {
+            color: #10b981;
+        }
+
+        .negative {
+            color: #ef4444;
+        }
+
+        /* Print Styles */
+        @media print {
+
+            .admin-header,
+            .download-options,
+            .download-progress,
+            .landing-footer,
+            .login-btn-top {
+                display: none !important;
+            }
+
+            .dashboard-container {
+                padding: 0;
+            }
+
+            body {
+                background: white;
+            }
+        }
+    /* Responsive Design */
+        @media (max-width: 768px) {
+            .invest-container {
+                padding: 20px;
+            }
+
+            .invest-header {
+                padding: 2rem 5%;
+            }
+
+            .invest-header h1 {
+                font-size: 2rem;
+            }
+
+            .invest-header p {
+                font-size: 1rem;
+            }
+
+            .invest-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .invest-card {
+                padding: 1.5rem;
+            }
+
+            .invest-icon {
+                font-size: 2rem;
+            }
+
+            .invest-card h3 {
+                font-size: 1.1rem;
+            }
+
+            .invest-card p {
+                font-size: 0.9rem;
+            }
+
+            .btn {
+                padding: 0.8rem 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .logo-section h1 {
+                font-size: 1.3rem;
+            }
+
+            .main-nav {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .invest-container {
+                padding: 15px;
+            }
+
+            .invest-header {
+                padding: 1.5rem 3%;
+            }
+
+            .invest-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .invest-header p {
+                font-size: 0.9rem;
+            }
+
+            .invest-card {
+                padding: 1rem;
+            }
+
+            .invest-icon {
+                font-size: 1.5rem;
+            }
+
+            .invest-card h3 {
+                font-size: 1rem;
+            }
+
+            .btn {
+                padding: 0.7rem 1.2rem;
+                font-size: 0.85rem;
+            }
+        }
+    /* invest.html - Mobile & Tablet Responsive Fixes - UPDATED */
+@media (max-width: 768px) {
+    /* Header - Three row layout */
+    .admin-header .header-content {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 10px 15px;
+    }
+    
+    /* Logo section - EXACT match to chart.html */
+    .admin-header .logo-section {
+        width: 100%;
+        justify-content: center;
+        order: 1;
+    }
+    
+    .admin-header .logo-section i {
+        color: #2563eb;
+        font-size: 24px;
+    }
+    
+    .admin-header .logo-section h1 {
+        color: white;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0;
+    }
+    
+    .admin-header .logo-section span {
+        color: #2563eb;
+    }
+    
+    /* Preserve menu style for General, Monthly, Investment */
+    .admin-header .dashboard-nav {
+        width: 100%;
+        justify-content: center;
+        order: 2;
+        margin: 0;
+        display: flex;
+        gap: 5px;
+        background: rgba(255, 255, 255, 0.15);
+        padding: 6px;
+        border-radius: 40px;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .admin-header .dashboard-nav-item {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+        white-space: nowrap;
+        display: inline-flex;
+        border-radius: 30px;
+        flex: 0 0 auto;
+    }
+    
+    .admin-header .dashboard-nav-item.active {
+        background: #2563eb;
+    }
+    
+    /* Keep Export Report, Member Login, Exit in ONE ROW */
+    .admin-header .main-nav {
+        width: 100%;
+        justify-content: space-between;
+        order: 3;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        gap: 5px;
+        padding: 5px 0;
+    }
+    
+    .admin-header .download-options {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .admin-header .download-btn {
+        width: 100%;
+        padding: 8px 5px;
+        font-size: 0.8rem;
+        justify-content: center;
+        white-space: nowrap;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 6px;
+    }
+    
+    .admin-header .login-btn-top {
+        flex: 1;
+        padding: 8px 5px;
+        font-size: 0.8rem;
+        justify-content: center;
+        white-space: nowrap;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    /* Download dropdown mobile positioning */
+    .admin-header .download-dropdown {
+        right: auto;
+        left: 0;
+        width: 280px;
+        max-width: calc(100vw - 20px);
+        position: absolute;
+        z-index: 1000;
+    }
+    
+    /* Main container - full width */
+    .main-content {
+        padding: 15px;
+    }
+    
+    .dashboard-container {
+        padding: 0;
+        width: 100%;
+    }
+    
+    /* Header card adjustments */
+    .header-card {
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .header-card h1 {
+        font-size: 24px;
+        line-height: 1.3;
+        text-align: center;
+    }
+    
+    .subtitle {
+        font-size: 14px;
+        text-align: center;
+    }
+    
+    .rate-badges {
+        flex-direction: column;
+        gap: 10px;
+        margin: 15px 0;
+    }
+    
+    .rate-badge {
+        width: 100%;
+        text-align: center;
+        font-size: 16px;
+        padding: 12px;
+    }
+    
+    .current-allocation {
+        flex-direction: column;
+        gap: 15px;
+        padding: 15px;
+        width: 100%;
+    }
+    
+    .allocation-item {
+        width: 100%;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .allocation-bar {
+        width: 150px;
+    }
+    
+    /* Tables - boxed with no overflow */
+    .data-table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 12px;
+        font-size: 14px;
+    }
+    
+    .data-table table {
+        min-width: 600px;
+    }
+    
+    .data-table th, 
+    .data-table td {
+        padding: 10px 8px;
+        white-space: nowrap;
+    }
+    
+    /* Insight cards - stacked with stretched content */
+    .insight-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .insight-card {
+        padding: 20px;
+        width: 100%;
+    }
+    
+    .insight-value {
+        font-size: 28px;
+        text-align: center;
+    }
+    
+    /* Charts - each in its own row */
+    .chart-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .chart-card {
+        width: 100%;
+        margin-bottom: 0;
+        padding: 20px;
+    }
+    
+    .chart-container {
+        min-height: 250px;
+        height: auto;
+        width: 100%;
+    }
+    
+    .chart-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .chart-question {
+        margin-top: 5px;
+    }
+    
+    /* Analysis sections */
+    .analysis-section {
+        padding: 20px;
+        width: 100%;
+    }
+    
+    .section-title {
+        font-size: 20px;
+    }
+    
+    .qa-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .qa-item {
+        padding: 18px;
+        width: 100%;
+    }
+    
+    /* Comparison table */
+    .comparison-table {
+        display: block;
+        overflow-x: auto;
+        font-size: 13px;
+    }
+    
+    .comparison-table th,
+    .comparison-table td {
+        padding: 10px 8px;
+        white-space: nowrap;
+    }
+    
+    /* Recommendation grid */
+    .recommendation-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .recommendation-card {
+        padding: 20px;
+        width: 100%;
+    }
+    
+    /* 5-year projection */
+    #fiveYearProjection {
+        grid-template-columns: 1fr !important;
+        gap: 15px;
+    }
+    
+    #fiveYearProjection > div {
+        padding: 20px !important;
+        width: 100% !important;
+    }
+    
+    /* Investment table buttons */
+    .btn-view-receipt {
+        padding: 4px 8px !important;
+        font-size: 11px !important;
+    }
+    
+    /* Legend adjustments */
+    .custom-legend {
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 10px;
+        width: 100%;
+    }
+    
+    .legend-item {
+        flex: 1 1 auto;
+        min-width: 120px;
+        justify-content: center;
+    }
+    
+    /* Stats grid */
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .stat-item {
+        width: 100%;
+    }
+}
+
+/* Tablet specific adjustments (768px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .admin-header .header-content {
+        flex-wrap: wrap;
+    }
+    
+    .insight-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .chart-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .qa-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .recommendation-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    #fiveYearProjection {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+/* Small mobile adjustments */
+@media (max-width: 480px) {
+    .admin-header .dashboard-nav-item {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+    }
+    
+    .admin-header .main-nav {
+        gap: 3px;
+    }
+    
+    .admin-header .download-btn,
+    .admin-header .login-btn-top {
+        padding: 6px 3px;
+        font-size: 0.7rem;
+    }
+    
+    .header-card h1 {
+        font-size: 20px;
+    }
+    
+    .subtitle {
+        font-size: 12px;
+    }
+    
+    .rate-badge {
+        font-size: 14px;
+        padding: 10px;
+    }
+    
+    .insight-value {
+        font-size: 24px;
+    }
+    
+    .insight-title {
+        font-size: 14px;
+    }
+    
+    .chart-container {
+        min-height: 200px;
+    }
+    
+    .section-title {
+        font-size: 18px;
+    }
+    
+    .qa-question {
+        font-size: 14px;
+    }
+    
+    .qa-answer {
+        font-size: 12px;
+    }
+    
+    .allocation-item {
+        font-size: 13px;
+    }
+    
+    .allocation-bar {
+        width: 100px;
+    }
+}
+</style>
+</head>
+
+<body>
+    <!-- HEADER with Dashboard Menu -->
+    <header class="admin-header">
+        <div class="header-content">
+            <a href="chart.html" class="logo-section">
+                <i class="fas fa-hand-holding-usd"></i>
+                <h1>Friends in Finance <span>Analytics</span></h1>
+            </a>
+
+            <!-- Dashboard Navigation Menu (replaces dropdown) -->
+            <nav class="dashboard-nav">
+                <a href="chart.html" class="dashboard-nav-item" data-dashboard="chart">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>General</span>
+                </a>
+                <a href="month.html" class="dashboard-nav-item" data-dashboard="month">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Monthly</span>
+                </a>
+                <a href="invest.html" class="dashboard-nav-item active" data-dashboard="invest">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Investment</span>
+                </a>
+            </nav>
+
+            <nav class="main-nav">
+                <div class="download-options" id="downloadOptions">
+                    <button class="download-btn" onclick="toggleDownloadDropdown()">
+                        <i class="fas fa-download"></i> Export Report
+                    </button>
+                    <div class="download-dropdown" id="downloadDropdown">
+                        <div class="download-option pdf" onclick="exportDashboard('pdf')">
+                            <i class="fas fa-file-pdf"></i> Download as PDF
+                            <span style="margin-left: auto; font-size: 12px; color: #64748b;">Report</span>
+                        </div>
+                        <div class="download-option png" onclick="exportDashboard('png')">
+                            <i class="fas fa-file-image"></i> Download as PNG
+                            <span style="margin-left: auto; font-size: 12px; color: #64748b;">Image</span>
+                        </div>
+                        <div class="download-option print" onclick="exportDashboard('print')">
+                            <i class="fas fa-print"></i> Print Dashboard
+                            <span style="margin-left: auto; font-size: 12px; color: #64748b;">Paper</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="login-btn-top" id="openLoginModal">
+                    <i class="fas fa-sign-in-alt"></i> Member Login
+                </button>
+                <button class="login-btn-top" id="logoutBtn" onclick="logout()" style="display:inline-flex;">
+                    <i class="fas fa-sign-out-alt"></i> Exit
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-content">
+
+        <!-- Download Progress Modal -->
+        <div class="download-progress" id="downloadProgress">
+            <div class="progress-spinner"></div>
+            <div class="progress-text" id="progressText">Preparing your report...</div>
+            <div class="progress-subtext" id="progressSubtext">This will take just a moment</div>
+        </div>
+
+        <div class="dashboard-container">
+            <!-- Header with Investment Data -->
+            <div class="header-card">
+                <h1>📈 Mansa-X (18%) vs I&M (8%) - Investment Performance Analysis</h1>
+                <p class="subtitle">Real-time analysis based on actual investment data from Nov 2025 - Jan 2026</p>
+
+                <div class="rate-badges">
+                    <div id="mansaBadge" class="rate-badge mansa-rate">
+                        🚀 Mansa-X: 18% per annum
+                    </div>
+                    <div id="iandmBadge" class="rate-badge iandm-rate">
+                        🏦 I&M: 8% per annum
+                    </div>
+                </div>
+
+                <div class="current-allocation" id="currentAllocation">
+                    <!-- Dynamically populated -->
+                </div>
+            </div>
+
+            <!-- Investment Data Table -->
+            <div class="analysis-section">
+                <div class="section-title">
+                    <span>📊</span> Investment Tracking Data (Source)
+                </div>
+
+                <table class="data-table" id="investmentDataTable">
+                    <thead>
+                        <tr>
+                            <th>Month</th>
+                            <th>Total Contributions</th>
+                            <th>Mansa-X Investment</th>
+                            <th>Cumulative Mansa-X</th>
+                            <th>I&M Balance</th>
+                            <th>Total Invested</th>
+                            <th>Receipt</th> <!-- Changed from "Cash Reserve" -->
+                        </tr>
+                    </thead>
+                    <tbody id="investmentTableBody">
+                        <!-- Dynamically populated -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Key Insight Cards -->
+            <div class="insight-grid" id="insightCards">
+                <!-- Dynamically populated -->
+            </div>
+
+            <!-- Charts Grid -->
+            <div class="chart-grid">
+                <!-- Chart 1: Investment Balance Over Time - Mansa-X vs I&M (REPLACED) -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <span class="chart-title">💰 Investment Balance Over Time</span>
+                        <span class="chart-question">❓ Mansa-X vs I&M Balance Trends</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="investmentBalanceChart"></canvas>
+                    </div>
+                    <div class="custom-legend" id="investmentLegend"></div>
+                </div>
+
+                <!-- Chart 2: Monthly Return Breakdown -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <span class="chart-title">📊 Monthly Return Breakdown</span>
+                        <span class="chart-question">❓ How much do we earn each month?</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="monthlyReturnChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart 3: Allocation vs Return Contribution -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <span class="chart-title">🔄 Capital vs Return Contribution</span>
+                        <span class="chart-question">❓ Which drives more returns?</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="allocationVsReturnChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart 4: ROI Timeline -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <span class="chart-title">📅 Time to Double Investment</span>
+                        <span class="chart-question">❓ How long to double our money?</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="roiTimelineChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comprehensive Q&A Analysis -->
+            <div class="analysis-section">
+                <div class="section-title">
+                    <span>🔍</span> Critical Investment Questions Answered
+                </div>
+
+                <div class="qa-grid" id="qaAnalysis">
+                    <!-- Dynamically populated -->
+                </div>
+            </div>
+
+            <!-- Investment Comparison Table -->
+            <div class="analysis-section">
+                <div class="section-title">
+                    <span>📊</span> Investment Vehicle Comparison
+                </div>
+
+                <table class="comparison-table" id="comparisonTable">
+                    <!-- Dynamically populated -->
+                </table>
+            </div>
+
+            <!-- Strategic Recommendations -->
+            <div class="analysis-section">
+                <div class="section-title">
+                    <span>🎯</span> Strategic Recommendations
+                </div>
+
+                <div class="recommendation-grid" id="recommendations">
+                    <!-- Dynamically populated -->
+                </div>
+            </div>
+
+            <!-- 5-Year Projection -->
+            <div class="analysis-section">
+                <div class="section-title">
+                    <span>🔮</span> 5-Year Wealth Projection
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;" id="fiveYearProjection">
+                    <!-- Dynamically populated -->
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="login-modal" id="loginModal">
+            <div class="login-box">
+                <button class="close-modal" id="closeLoginModal">&times;</button>
+                <div class="login-header">
+                    <h3>Member Login</h3>
+                    <p>Access your contribution dashboard</p>
+                </div>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="username">Email</label>
+                        <input type="email" id="username" class="form-control" placeholder="you@domain.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="password-input-container">
+                            <input type="password" id="password" class="form-control" placeholder="Enter your password"
+                                required>
+                            <button type="button" class="password-toggle-btn" onclick="togglePassword('password')" title="Toggle password visibility">
+                                <i class="far fa-eye" id="password-toggle-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn">Login to Dashboard</button>
+                </form>
+            </div>
+        </div>
+
+        <script>
+            // API base
+            const API_BASE = 'http://localhost:3000';
+
+            // ============================================
+            // INVESTMENT DATA (fetched from `investment_tracking` table via backend)
+            // ============================================
+            let investmentData = {
+                months: [],
+                totalContributions: [],
+                mansaXInvestments: [],
+                cumulativeMansaX: [],
+                iandmBalance: [],
+                totalInvested: [],
+                cashReserve: [],
+                runningTotalContributions: []
+            };
+
+            // Current totals populated from summary endpoint
+            let currentTotals = {
+                mansaX: 0,
+                iandm: 0,
+                total: 0,
+                mansaXPercentage: 0,
+                iandmPercentage: 0
+            };
+
+            // Store chart instances globally
+            let investmentBalanceChart, monthlyReturnChart, allocationChart, roiChart;
+            let charts = {};
+
+            // Show error message
+            function showError(message) {
+                const container = document.createElement('div');
+                container.className = 'error';
+                container.textContent = message;
+                container.style.cssText = `
+                background-color: #fee2e2;
+                color: #ef4444;
+                padding: 12px 20px;
+                border-radius: 6px;
+                margin-bottom: 20px;
+                border-left: 4px solid #ef4444;
+            `;
+                document.querySelector('.dashboard-container').prepend(container);
+                setTimeout(() => container.remove(), 5000);
+            }
+
+            // Show info message
+            function showInfo(message) {
+                const container = document.createElement('div');
+                container.className = 'info';
+                container.textContent = message;
+                container.style.cssText = `
+                background-color: #dbeafe;
+                color: #2563eb;
+                padding: 12px 20px;
+                border-radius: 6px;
+                margin-bottom: 20px;
+                border-left: 4px solid #2563eb;
+            `;
+                document.querySelector('.dashboard-container').prepend(container);
+                setTimeout(() => container.remove(), 3000);
+            }
+
+            // Show notification
+            function showNotification(message) {
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #10b981;
+                color: white;
+                padding: 16px 24px;
+                border-radius: 12px;
+                font-weight: 600;
+                box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+                z-index: 10001;
+                animation: slideIn 0.3s ease;
+            `;
+                notification.innerHTML = `✅ ${message}`;
+
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+
+            async function fetchInvestmentRecords() {
+                try {
+                    const res = await fetch(`${API_BASE}/investments`);
+                    if (!res.ok) throw new Error('Failed to fetch investments');
+                    const rows = await res.json();
+                    return rows;
+                } catch (err) {
+                    console.error('fetchInvestmentRecords error', err);
+                    return [];
+                }
+            }
+
+            async function fetchInvestmentSummary() {
+                try {
+                    const res = await fetch(`${API_BASE}/investments/summary`);
+                    if (!res.ok) throw new Error('Failed to fetch investment summary');
+                    return await res.json();
+                } catch (err) {
+                    console.error('fetchInvestmentSummary error', err);
+                    return null;
+                }
+            }
+
+            /**
+             * Parse month label to Date for sorting
+             */
+            function parseMonthLabelToDate(monthLabel) {
+                if (!monthLabel) return null;
+                const monthMap = {
+                    'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
+                    'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
+                };
+                const parts = monthLabel.trim().split(/\s+/);
+                if (parts.length >= 2) {
+                    const monthName = parts[0];
+                    const year = parseInt(parts[1]);
+                    if (monthMap[monthName] !== undefined && !isNaN(year)) {
+                        return new Date(year, monthMap[monthName], 1);
+                    }
+                }
+                return null;
+            }
+
+            function loadInvestmentDataFromRows(rows) {
+                // Sort rows chronologically by month
+                rows.sort((a, b) => {
+                    const da = parseMonthLabelToDate(a.month) || new Date(0);
+                    const db = parseMonthLabelToDate(b.month) || new Date(0);
+                    return da - db;
+                });
+
+                // Initialize data arrays
+                investmentData = {
+                    months: [],
+                    totalContributions: [],
+                    mansaXInvestments: [],
+                    cumulativeMansaX: [],
+                    iandmBalance: [],
+                    totalInvested: [],
+                    cashReserve: [],
+                    runningTotalContributions: [],
+                    receipts: {}  // Add receipts object
+                };
+
+                // Process each row using exact column names from investment_tracking table
+                rows.forEach(r => {
+                    const monthLabel = r.month || '';
+                    const totalContrib = Number(r.total_contributions) || 0;
+                    const mansaX = Number(r.mansa_x) || 0;
+                    const cumulative = Number(r.cumulative_mansa_x) || 0;
+                    const iandm = Number(r.i_and_m) || 0;
+                    const totalInv = Number(r.total_invested) || 0;
+                    const running = Number(r.running_total_contributions) || 0;
+
+                    investmentData.months.push(monthLabel);
+                    investmentData.totalContributions.push(totalContrib);
+                    investmentData.mansaXInvestments.push(mansaX);
+                    investmentData.cumulativeMansaX.push(cumulative);
+                    investmentData.iandmBalance.push(iandm);
+                    investmentData.totalInvested.push(totalInv);
+                    investmentData.runningTotalContributions.push(running);
+
+                    // Store receipt info if available
+                    if (r.receipt_path) {
+                        investmentData.receipts[monthLabel] = {
+                            path: r.receipt_path,
+                            filename: r.receipt_filename,
+                            uploaded_at: r.receipt_uploaded_at,
+                            uploaded_by: r.receipt_uploaded_by
+                        };
+                    }
+
+                    // Cash reserve = running_total_contributions - total_invested
+                    investmentData.cashReserve.push(running - totalInv);
+                });
+
+                // Populate currentTotals from last row (most recent data)
+                const last = rows[rows.length - 1];
+                if (last) {
+                    currentTotals.mansaX = Number(last.cumulative_mansa_x) || 0;
+                    currentTotals.iandm = Number(last.iandm_balance) || 0;
+                    currentTotals.total = Number(last.total_invested) || (currentTotals.mansaX + currentTotals.iandm);
+                    currentTotals.mansaXPercentage = currentTotals.total > 0 ? ((currentTotals.mansaX / currentTotals.total) * 100).toFixed(1) : 0;
+                    currentTotals.iandmPercentage = currentTotals.total > 0 ? ((currentTotals.iandm / currentTotals.total) * 100).toFixed(1) : 0;
+                }
+            }
+
+            // Interest rates
+            const RATES = {
+                mansaX: 0.18,  // 18% per annum
+                iandm: 0.08     // 8% per annum
+            };
+
+            // ============================================
+            // CALCULATION FUNCTIONS
+            // ============================================
+
+            /**
+             * Calculate monthly returns based on current balances
+             */
+            function calculateMonthlyReturns() {
+                const monthlyMansaXReturn = (currentTotals.mansaX * RATES.mansaX) / 12;
+                const monthlyIandmReturn = (currentTotals.iandm * RATES.iandm) / 12;
+
+                return {
+                    monthly: {
+                        mansaX: monthlyMansaXReturn,
+                        iandm: monthlyIandmReturn,
+                        total: monthlyMansaXReturn + monthlyIandmReturn
+                    },
+                    annual: {
+                        mansaX: currentTotals.mansaX * RATES.mansaX,
+                        iandm: currentTotals.iandm * RATES.iandm,
+                        total: (currentTotals.mansaX * RATES.mansaX) + (currentTotals.iandm * RATES.iandm)
+                    }
+                };
+            }
+
+            /**
+             * Calculate cumulative returns over time
+             */
+            function calculateCumulativeReturns(months = 12) {
+                const monthlyReturns = calculateMonthlyReturns();
+                const cumulative = [];
+                let runningTotal = 0;
+
+                for (let i = 1; i <= months; i++) {
+                    runningTotal += monthlyReturns.monthly.total;
+                    cumulative.push({
+                        month: `Month ${i}`,
+                        cumulative: runningTotal,
+                        monthly: monthlyReturns.monthly.total
+                    });
+                }
+
+                return cumulative;
+            }
+
+            /**
+             * Calculate time to double using Rule of 72
+             */
+            function calculateDoublingTime(rate) {
+                return (72 / (rate * 100)).toFixed(1);
+            }
+
+            /**
+             * Calculate opportunity cost
+             */
+            function calculateOpportunityCost() {
+                const currentReturn = (currentTotals.mansaX * RATES.mansaX) + (currentTotals.iandm * RATES.iandm);
+                const ifAllMansaX = currentTotals.total * RATES.mansaX;
+                const ifAllIandM = currentTotals.total * RATES.iandm;
+
+                return {
+                    current: currentReturn,
+                    allMansaX: ifAllMansaX,
+                    allIandM: ifAllIandM,
+                    opportunityVsMansaX: ifAllMansaX - currentReturn,
+                    opportunityVsIandM: currentReturn - ifAllIandM,
+                    mansaXPercentage: (currentTotals.mansaX / currentTotals.total) * 100,
+                    iandmPercentage: (currentTotals.iandm / currentTotals.total) * 100
+                };
+            }
+
+            /**
+             * Calculate weighted average return
+             */
+            function calculateWeightedReturn() {
+                return (
+                    ((currentTotals.mansaX * RATES.mansaX) + (currentTotals.iandm * RATES.iandm)) /
+                    currentTotals.total * 100
+                ).toFixed(2);
+            }
+
+            /**
+             * Calculate 5-year projection with compounding
+             */
+            function calculateFiveYearProjection() {
+                const mansaXFuture = currentTotals.mansaX * Math.pow(1 + RATES.mansaX, 5);
+                const iandmFuture = currentTotals.iandm * Math.pow(1 + RATES.iandm, 5);
+                const totalFuture = mansaXFuture + iandmFuture;
+
+                return {
+                    year1: {
+                        mansaX: currentTotals.mansaX * (1 + RATES.mansaX),
+                        iandm: currentTotals.iandm * (1 + RATES.iandm),
+                        total: currentTotals.total * (1 + (RATES.mansaX * currentTotals.mansaX / currentTotals.total + RATES.iandm * currentTotals.iandm / currentTotals.total))
+                    },
+                    year5: {
+                        mansaX: mansaXFuture,
+                        iandm: iandmFuture,
+                        total: totalFuture,
+                        gain: totalFuture - currentTotals.total
+                    }
+                };
+            }
+
+            // ============================================
+            // RENDER FUNCTIONS
+            // ============================================
+
+            function renderInvestmentTable() {
+                let tableHTML = '';
+
+                for (let i = 0; i < investmentData.months.length; i++) {
+                    const month = investmentData.months[i];
+                    const hasReceipt = investmentData.receipts && investmentData.receipts[month];
+
+                    tableHTML += `
+                    <tr>
+                        <td><strong>${investmentData.months[i]}</strong></td>
+                        <td>KES ${investmentData.totalContributions[i].toLocaleString()}</td>
+                        <td class="mansa-bg">KES ${investmentData.mansaXInvestments[i].toLocaleString()}</td>
+                        <td class="mansa-bg"><strong>KES ${investmentData.cumulativeMansaX[i].toLocaleString()}</strong></td>
+                        <td class="iandm-bg"><strong>KES ${investmentData.iandmBalance[i].toLocaleString()}</strong></td>
+                        <td>KES ${investmentData.totalInvested[i].toLocaleString()}</td>
+                        <td>
+                            <button class="btn-view-receipt" onclick="viewReceipt('${month}')" 
+                                    style="background: ${hasReceipt ? '#10b981' : '#f59e0b'}; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                                <i class="fas fa-${hasReceipt ? 'file-invoice' : 'exclamation-circle'}"></i>
+                                ${hasReceipt ? 'View' : 'No Receipt'}
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                }
+
+                document.getElementById('investmentTableBody').innerHTML = tableHTML;
+            }
+
+            // Function to view receipt
+            function viewReceipt(month) {
+                const receipt = investmentData.receipts && investmentData.receipts[month];
+
+                if (receipt) {
+                    // Open receipt in new tab
+                    window.open(`${API_BASE}/investments/${encodeURIComponent(month)}/receipt`, '_blank');
+                } else {
+                    // Show popup message
+                    showNotification('Receipt not yet provided for ' + month, 'warning');
+                }
+            }
+
+            function renderCurrentAllocation() {
+                const html = `
+                <div class="allocation-item">
+                    <span style="font-weight: 700; color: #059669;">Mansa-X</span>
+                    <span>KES ${currentTotals.mansaX.toLocaleString()}</span>
+                    <div class="allocation-bar">
+                        <div class="allocation-fill" style="width: ${currentTotals.mansaXPercentage}%"></div>
+                    </div>
+                    <span>${currentTotals.mansaXPercentage}%</span>
+                </div>
+                <div class="allocation-item">
+                    <span style="font-weight: 700; color: #d97706;">I&M</span>
+                    <span>KES ${currentTotals.iandm.toLocaleString()}</span>
+                    <div class="allocation-bar">
+                        <div class="allocation-fill iandm" style="width: ${currentTotals.iandmPercentage}%"></div>
+                    </div>
+                    <span>${currentTotals.iandmPercentage}%</span>
+                </div>
+                <div style="margin-left: auto;">
+                    <span style="font-weight: 700;">Total Pool:</span> KES ${currentTotals.total.toLocaleString()}
+                </div>
+            `;
+
+                document.getElementById('currentAllocation').innerHTML = html;
+
+                // Update the rate badges with live allocation percentages
+                try {
+                    const mBadge = document.getElementById('mansaBadge');
+                    const iBadge = document.getElementById('iandmBadge');
+                    if (mBadge) {
+                        mBadge.innerHTML = `🚀 Mansa-X: 18% per annum — <strong>${currentTotals.mansaXPercentage}% of pool</strong>`;
+                    }
+                    if (iBadge) {
+                        iBadge.innerHTML = `🏦 I&M: 8% per annum — <strong>${currentTotals.iandmPercentage}% of pool</strong>`;
+                    }
+                } catch (e) {
+                    console.warn('Unable to update rate badges', e);
+                }
+            }
+
+            function renderInsightCards() {
+                const returns = calculateMonthlyReturns();
+                const weightedReturn = calculateWeightedReturn();
+                const opportunity = calculateOpportunityCost();
+                const mansaXDoubleTime = calculateDoublingTime(RATES.mansaX);
+                const iandmDoubleTime = calculateDoublingTime(RATES.iandm);
+                const fiveYear = calculateFiveYearProjection();
+
+                const html = `
+                <div class="insight-card">
+                    <div class="insight-title">📈 Monthly Passive Income</div>
+                    <div class="insight-value">KES ${Math.round(returns.monthly.total).toLocaleString()}</div>
+                    <div class="insight-desc">
+                        Mansa-X: KES ${Math.round(returns.monthly.mansaX).toLocaleString()} | 
+                        I&M: KES ${Math.round(returns.monthly.iandm).toLocaleString()}
+                        <div class="highlight">Enough to cover utilities</div>
+                    </div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-title">💰 Annual Return</div>
+                    <div class="insight-value">KES ${Math.round(returns.annual.total).toLocaleString()}</div>
+                    <div class="insight-desc">
+                        ${(returns.annual.total / currentTotals.total * 100).toFixed(1)}% return on capital
+                        <div class="highlight">Adds KES ${Math.round(returns.annual.total / 11).toLocaleString()}/member</div>
+                    </div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-title">⚡ Weighted Average</div>
+                    <div class="insight-value">${weightedReturn}%</div>
+                    <div class="insight-desc">
+                        Mansa-X: 18% | I&M: 8%
+                        <div class="highlight">Mix: ${currentTotals.mansaXPercentage}% / ${currentTotals.iandmPercentage}%</div>
+                    </div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-title">🎯 Time to Double</div>
+                    <div class="insight-value">${mansaXDoubleTime} / ${iandmDoubleTime} yrs</div>
+                    <div class="insight-desc">
+                        Mansa-X: ${mansaXDoubleTime} years | I&M: ${iandmDoubleTime} years
+                        <div class="highlight">Blended: ~${(72 / parseFloat(weightedReturn)).toFixed(1)} years</div>
+                    </div>
+                </div>
+            `;
+
+                document.getElementById('insightCards').innerHTML = html;
+            }
+
+            function renderQAAnalysis() {
+                const returns = calculateMonthlyReturns();
+                const opportunity = calculateOpportunityCost();
+                const weightedReturn = calculateWeightedReturn();
+                const fiveYear = calculateFiveYearProjection();
+
+                const html = `
+                <div class="qa-item mansa">
+                    <div class="qa-question">❓ Which investment generates more income?</div>
+                    <div class="qa-answer">
+                        <strong>Mansa-X (18%):</strong> KES ${Math.round(returns.annual.mansaX).toLocaleString()}/year<br>
+                        <strong>I&M (8%):</strong> KES ${Math.round(returns.annual.iandm).toLocaleString()}/year<br>
+                        <strong>Impact:</strong> Mansa-X is ${currentTotals.mansaXPercentage}% of capital but generates ${(returns.annual.mansaX / returns.annual.total * 100).toFixed(1)}% of returns.
+                    </div>
+                </div>
+                <div class="qa-item mixed">
+                    <div class="qa-question">❓ What's the opportunity cost?</div>
+                    <div class="qa-answer">
+                        <strong>Current:</strong> KES ${Math.round(opportunity.current).toLocaleString()}/year<br>
+                        <strong>If 100% Mansa-X:</strong> KES ${Math.round(opportunity.allMansaX).toLocaleString()}/year (+KES ${Math.round(opportunity.opportunityVsMansaX).toLocaleString()})<br>
+                        <strong>If 100% I&M:</strong> KES ${Math.round(opportunity.allIandM).toLocaleString()}/year (-KES ${Math.round(opportunity.opportunityVsIandM).toLocaleString()})
+                    </div>
+                </div>
+                <div class="qa-item iandm">
+                    <div class="qa-question">❓ What's the 5-year projection?</div>
+                    <div class="qa-answer">
+                        <strong>Current:</strong> KES ${currentTotals.total.toLocaleString()}<br>
+                        <strong>Year 5:</strong> KES ${Math.round(fiveYear.year5.total).toLocaleString()}<br>
+                        <strong>Total Gain:</strong> KES ${Math.round(fiveYear.year5.gain).toLocaleString()} (${(fiveYear.year5.gain / currentTotals.total * 100).toFixed(1)}%)
+                    </div>
+                </div>
+                <div class="qa-item mixed">
+                    <div class="qa-question">❓ How does compounding work?</div>
+                    <div class="qa-answer">
+                        <strong>Year 1 return:</strong> KES ${Math.round(returns.annual.total).toLocaleString()}<br>
+                        <strong>Year 5 return:</strong> KES ${Math.round(fiveYear.year5.total - currentTotals.total).toLocaleString()}<br>
+                        <strong>Compounding bonus:</strong> ${((fiveYear.year5.total - currentTotals.total) / (returns.annual.total * 5) * 100 - 100).toFixed(1)}% more in year 5
+                    </div>
+                </div>
+            `;
+
+                document.getElementById('qaAnalysis').innerHTML = html;
+            }
+
+            function renderComparisonTable() {
+                const returns = calculateMonthlyReturns();
+                const weightedReturn = calculateWeightedReturn();
+                const mansaXDoubleTime = calculateDoublingTime(RATES.mansaX);
+                const iandmDoubleTime = calculateDoublingTime(RATES.iandm);
+                const fiveYear = calculateFiveYearProjection();
+
+                const html = `
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Mansa-X (18%)</th>
+                        <th>I&M (8%)</th>
+                        <th>Total/Blended</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Current Balance</strong></td>
+                        <td>KES ${currentTotals.mansaX.toLocaleString()}</td>
+                        <td>KES ${currentTotals.iandm.toLocaleString()}</td>
+                        <td><strong>KES ${currentTotals.total.toLocaleString()}</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Allocation</strong></td>
+                        <td>${currentTotals.mansaXPercentage}%</td>
+                        <td>${currentTotals.iandmPercentage}%</td>
+                        <td>100%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Monthly Return</strong></td>
+                        <td class="return-positive">KES ${Math.round(returns.monthly.mansaX).toLocaleString()}</td>
+                        <td class="return-positive">KES ${Math.round(returns.monthly.iandm).toLocaleString()}</td>
+                        <td class="return-positive"><strong>KES ${Math.round(returns.monthly.total).toLocaleString()}</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Annual Return</strong></td>
+                        <td class="return-positive">KES ${Math.round(returns.annual.mansaX).toLocaleString()}</td>
+                        <td class="return-positive">KES ${Math.round(returns.annual.iandm).toLocaleString()}</td>
+                        <td class="return-positive"><strong>KES ${Math.round(returns.annual.total).toLocaleString()}</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Annual ROI</strong></td>
+                        <td class="return-positive">18%</td>
+                        <td class="return-positive">8%</td>
+                        <td class="return-positive"><strong>${weightedReturn}%</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Time to Double</strong></td>
+                        <td>${mansaXDoubleTime} years</td>
+                        <td>${iandmDoubleTime} years</td>
+                        <td>~${(72 / parseFloat(weightedReturn)).toFixed(1)} years</td>
+                    </tr>
+                    <tr>
+                        <td><strong>5-Year Value</strong></td>
+                        <td>KES ${Math.round(fiveYear.year5.mansaX).toLocaleString()}</td>
+                        <td>KES ${Math.round(fiveYear.year5.iandm).toLocaleString()}</td>
+                        <td><strong>KES ${Math.round(fiveYear.year5.total).toLocaleString()}</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>5-Year Gain</strong></td>
+                        <td class="return-positive">KES ${Math.round(fiveYear.year5.mansaX - currentTotals.mansaX).toLocaleString()}</td>
+                        <td class="return-positive">KES ${Math.round(fiveYear.year5.iandm - currentTotals.iandm).toLocaleString()}</td>
+                        <td class="return-positive"><strong>KES ${Math.round(fiveYear.year5.gain).toLocaleString()}</strong></td>
+                    </tr>
+                </tbody>
+            `;
+
+                document.getElementById('comparisonTable').innerHTML = html;
+            }
+
+            function renderRecommendations() {
+                const returns = calculateMonthlyReturns();
+                const opportunity = calculateOpportunityCost();
+                const weightedReturn = calculateWeightedReturn();
+                const currentMansaXPercent = parseFloat(currentTotals.mansaXPercentage);
+
+                // Calculate impact of increasing Mansa-X to 80%
+                const targetMansaX = currentTotals.total * 0.8;
+                const targetIandM = currentTotals.total * 0.2;
+                const newReturn = (targetMansaX * RATES.mansaX) + (targetIandM * RATES.iandm);
+                const impactIncrease = newReturn - opportunity.current;
+
+                const html = `
+                <div class="recommendation-card">
+                    <div class="recommendation-icon">🚀</div>
+                    <div class="recommendation-title">Growth Focus</div>
+                    <div class="recommendation-desc">
+                        Increase Mansa-X to 80% allocation (currently ${currentMansaXPercent}%).<br>
+                        <strong>Impact:</strong> +KES ${Math.round(impactIncrease).toLocaleString()}/year<br>
+                        <small>Higher returns with moderate risk</small>
+                    </div>
+                </div>
+                <div class="recommendation-card">
+                    <div class="recommendation-icon">⚖️</div>
+                    <div class="recommendation-title">Balanced Approach</div>
+                    <div class="recommendation-desc">
+                        Maintain current ${currentMansaXPercent}%/${currentTotals.iandmPercentage}% split.<br>
+                        <strong>Current:</strong> ${weightedReturn}% weighted return<br>
+                        <small>Optimal risk-reward balance</small>
+                    </div>
+                </div>
+                <div class="recommendation-card">
+                    <div class="recommendation-icon">🔄</div>
+                    <div class="recommendation-title">Reinvest Returns</div>
+                    <div class="recommendation-desc">
+                        Reinvest KES ${Math.round(returns.monthly.total).toLocaleString()}/month.<br>
+                        <strong>5-year result:</strong> +KES ${Math.round(returns.monthly.total * 12 * 5 * 1.5).toLocaleString()}<br>
+                        <small>Compound your growth</small>
+                    </div>
+                </div>
+            `;
+
+                document.getElementById('recommendations').innerHTML = html;
+            }
+
+            function renderFiveYearProjection() {
+                const fiveYear = calculateFiveYearProjection();
+
+                const html = `
+                <div style="background: #f0fdf4; padding: 25px; border-radius: 20px;">
+                    <div style="font-size: 20px; margin-bottom: 10px;">Year 1</div>
+                    <div style="font-size: 28px; font-weight: 800; color: #059669;">KES ${Math.round(fiveYear.year1.total).toLocaleString()}</div>
+                    <div style="color: #475569; margin-top: 10px;">+KES ${Math.round(fiveYear.year1.total - currentTotals.total).toLocaleString()}</div>
+                </div>
+                <div style="background: #fef9c3; padding: 25px; border-radius: 20px;">
+                    <div style="font-size: 20px; margin-bottom: 10px;">Year 3</div>
+                    <div style="font-size: 28px; font-weight: 800; color: #d97706;">KES ${Math.round(currentTotals.total * Math.pow(1 + parseFloat(calculateWeightedReturn()) / 100, 3)).toLocaleString()}</div>
+                    <div style="color: #475569; margin-top: 10px;">+KES ${Math.round(currentTotals.total * (Math.pow(1 + parseFloat(calculateWeightedReturn()) / 100, 3) - 1)).toLocaleString()}</div>
+                </div>
+                <div style="background: #e0f2fe; padding: 25px; border-radius: 20px;">
+                    <div style="font-size: 20px; margin-bottom: 10px;">Year 5</div>
+                    <div style="font-size: 28px; font-weight: 800; color: #0284c7;">KES ${Math.round(fiveYear.year5.total).toLocaleString()}</div>
+                    <div style="color: #475569; margin-top: 10px;">+KES ${Math.round(fiveYear.year5.gain).toLocaleString()}</div>
+                </div>
+                <div style="background: #f1f5f9; padding: 25px; border-radius: 20px;">
+                    <div style="font-size: 20px; margin-bottom: 10px;">Total Return</div>
+                    <div style="font-size: 28px; font-weight: 800; color: #0f172a;">${(fiveYear.year5.gain / currentTotals.total * 100).toFixed(1)}%</div>
+                    <div style="color: #475569; margin-top: 10px;">${(fiveYear.year5.gain / currentTotals.total * 100 / 5).toFixed(1)}% CAGR</div>
+                </div>
+            `;
+
+                document.getElementById('fiveYearProjection').innerHTML = html;
+            }
+
+            // ============================================
+            // INVESTMENT BALANCE CHART (REPLACED CUMULATIVE RETURNS)
+            // ============================================
+
+            function initializeInvestmentBalanceChart() {
+                const ctx = document.getElementById('investmentBalanceChart').getContext('2d');
+
+                // Destroy existing chart if it exists
+                if (investmentBalanceChart) investmentBalanceChart.destroy();
+
+                // Prepare datasets based on actual investment data
+                const datasets = [];
+
+                if (investmentData.cumulativeMansaX && investmentData.cumulativeMansaX.length > 0) {
+                    datasets.push({
+                        label: 'Cumulative Mansa-X',
+                        data: investmentData.cumulativeMansaX,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 4,
+                        pointBackgroundColor: '#10b981',
+                        pointBorderColor: 'white',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        fill: true,
+                        tension: 0.4
+                    });
+                }
+
+                if (investmentData.iandmBalance && investmentData.iandmBalance.length > 0) {
+                    datasets.push({
+                        label: 'I&M Balance',
+                        data: investmentData.iandmBalance,
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        borderWidth: 4,
+                        pointBackgroundColor: '#f59e0b',
+                        pointBorderColor: 'white',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        fill: true,
+                        tension: 0.4
+                    });
+                }
+
+                investmentBalanceChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: investmentData.months && investmentData.months.length > 0 ? investmentData.months : [],
+                        datasets: datasets.length > 0 ? datasets : []
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#1e293b',
+                                titleColor: '#f1f5f9',
+                                bodyColor: '#cbd5e1',
+                                padding: 12,
+                                borderColor: '#334155',
+                                borderWidth: 1,
+                                callbacks: {
+                                    label: function (context) {
+                                        return context.dataset.label + ': KES ' + context.raw.toLocaleString();
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: '#e2e8f0' },
+                                ticks: {
+                                    callback: function (value) {
+                                        return 'KES ' + (value / 1000) + 'K';
+                                    }
+                                }
+                            },
+                            x: {
+                                grid: { display: false }
+                            }
+                        },
+                        interaction: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    }
+                });
+
+                // Update legend with current values
+                const legend = document.getElementById('investmentLegend');
+                const lastMansaX = investmentData.cumulativeMansaX && investmentData.cumulativeMansaX.length > 0
+                    ? investmentData.cumulativeMansaX[investmentData.cumulativeMansaX.length - 1]
+                    : 350000;
+                const lastIandM = investmentData.iandmBalance && investmentData.iandmBalance.length > 0
+                    ? investmentData.iandmBalance[investmentData.iandmBalance.length - 1]
+                    : 185000;
+
+                legend.innerHTML = `
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #10b981;"></div>
+                    <span class="legend-label">Cumulative Mansa-X</span>
+                    <span class="legend-value">KES ${lastMansaX.toLocaleString()}</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #f59e0b;"></div>
+                    <span class="legend-label">I&M Balance</span>
+                    <span class="legend-value">KES ${lastIandM.toLocaleString()}</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #667eea20;"></div>
+                    <span class="legend-label">Total Pool</span>
+                    <span class="legend-value">KES ${(lastMansaX + lastIandM).toLocaleString()}</span>
+                </div>
+            `;
+
+                charts.investmentBalanceChart = investmentBalanceChart;
+            }
+
+            // ============================================
+            // CHART INITIALIZATION
+            // ============================================
+
+            function initializeCharts() {
+                const returns = calculateMonthlyReturns();
+                const opportunity = calculateOpportunityCost();
+
+                // Initialize the new investment balance chart
+                initializeInvestmentBalanceChart();
+
+                // Safely destroy existing charts if they exist
+                if (monthlyReturnChart) monthlyReturnChart.destroy();
+                if (allocationChart) allocationChart.destroy();
+                if (roiChart) roiChart.destroy();
+
+                // Chart 2: Monthly Return Breakdown
+                const ctx2 = document.getElementById('monthlyReturnChart').getContext('2d');
+                monthlyReturnChart = new Chart(ctx2, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Monthly Returns'],
+                        datasets: [
+                            {
+                                label: 'Mansa-X (18%)',
+                                data: [returns.monthly.mansaX],
+                                backgroundColor: '#10b981',
+                                borderRadius: 8,
+                                barPercentage: 0.6
+                            },
+                            {
+                                label: 'I&M (8%)',
+                                data: [returns.monthly.iandm],
+                                backgroundColor: '#f59e0b',
+                                borderRadius: 8,
+                                barPercentage: 0.6
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            tooltip: {
+                                callbacks: {
+                                    label: (ctx) => ctx.dataset.label + ': KES ' + Math.round(ctx.raw).toLocaleString()
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: '#e2e8f0' },
+                                ticks: {
+                                    callback: (v) => 'KES ' + Math.round(v).toLocaleString()
+                                }
+                            },
+                            x: {
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+                charts.monthlyReturnChart = monthlyReturnChart;
+
+                // Chart 3: Allocation vs Return Contribution
+                const allocationReturns = calculateMonthlyReturns();
+                const mansaXReturnPercent = currentTotals.total > 0
+                    ? ((allocationReturns.annual.mansaX / allocationReturns.annual.total) * 100).toFixed(1)
+                    : 0;
+                const iandmReturnPercent = currentTotals.total > 0
+                    ? ((allocationReturns.annual.iandm / allocationReturns.annual.total) * 100).toFixed(1)
+                    : 0;
+
+                const ctx3 = document.getElementById('allocationVsReturnChart').getContext('2d');
+                allocationChart = new Chart(ctx3, {
+                    type: 'doughnut',
+                    data: {
+                        labels: [
+                            `Mansa-X: ${currentTotals.mansaXPercentage}% capital, ${mansaXReturnPercent}% returns`,
+                            `I&M: ${currentTotals.iandmPercentage}% capital, ${iandmReturnPercent}% returns`
+                        ],
+                        datasets: [
+                            {
+                                label: 'Annual Return Contribution',
+                                data: [allocationReturns.annual.mansaX, allocationReturns.annual.iandm],
+                                backgroundColor: ['#10b981', '#f59e0b'],
+                                borderWidth: 2,
+                                borderColor: '#ffffff',
+                                borderRadius: 8
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '65%',
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 15,
+                                    font: { size: 12 }
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: (ctx) => {
+                                        const percent = ((ctx.raw / allocationReturns.annual.total) * 100).toFixed(1);
+                                        return ctx.label + ': KES ' + Math.round(ctx.raw).toLocaleString() +
+                                            ' (' + percent + '% of total returns)';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                charts.allocationChart = allocationChart;
+
+                // Chart 4: ROI Timeline - Calculate based on actual rates
+                const calculateROITimeline = (rate, years = 5) => {
+                    const timeline = [100];
+                    for (let year = 1; year <= years; year++) {
+                        timeline.push(100 * Math.pow(1 + rate, year));
+                    }
+                    return timeline;
+                };
+
+                const ctx4 = document.getElementById('roiTimelineChart').getContext('2d');
+                roiChart = new Chart(ctx4, {
+                    type: 'line',
+                    data: {
+                        labels: ['Year 0', 'Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5'],
+                        datasets: [
+                            {
+                                label: 'Mansa-X (18%)',
+                                data: calculateROITimeline(RATES.mansaX, 5),
+                                borderColor: '#10b981',
+                                borderWidth: 3,
+                                backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                                fill: false,
+                                tension: 0.4,
+                                pointRadius: 4,
+                                pointBackgroundColor: '#10b981'
+                            },
+                            {
+                                label: 'I&M (8%)',
+                                data: calculateROITimeline(RATES.iandm, 5),
+                                borderColor: '#f59e0b',
+                                borderWidth: 3,
+                                backgroundColor: 'rgba(245, 158, 11, 0.05)',
+                                fill: false,
+                                tension: 0.4,
+                                pointRadius: 4,
+                                pointBackgroundColor: '#f59e0b'
+                            },
+                            {
+                                label: `Blended (${calculateWeightedReturn()}%)`,
+                                data: calculateROITimeline(parseFloat(calculateWeightedReturn()) / 100, 5),
+                                borderColor: '#667eea',
+                                borderWidth: 2,
+                                borderDash: [5, 5],
+                                backgroundColor: 'rgba(102, 126, 234, 0.05)',
+                                fill: false,
+                                tension: 0.4,
+                                pointRadius: 3,
+                                pointBackgroundColor: '#667eea'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            tooltip: {
+                                callbacks: {
+                                    label: (ctx) => ctx.dataset.label + ': ' + ctx.raw.toFixed(2) + '% of initial'
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 250,
+                                grid: { color: '#e2e8f0' },
+                                title: {
+                                    display: true,
+                                    text: 'Value (% of initial)'
+                                },
+                                ticks: {
+                                    callback: (v) => v.toFixed(0) + '%'
+                                }
+                            },
+                            x: {
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+                charts.roiChart = roiChart;
+            }
+
+            // ============================================
+            // DOWNLOAD / EXPORT FUNCTIONALITY
+            // ============================================
+
+            function toggleDownloadDropdown() {
+                const dropdown = document.getElementById('downloadDropdown');
+                dropdown.classList.toggle('show');
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function closeDropdown(e) {
+                    if (!e.target.closest('.download-options')) {
+                        dropdown.classList.remove('show');
+                        document.removeEventListener('click', closeDropdown);
+                    }
+                });
+            }
+
+            function showProgress(message, submessage) {
+                const progress = document.getElementById('downloadProgress');
+                const progressText = document.getElementById('progressText');
+                const progressSubtext = document.getElementById('progressSubtext');
+
+                progressText.textContent = message || 'Preparing your report...';
+                progressSubtext.textContent = submessage || 'This will take just a moment';
+                progress.classList.add('active');
+            }
+
+            function hideProgress() {
+                const progress = document.getElementById('downloadProgress');
+                progress.classList.remove('active');
+            }
+
+            async function exportDashboard(format) {
+                // Close dropdown
+                document.getElementById('downloadDropdown').classList.remove('show');
+
+                const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+                const filename = `Investment_Analytics_${timestamp}`;
+
+                switch (format) {
+                    case 'pdf':
+                        await exportAsPDF(filename);
+                        break;
+                    case 'png':
+                        await exportAsPNG(filename);
+                        break;
+                    case 'csv':
+                        exportAsCSV(filename);
+                        break;
+                    case 'print':
+                        printDashboard();
+                        break;
+                    case 'pptx':
+                        await exportAsPPTX(filename);
+                        break;
+                }
+            }
+
+            async function exportAsPDF(filename) {
+                try {
+                    showProgress('Generating PDF...', 'Creating investment report');
+
+                    const dashboard = document.querySelector('.dashboard-container');
+                    dashboard.classList.add('downloading');
+
+                    // Add timestamp
+                    const timestampDiv = document.createElement('div');
+                    timestampDiv.className = 'export-timestamp';
+                    timestampDiv.innerHTML = `Report generated: ${new Date().toLocaleString()} • Investment Analytics`;
+                    dashboard.insertBefore(timestampDiv, dashboard.firstChild);
+
+                    const canvas = await html2canvas(dashboard, {
+                        scale: 2,
+                        backgroundColor: '#ffffff',
+                        logging: false,
+                        allowTaint: true,
+                        useCORS: true
+                    });
+
+                    timestampDiv.remove();
+                    dashboard.classList.remove('downloading');
+
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF('p', 'pt', 'a4');
+                    const imgData = canvas.toDataURL('image/png');
+                    const imgWidth = 595.28;
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+                    pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+
+                    // Open in new tab
+                    window.open(pdf.output('bloburl'), '_blank');
+
+                    hideProgress();
+                    showNotification('PDF preview opened in new tab');
+                } catch (error) {
+                    console.error('PDF generation error:', error);
+                    hideProgress();
+                    showError('Error generating PDF. Please try again.');
+                }
+            }
+
+            async function exportAsPNG(filename) {
+                try {
+                    showProgress('Generating PNG...', 'Creating investment image');
+
+                    const dashboard = document.querySelector('.dashboard-container');
+                    dashboard.classList.add('downloading');
+
+                    const timestampDiv = document.createElement('div');
+                    timestampDiv.className = 'export-timestamp';
+                    timestampDiv.innerHTML = `Report generated: ${new Date().toLocaleString()} • Investment Analytics`;
+                    dashboard.insertBefore(timestampDiv, dashboard.firstChild);
+
+                    const canvas = await html2canvas(dashboard, {
+                        scale: 2,
+                        backgroundColor: '#ffffff',
+                        logging: false
+                    });
+
+                    timestampDiv.remove();
+                    dashboard.classList.remove('downloading');
+
+                    const imgData = canvas.toDataURL('image/png');
+                    const link = document.createElement('a');
+                    link.download = `${filename}.png`;
+                    link.href = imgData;
+                    link.click();
+
+                    hideProgress();
+                    showNotification('PNG report downloaded successfully!');
+                } catch (error) {
+                    console.error('PNG generation error:', error);
+                    hideProgress();
+                    showError('Error generating PNG. Please try again.');
+                }
+            }
+
+            function exportAsCSV(filename) {
+                showProgress('Generating CSV...', 'Exporting investment data');
+
+                // Create CSV content
+                let csvContent = "Investment Analytics Report\n";
+                csvContent += `Generated: ${new Date().toLocaleString()}\n\n`;
+
+                // Summary statistics
+                csvContent += "SUMMARY STATISTICS\n";
+                csvContent += `Total Invested,${currentTotals.total.toLocaleString()}\n`;
+                csvContent += `Mansa-X Balance,${currentTotals.mansaX.toLocaleString()}\n`;
+                csvContent += `I&M Balance,${currentTotals.iandm.toLocaleString()}\n`;
+                csvContent += `Mansa-X Allocation,${currentTotals.mansaXPercentage}%\n`;
+                csvContent += `I&M Allocation,${currentTotals.iandmPercentage}%\n\n`;
+
+                const returns = calculateMonthlyReturns();
+                csvContent += "RETURN CALCULATIONS\n";
+                csvContent += `Monthly Return (Total),${Math.round(returns.monthly.total).toLocaleString()}\n`;
+                csvContent += `Monthly Return (Mansa-X),${Math.round(returns.monthly.mansaX).toLocaleString()}\n`;
+                csvContent += `Monthly Return (I&M),${Math.round(returns.monthly.iandm).toLocaleString()}\n`;
+                csvContent += `Annual Return (Total),${Math.round(returns.annual.total).toLocaleString()}\n`;
+                csvContent += `Weighted Return,${calculateWeightedReturn()}%\n\n`;
+
+                // Monthly data
+                csvContent += "MONTHLY INVESTMENT DATA\n";
+                csvContent += "Month,Total Contributions,Mansa-X Investment,Cumulative Mansa-X,I&M Balance,Total Invested,Cash Reserve\n";
+                for (let i = 0; i < investmentData.months.length; i++) {
+                    csvContent += `${investmentData.months[i]},${investmentData.totalContributions[i]},${investmentData.mansaXInvestments[i]},${investmentData.cumulativeMansaX[i]},${investmentData.iandmBalance[i]},${investmentData.totalInvested[i]},${investmentData.cashReserve[i]}\n`;
+                }
+
+                // Open CSV in new tab
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                window.open(url, '_blank');
+
+                hideProgress();
+                showNotification('CSV exported to new tab');
+            }
+
+            async function exportAsPPTX(filename) {
+                try {
+                    showProgress('Generating PowerPoint...', 'Creating presentation slides');
+
+                    // Get chart images
+                    const chartImages = {
+                        investmentBalanceChart: charts.investmentBalanceChart?.toBase64Image(),
+                        monthlyReturnChart: charts.monthlyReturnChart?.toBase64Image(),
+                        allocationChart: charts.allocationChart?.toBase64Image(),
+                        roiChart: charts.roiChart?.toBase64Image()
+                    };
+
+                    // Create PPTX
+                    const pptx = new PptxGenJS();
+                    pptx.layout = 'LAYOUT_WIDE';
+
+                    // Title Slide
+                    const titleSlide = pptx.addSlide();
+                    titleSlide.addText('Friends in Finance Investment Analysis', {
+                        x: 0.5, y: 1.5, w: 9, h: 1,
+                        fontSize: 44,
+                        bold: true,
+                        color: '2563eb',
+                        align: 'center'
+                    });
+                    titleSlide.addText(`Generated: ${new Date().toLocaleString()}`, {
+                        x: 0.5, y: 3, w: 9, h: 0.5,
+                        fontSize: 20,
+                        color: '4b5563',
+                        align: 'center'
+                    });
+
+                    // Summary Slide
+                    const summarySlide = pptx.addSlide();
+                    summarySlide.addText('Investment Summary', {
+                        x: 0.5, y: 0.3, w: 9, h: 0.8,
+                        fontSize: 32,
+                        bold: true,
+                        color: '2563eb'
+                    });
+
+                    summarySlide.addText([
+                        { text: 'Total Invested\n', options: { fontSize: 14, color: '6b7280' } },
+                        { text: `KES ${currentTotals.total.toLocaleString()}`, options: { fontSize: 28, bold: true, color: '2563eb' } }
+                    ], { x: 0.5, y: 1.5, w: 2.5, h: 1.5 });
+
+                    summarySlide.addText([
+                        { text: 'Mansa-X Allocation\n', options: { fontSize: 14, color: '6b7280' } },
+                        { text: `${currentTotals.mansaXPercentage}%`, options: { fontSize: 28, bold: true, color: '2563eb' } }
+                    ], { x: 3.5, y: 1.5, w: 2, h: 1.5 });
+
+                    summarySlide.addText([
+                        { text: 'I&M Allocation\n', options: { fontSize: 14, color: '6b7280' } },
+                        { text: `${currentTotals.iandmPercentage}%`, options: { fontSize: 28, bold: true, color: '2563eb' } }
+                    ], { x: 6, y: 1.5, w: 2, h: 1.5 });
+
+                    // Chart Slides
+                    if (chartImages.investmentBalanceChart) {
+                        const chartSlide = pptx.addSlide();
+                        chartSlide.addText('Investment Balance Over Time', {
+                            x: 0.5, y: 0.3, w: 9, h: 0.8,
+                            fontSize: 32,
+                            bold: true,
+                            color: '2563eb'
+                        });
+                        chartSlide.addImage({ data: chartImages.investmentBalanceChart, x: 0.5, y: 1.2, w: 9, h: 3.5 });
+                    }
+
+                    if (chartImages.monthlyReturnChart) {
+                        const chartSlide = pptx.addSlide();
+                        chartSlide.addText('Monthly Return Breakdown', {
+                            x: 0.5, y: 0.3, w: 9, h: 0.8,
+                            fontSize: 32,
+                            bold: true,
+                            color: '2563eb'
+                        });
+                        chartSlide.addImage({ data: chartImages.monthlyReturnChart, x: 0.5, y: 1.2, w: 9, h: 3.5 });
+                    }
+
+                    if (chartImages.allocationChart) {
+                        const chartSlide = pptx.addSlide();
+                        chartSlide.addText('Capital vs Return Contribution', {
+                            x: 0.5, y: 0.3, w: 9, h: 0.8,
+                            fontSize: 32,
+                            bold: true,
+                            color: '2563eb'
+                        });
+                        chartSlide.addImage({ data: chartImages.allocationChart, x: 0.5, y: 1.2, w: 9, h: 3.5 });
+                    }
+
+                    if (chartImages.roiChart) {
+                        const chartSlide = pptx.addSlide();
+                        chartSlide.addText('Time to Double Investment', {
+                            x: 0.5, y: 0.3, w: 9, h: 0.8,
+                            fontSize: 32,
+                            bold: true,
+                            color: '2563eb'
+                        });
+                        chartSlide.addImage({ data: chartImages.roiChart, x: 0.5, y: 1.2, w: 9, h: 3.5 });
+                    }
+
+                    // Monthly Data Table Slide
+                    const monthlySlide = pptx.addSlide();
+                    monthlySlide.addText('Monthly Investment Data', {
+                        x: 0.5, y: 0.3, w: 9, h: 0.8,
+                        fontSize: 32,
+                        bold: true,
+                        color: '2563eb'
+                    });
+
+                    const tableRows = [['Month', 'Contributions', 'Mansa-X', 'Cumulative Mansa-X', 'I&M Balance', 'Total Invested']];
+                    for (let i = 0; i < investmentData.months.length; i++) {
+                        tableRows.push([
+                            investmentData.months[i],
+                            `KES ${investmentData.totalContributions[i].toLocaleString()}`,
+                            `KES ${investmentData.mansaXInvestments[i].toLocaleString()}`,
+                            `KES ${investmentData.cumulativeMansaX[i].toLocaleString()}`,
+                            `KES ${investmentData.iandmBalance[i].toLocaleString()}`,
+                            `KES ${investmentData.totalInvested[i].toLocaleString()}`
+                        ]);
+                    }
+
+                    monthlySlide.addTable(tableRows, {
+                        x: 0.5, y: 1.2, w: 9,
+                        fontSize: 10,
+                        border: { pt: 1, color: 'e5e7eb' }
+                    });
+
+                    // Save PPTX
+                    pptx.writeFile({ fileName: `${filename}.pptx` });
+
+                    hideProgress();
+                    showNotification('PowerPoint presentation downloaded successfully!');
+
+                } catch (error) {
+                    console.error('PPTX generation error:', error);
+                    hideProgress();
+                    showError('Failed to generate PowerPoint. Please try again.');
+                }
+            }
+
+            function printDashboard() {
+                showProgress('Preparing Print...', 'Setting up dashboard for printing');
+
+                const dashboard = document.querySelector('.dashboard-container');
+                dashboard.classList.add('downloading');
+
+                const timestampDiv = document.createElement('div');
+                timestampDiv.className = 'export-timestamp';
+                timestampDiv.style.display = 'block';
+                timestampDiv.innerHTML = `Report generated: ${new Date().toLocaleString()} • Investment Analytics`;
+                dashboard.insertBefore(timestampDiv, dashboard.firstChild);
+
+                setTimeout(() => {
+                    hideProgress();
+                    window.print();
+
+                    timestampDiv.remove();
+                    dashboard.classList.remove('downloading');
+                }, 500);
+            }
+
+            // ============================================
+            // INITIALIZATION
+            // ============================================
+
+            window.onload = async function () {
+                // Fetch dynamic data from backend then render
+                try {
+                    const [rows, summary] = await Promise.all([
+                        fetchInvestmentRecords(),
+                        fetchInvestmentSummary()
+                    ]);
+
+                    if (rows && rows.length > 0) {
+                        // Load data from rows
+                        loadInvestmentDataFromRows(rows);
+                    } else {
+                        // Show friendly message in table when no rows returned
+                        document.getElementById('investmentTableBody').innerHTML =
+                            `<tr><td colspan="7" style="text-align:center;padding:20px;color:#64748b;">
+                            No investment data available — ensure the backend is running at ${API_BASE} and that 
+                            the 'investment_tracking' table is populated.
+                        </td></tr>`;
+                    }
+
+                    // Use summary endpoint to get final values if available
+                    if (summary) {
+                        // Override currentTotals with summary data (most accurate)
+                        if (summary.cumulative_mansa_x_final !== undefined) {
+                            currentTotals.mansaX = Number(summary.cumulative_mansa_x_final) || 0;
+                        }
+                        if (summary.iandm_balance_final !== undefined) {
+                            currentTotals.iandm = Number(summary.iandm_balance_final) || 0;
+                        }
+                        if (summary.total_invested_final !== undefined) {
+                            currentTotals.total = Number(summary.total_invested_final) || (currentTotals.mansaX + currentTotals.iandm);
+                        }
+
+                        // Recalculate percentages
+                        currentTotals.mansaXPercentage = currentTotals.total > 0
+                            ? ((currentTotals.mansaX / currentTotals.total) * 100).toFixed(1)
+                            : 0;
+                        currentTotals.iandmPercentage = currentTotals.total > 0
+                            ? ((currentTotals.iandm / currentTotals.total) * 100).toFixed(1)
+                            : 0;
+                    }
+
+                    // Render all components with updated data
+                    renderInvestmentTable();
+                    renderCurrentAllocation();
+                    renderInsightCards();
+                    renderQAAnalysis();
+                    renderComparisonTable();
+                    renderRecommendations();
+                    renderFiveYearProjection();
+
+                    // Initialize charts with the new investment balance chart
+                    initializeCharts();
+
+                    // Close dropdown when clicking outside
+                    document.addEventListener('click', function (e) {
+                        if (!e.target.closest('.download-options')) {
+                            document.getElementById('downloadDropdown').classList.remove('show');
+                        }
+                    });
+                } catch (err) {
+                    console.error('Initialization error:', err);
+                    // Show error message
+                    const errorMsg = `Error loading data: ${err.message}. Please check that the backend is running at ${API_BASE}`;
+                    document.getElementById('investmentTableBody').innerHTML =
+                        `<tr><td colspan="7" style="text-align:center;padding:20px;color:#ef4444;">${errorMsg}</td></tr>`;
+
+                    // Fallback to rendering with any available values (may be zeros)
+                    renderInvestmentTable();
+                    renderCurrentAllocation();
+                    renderInsightCards();
+                    renderQAAnalysis();
+                    renderComparisonTable();
+                    renderRecommendations();
+                    renderFiveYearProjection();
+                    initializeCharts();
+                }
+            };
+        </script>
+        <script>
+            // Check authentication status on page load
+            async function checkAuthStatus() {
+                try {
+                    const response = await fetch('/api/auth/status');
+                    const data = await response.json();
+
+                    // Exit button is always visible — only toggle the Member Login button when explicitly authenticated
+                    const loginBtn = document.getElementById('openLoginModal');
+                    if (loginBtn) {
+                        // Only hide if explicitly authenticated and status is confirmed
+                        if (data.authenticated === true) {
+                            loginBtn.style.display = 'none';
+                        } else {
+                            // Always show login button unless explicitly authenticated
+                            loginBtn.style.display = 'inline-flex';
+                        }
+                    }
+                } catch (error) {
+                    console.error('Auth status check failed:', error);
+                }
+            }
+
+            // Handle login form submission
+            async function showComingSoon() {
+                alert('✨ This feature is coming soon! Check back later.');
+            }
+
+            // Logout function
+            async function logout() {
+                try {
+                    const response = await fetch('/api/logout', {
+                        method: 'POST',
+                        credentials: 'include'
+                    });
+
+                    if (response.ok) {
+                        // Clear any stored session data
+                        localStorage.removeItem('lastLoginEmail');
+
+                        // Redirect to gateway page
+                        window.location.href = 'gateway.html';
+                    } else {
+                        alert('Logout failed. Please try again.');
+                    }
+                } catch (error) {
+                    console.error('Logout error:', error);
+                    alert('Network error during logout. Please try again.');
+                }
+            }
+
+            // Show notification function
+            function showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.innerHTML = message;
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.style.animation = 'slideOut 0.3s ease';
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 300);
+                }, 5000);
+            }
+
+            async function handleLogin(e) {
+                e.preventDefault();
+
+                const email = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                const submitBtn = e.target.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+
+                // Show loading state
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+
+                try {
+                    const response = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ email, password })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Save email to localStorage for next time
+                        localStorage.setItem('lastLoginEmail', email);
+
+                        showNotification('Login successful! Redirecting...', 'success');
+
+                        // Successful login - redirect to appropriate dashboard
+                        setTimeout(() => {
+                            window.location.href = data.redirectTo;
+                        }, 1000);
+                    } else {
+                        // Failed login - show error
+                        showNotification(data.message || 'Login failed', 'error');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                    }
+                } catch (error) {
+                    console.error('Login error:', error);
+                    showNotification('Network error. Please try again.', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                }
+            }
+
+            // Initialize
+            document.addEventListener('DOMContentLoaded', function () {
+                // Check if user is already authenticated
+                checkAuthStatus();
+
+                // Auto-fill last used email
+                const lastEmail = localStorage.getItem('lastLoginEmail');
+                if (lastEmail) {
+                    document.getElementById('username').value = lastEmail;
+                }
+
+                // Add login form handler
+                const loginForm = document.getElementById('loginForm');
+                if (loginForm) {
+                    loginForm.addEventListener('submit', handleLogin);
+                }
+            });
+
+            // Password toggle function
+            function togglePassword(inputId) {
+                const input = document.getElementById(inputId);
+                const icon = document.getElementById(inputId + '-toggle-icon');
+                
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('far', 'fa-eye');
+                    icon.classList.add('far', 'fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('far', 'fa-eye-slash');
+                    icon.classList.add('far', 'fa-eye');
+                }
+            }
+
+            (function () {
+                var modal = document.getElementById('loginModal');
+                var openBtn = document.getElementById('openLoginModal');
+                var closeBtn = document.getElementById('closeLoginModal');
+                if (openBtn && modal) {
+                    openBtn.addEventListener('click', function () { modal.classList.add('active'); });
+                    if (closeBtn) closeBtn.addEventListener('click', function () { modal.classList.remove('active'); });
+                    modal.addEventListener('click', function (e) { if (e.target === modal) modal.classList.remove('active'); });
+                }
+            })();
+
+            // Toggle download dropdown
+            function toggleDownloadDropdown() {
+                const dropdown = document.getElementById('downloadDropdown');
+                if (dropdown) {
+                    dropdown.classList.toggle('show');
+                }
+            }
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function (e) {
+                const dropdown = document.getElementById('downloadDropdown');
+                const exportBtn = document.getElementById('exportBtn');
+                if (dropdown && exportBtn && !exportBtn.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.classList.remove('show');
+                }
+            });
+
+            // Export Investment Report function
+            function exportInvestmentReport(format) {
+                const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+                const filename = `Investment_Dashboard_${timestamp}`;
+                switch (format) {
+                    case 'pdf':
+                        showNotification('PDF export coming soon!', 'info');
+                        break;
+                    case 'png':
+                        showNotification('PNG export coming soon!', 'info');
+                        break;
+                    case 'csv':
+                        showNotification('CSV export coming soon!', 'info');
+                        break;
+                    case 'print':
+                        window.print();
+                        break;
+                }
+            }
+        </script>
+
+        <!-- Close main content and dashboard container -->
+    </div><!-- end dashboard-container -->
+    </div><!-- end main-content -->
+
+    <!-- FOOTER -->
+    <footer class="landing-footer">
+        <div class="footer-content">
+            <a href="chart.html" class="logo-section footer-logo">
+                <i class="fas fa-hand-holding-usd"></i>
+                <h1>Friends in Finance <span>Contribution</span> Portal</h1>
+            </a>
+            <div class="footer-links">
+                <a href="about.html"><i class="fas fa-info-circle"></i> About</a>
+                <a href="faq.html"><i class="fas fa-question-circle"></i> FAQ</a>
+                <a href="contact.html"><i class="fas fa-envelope"></i> Contact</a>
+            </div>
+            <p class="copyright">© 2026 Friends in Finance Group. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+
+</html>
