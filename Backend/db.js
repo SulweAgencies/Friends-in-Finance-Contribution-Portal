@@ -70,7 +70,6 @@ function initializeDatabase() {
       member_name TEXT,             -- added column
       document_type TEXT NOT NULL, -- 'photo' or 'mou'
       document_title TEXT,         -- filename or title
-      file_path TEXT NOT NULL,    -- path to the file on disk
       file_name TEXT NOT NULL,    -- original filename
       file_size INTEGER,          -- file size in bytes
       mime_type TEXT,            -- image/png, application/pdf, etc.
@@ -82,6 +81,8 @@ function initializeDatabase() {
       download_count INTEGER DEFAULT 0, -- for MOU: track downloads
       last_downloaded DATETIME,  -- for MOU: last download timestamp
       metadata TEXT,            -- JSON field for any additional data
+      cloudinary_url TEXT,      -- Cloudinary URL
+      public_id TEXT,           -- Cloudinary public ID
       FOREIGN KEY (member_email) REFERENCES users(member_email) ON DELETE CASCADE
     );
   `, (err) => {

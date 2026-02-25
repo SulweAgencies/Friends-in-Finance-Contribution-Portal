@@ -1556,7 +1556,7 @@
         <div class="footer-content">
             <a href="chart.html" class="logo-section footer-logo">
                 <i class="fas fa-hand-holding-usd"></i>
-                <h1>Friends in Finance <span>Contribution</span> Portal</h1>
+                <h1>Friends in Finance <span>Analytics</span></h1>
             </a>
             <div class="footer-links">
                 <a href="about.html"><i class="fas fa-info-circle"></i> About</a>
@@ -2738,7 +2738,8 @@
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ email, password })
+                body: JSON.stringify({ email, password }),
+                credentials: 'include'
             });
 
             const data = await response.json();
@@ -2748,6 +2749,9 @@
                 localStorage.setItem('lastLoginEmail', email);
 
                 showNotification('Login successful! Redirecting...', 'success');
+
+                console.log('🔐 Login response:', data);
+                console.log('📍 Redirecting to:', data.redirectTo);
 
                 // Successful login - redirect to appropriate dashboard
                 setTimeout(() => {
@@ -2813,8 +2817,8 @@
                 // Clear any stored session data
                 localStorage.removeItem('lastLoginEmail');
 
-                // Redirect to gateway page
-                window.location.href = 'gateway.html';
+                // Redirect to index page
+                window.location.href = 'index.html';
             } else {
                 alert('Logout failed. Please try again.');
             }

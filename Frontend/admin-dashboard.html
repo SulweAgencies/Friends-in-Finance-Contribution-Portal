@@ -2098,12 +2098,17 @@
         // Initialize dashboard
         document.addEventListener('DOMContentLoaded', function () {
             // Check if user is authenticated and is admin
-            fetch('/api/auth/status')
+            fetch('/api/auth/status', {
+                credentials: 'include' // Add this
+            })
                 .then(response => response.json())
                 .then(data => {
+                    console.log('🔐 Admin auth check response:', data);
                     if (!data.authenticated || data.user.role !== 'Admin') {
-                        // Not authenticated or not admin, redirect to login
-                        window.location.href = '/gateway.html';
+                        // Not authenticated or not admin, redirect to chart page
+                        console.log('❌ Admin auth check failed:', data);
+                        console.log('Not authenticated as admin, redirecting to chart');
+                        window.location.href = 'chart.html'; // Redirect to chart, NOT index.html
                         return;
                     }
 
@@ -2119,7 +2124,7 @@
                 })
                 .catch(error => {
                     console.error('Auth check failed:', error);
-                    window.location.href = '/gateway.html';
+                    window.location.href = 'chart.html'; // Redirect to chart, NOT index.html
                 });
 
             // Navigation
@@ -2135,7 +2140,8 @@
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                            }
+                            },
+                            credentials: 'include'
                         });
 
                         const data = await response.json();
@@ -2143,7 +2149,7 @@
                         if (data.success) {
                             // Successful logout - redirect to chart.html
                             setTimeout(() => {
-                                window.location.href = 'chart.html';
+                                window.location.href = 'chart.html'; // Redirect to chart, NOT index.html
                             }, 1000);
                         } else {
                             showNotification('Logout failed: ' + data.message, 'error');
@@ -2153,7 +2159,7 @@
                         showNotification('Network error during logout', 'error');
                         // Still redirect on error
                         setTimeout(() => {
-                            window.location.href = 'chart.html';
+                            window.location.href = 'chart.html'; // Redirect to chart, NOT index.html
                         }, 1000);
                     }
                 }
@@ -2201,12 +2207,31 @@
 
         async function initializeDashboard() {
             try {
-                // Fetch all necessary data
-                await Promise.all([
+                console.log('🚀 Initializing admin dashboard...');
+                
+                // Fetch all necessary data with individual error handling
+                const results = await Promise.allSettled([
                     fetchAnalytics(),
                     fetchUsers(),
                     fetchContributions()
                 ]);
+
+                // Log results of each fetch
+                results.forEach((result, index) => {
+                    const names = ['Analytics', 'Users', 'Contributions'];
+                    if (result.status === 'fulfilled') {
+                        console.log(`✅ ${names[index]} loaded successfully`);
+                    } else {
+                        console.error(`❌ ${names[index]} failed:`, result.reason);
+                        showNotification(`Failed to load ${names[index].toLowerCase()}: ${result.reason.message}`, 'error');
+                    }
+                });
+
+                // Check if we have at least some data to work with
+                if (!adminData.analytics && !adminData.members && !adminData.contributions) {
+                    showNotification('No data could be loaded. Please check server connection.', 'error');
+                    return;
+                }
 
                 // Update UI
                 updateStats();
@@ -2237,9 +2262,18 @@
 
         async function fetchAnalytics() {
             try {
-                const response = await fetch(`${API_BASE}/analytics`);
-                if (!response.ok) throw new Error('Failed to fetch analytics');
+                console.log('📊 Fetching analytics...');
+                const response = await fetch(`${API_BASE}/analytics`, {
+                    credentials: 'include'
+                });
+                console.log('📊 Analytics response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`Analytics fetch failed: ${response.status} ${response.statusText}`);
+                }
+                
                 adminData.analytics = await response.json();
+                console.log('📊 Analytics data loaded:', adminData.analytics);
 
                 // Update local stats from analytics
                 if (adminData.analytics.totalStats) {
@@ -2250,29 +2284,47 @@
                     adminData.stats.activeMonths = Object.keys(adminData.analytics.monthlyContributions || {}).length;
                 }
             } catch (error) {
-                console.error('fetchAnalytics error', error);
+                console.error('❌ fetchAnalytics error:', error);
                 throw error;
             }
         }
 
         async function fetchUsers() {
             try {
-                const response = await fetch(`${API_BASE}/users`);
-                if (!response.ok) throw new Error('Failed to fetch users');
+                console.log('👥 Fetching users...');
+                const response = await fetch(`${API_BASE}/users`, {
+                    credentials: 'include'
+                });
+                console.log('👥 Users response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`Users fetch failed: ${response.status} ${response.statusText}`);
+                }
+                
                 adminData.members = await response.json();
+                console.log('👥 Users data loaded:', adminData.members?.length || 0, 'members');
             } catch (error) {
-                console.error('fetchUsers error', error);
+                console.error('❌ fetchUsers error:', error);
                 throw error;
             }
         }
 
         async function fetchContributions() {
             try {
-                const response = await fetch(`${API_BASE}/contributions`);
-                if (!response.ok) throw new Error('Failed to fetch contributions');
+                console.log('💰 Fetching contributions...');
+                const response = await fetch(`${API_BASE}/contributions`, {
+                    credentials: 'include'
+                });
+                console.log('💰 Contributions response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`Contributions fetch failed: ${response.status} ${response.statusText}`);
+                }
+                
                 adminData.contributions = await response.json();
+                console.log('💰 Contributions data loaded:', adminData.contributions?.length || 0, 'contributions');
             } catch (error) {
-                console.error('fetchContributions error', error);
+                console.error('❌ fetchContributions error:', error);
                 throw error;
             }
         }
@@ -2353,10 +2405,12 @@
         }
 
         function loadMembersTable() {
+            console.log('📋 Loading members table with', adminData.members?.length || 0, 'members');
             const tableBody = document.getElementById('membersTable');
             tableBody.innerHTML = '';
 
-            if (adminData.members.length === 0) {
+            if (!adminData.members || adminData.members.length === 0) {
+                console.log('❌ No members data available');
                 tableBody.innerHTML = '<tr><td colspan="7" class="text-center">No members found. Sync data first.</td></tr>';
                 return;
             }
@@ -2400,10 +2454,12 @@
         }
 
         function loadContributionsTable() {
+            console.log('💰 Loading contributions table with', adminData.contributions?.length || 0, 'contributions');
             const tableBody = document.getElementById('contributionsTable');
             tableBody.innerHTML = '';
 
-            if (adminData.contributions.length === 0) {
+            if (!adminData.contributions || adminData.contributions.length === 0) {
+                console.log('❌ No contributions data available');
                 tableBody.innerHTML = '<tr><td colspan="8" class="text-center">No contributions found.</td></tr>';
                 return;
             }
@@ -3237,11 +3293,11 @@
 
             // Analytics and Live Data buttons
             document.getElementById('analyticsBtn')?.addEventListener('click', () => {
-                window.location.href = 'chart.html';
+                window.location.href = 'index.html';
             });
 
             document.getElementById('liveDataBtn')?.addEventListener('click', () => {
-                window.location.href = 'index.html';
+                window.location.href = 'live_data.html';
             });
 
             // Add Member button

@@ -1159,7 +1159,7 @@
                 color: white;
             }
             
-            /* Dashboard navigation menu - matching chart.html style */
+            /* Dashboard navigation menu - matching index.html style */
             .admin-header .dashboard-nav {
                 width: 100%;
                 justify-content: center;
@@ -2161,17 +2161,46 @@
             setupPasswordValidation();
         });
 
-        // Check if user is authenticated
-        async function checkAuth() {
+        // Add this temporary debug function
+        async function debugSession() {
             try {
-                const response = await fetch(`${API_BASE}/api/auth/status`, {
+                const response = await fetch(`${API_BASE}/api/debug/session`, {
                     credentials: 'include'
                 });
                 const data = await response.json();
+                console.log('Session debug:', data);
+                return data;
+            } catch (error) {
+                console.error('Debug session error:', error);
+            }
+        }
+
+        // Check if user is authenticated
+        // Check if user is authenticated
+        async function checkAuth() {
+            await debugSession(); // Add this line temporarily
+            try {
+                const response = await fetch(`${API_BASE}/api/auth/status`, {
+                    credentials: 'include', // This is crucial - sends cookies
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Auth status check failed: ${response.status}`);
+                }
+                
+                const data = await response.json();
 
                 if (!data.authenticated) {
-                    console.log('Not authenticated, redirecting to gateway');
-                    window.location.href = 'chart.html';
+                    console.log('❌ Member auth check failed:', data);
+                    console.log('Not authenticated, redirecting to chart page');
+                    // Show a message before redirecting
+                    showNotification('Session expired. Please login again.', 'warning');
+                    setTimeout(() => {
+                        window.location.href = 'chart.html';
+                    }, 2000);
                     return;
                 }
 
@@ -2184,7 +2213,7 @@
 
             } catch (error) {
                 console.error('Auth check failed:', error);
-                showNotification('Authentication failed. Please login again.', 'error');
+                showNotification('Authentication error. Please login again.', 'error');
                 setTimeout(() => {
                     window.location.href = 'chart.html';
                 }, 2000);
@@ -2199,8 +2228,16 @@
                 document.getElementById('dashboardMain').style.display = 'none';
 
                 // First, get contributions data
-                const response = await fetch(`${API_BASE}/contributions`);
+                const response = await fetch(`${API_BASE}/contributions`, {
+                    credentials: 'include' // Add this
+                });
+                
                 if (!response.ok) {
+                    if (response.status === 401) {
+                        // Unauthorized - redirect to login
+                        window.location.href = 'chart.html';
+                        return;
+                    }
                     throw new Error(`Database error: ${response.status}`);
                 }
 
@@ -2975,7 +3012,7 @@
                 } catch (e) {
                     console.error('Logout error:', e);
                 }
-                window.location.href = 'chart.html';
+                window.location.href = 'chart.html'; // Redirect to chart, NOT index.html
             });
 
             // Change password modal
