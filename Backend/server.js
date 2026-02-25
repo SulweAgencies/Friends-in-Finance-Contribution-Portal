@@ -23,9 +23,33 @@ const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
 
-// ===== CLOUDINARY IMPORTS =====
-const cloudinary = require('cloudinary').v2;
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
+// ===== CLOUDINARY CONFIGURATION WITH ERROR HANDLING =====
+let cloudinary, CloudinaryStorage;
+let photoStorage, mouStorage, receiptStorage;
+let hasCloudinary = false;
+
+try {
+  cloudinary = require('cloudinary').v2;
+  CloudinaryStorage = require('multer-storage-cloudinary').CloudinaryStorage;
+  
+  if (process.env.CLOUDINARY_CLOUD_NAME && 
+      process.env.CLOUDINARY_API_KEY && 
+      process.env.CLOUDINARY_API_SECRET) {
+    
+    cloudinary.config({
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET
+    });
+    
+    hasCloudinary = true;
+    console.log('✅ Cloudinary configured and connected');
+  } else {
+    console.warn('⚠️ Cloudinary environment variables missing - using local storage');
+  }
+} catch (error) {
+  console.warn('⚠️ Cloudinary not available - using local storage:', error.message);
+}
 
 const app = express();
 
@@ -33,17 +57,12 @@ const app = express();
 const isProduction = process.env.NODE_ENV === 'production';
 const isRenderEnvironment = process.env.RENDER || process.env.RENDER_SERVICE_ID || process.env.RENDER_EXTERNAL_URL;
 
-// ===== CLOUDINARY CONFIGURATION =====
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
-
 // Test Cloudinary connection on startup
-cloudinary.api.ping()
-  .then(() => console.log('✅ Cloudinary connected successfully'))
-  .catch(err => console.log('❌ Cloudinary connection error:', err.message));
+if (hasCloudinary) {
+  cloudinary.api.ping()
+    .then(() => console.log('✅ Cloudinary connected successfully'))
+    .catch(err => console.log('❌ Cloudinary connection error:', err.message));
+}
 
 // Middleware
 const corsOptions = {
@@ -999,46 +1018,76 @@ app.get("/api/test/populate-logs", async (req, res) => {
     }
 });
 
-// ===== CLOUDINARY STORAGE CONFIGURATION =====
-const photoStorage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'friends-finance/photos',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'gif'],
-    transformation: [{ width: 500, height: 500, crop: 'limit' }],
-    public_id: (req, file) => {
-      const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
-      return `PHOTO-${unique}`;
+// ===== STORAGE CONFIGURATION (Cloudinary or Local) =====
+if (hasCloudinary) {
+  // Use Cloudinary storage
+  photoStorage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+      folder: 'friends-finance/photos',
+      allowed_formats: ['jpg', 'jpeg', 'png', 'gif'],
+      transformation: [{ width: 500, height: 500, crop: 'limit' }],
+      public_id: (req, file) => {
+        const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
+        return `PHOTO-${unique}`;
+      }
     }
-  }
-});
+  });
 
-const mouStorage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'friends-finance/mou',
-    allowed_formats: ['pdf', 'doc', 'docx'],
-    resource_type: 'raw',
-    public_id: (req, file) => {
-      const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
-      return `MOU-${unique}`;
+  mouStorage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+      folder: 'friends-finance/mou',
+      allowed_formats: ['pdf', 'doc', 'docx'],
+      resource_type: 'raw',
+      public_id: (req, file) => {
+        const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
+        return `MOU-${unique}`;
+      }
     }
-  }
-});
+  });
 
-const receiptStorage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'friends-finance/receipts',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'pdf'],
-    resource_type: 'auto',
-    public_id: (req, file) => {
-      const month = req.params.month.replace(/[^a-zA-Z0-9-]/g, '_');
-      const timestamp = Date.now();
-      return `receipt_${month}_${timestamp}`;
+  receiptStorage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+      folder: 'friends-finance/receipts',
+      allowed_formats: ['pdf', 'jpg', 'jpeg', 'png'],
+      resource_type: 'auto',
+      public_id: (req, file) => {
+        const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
+        return `RECEIPT-${unique}`;
+      }
     }
-  }
-});
+  });
+} else {
+  // Use local disk storage as fallback
+  const diskStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      if (file.fieldname === 'photo') {
+        const uploadPath = path.join(__dirname, 'uploads', 'photos');
+        if (!fs.existsSync(uploadPath)) fs.mkdirSync(uploadPath, { recursive: true });
+        cb(null, uploadPath);
+      } else if (file.fieldname === 'mouFile') {
+        const uploadPath = path.join(__dirname, 'uploads', 'mou');
+        if (!fs.existsSync(uploadPath)) fs.mkdirSync(uploadPath, { recursive: true });
+        cb(null, uploadPath);
+      } else if (file.fieldname === 'receipt') {
+        const uploadPath = path.join(__dirname, 'uploads', 'receipts');
+        if (!fs.existsSync(uploadPath)) fs.mkdirSync(uploadPath, { recursive: true });
+        cb(null, uploadPath);
+      }
+    },
+    filename: (req, file, cb) => {
+      const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      const ext = path.extname(file.originalname);
+      cb(null, `${file.fieldname}-${unique}${ext}`);
+    }
+  });
+
+  photoStorage = diskStorage;
+  mouStorage = diskStorage;
+  receiptStorage = diskStorage;
+}
 
 // Multer upload configurations
 const photoUpload = multer({
@@ -1101,13 +1150,29 @@ app.post('/users/:id/photo', photoUpload.single('photo'), async (req, res) => {
         });
 
         if (!user) {
-            // Delete from Cloudinary if user not found
-            await cloudinary.uploader.destroy(req.file.filename);
+            // Delete uploaded file if user not found
+            if (hasCloudinary && req.file.filename) {
+                await cloudinary.uploader.destroy(req.file.filename).catch(e => {});
+            } else if (!hasCloudinary && req.file.path) {
+                fs.unlinkSync(req.file.path);
+            }
             return res.status(404).json({ error: 'User not found' });
         }
 
-        const cloudinaryUrl = req.file.path;
-        const publicId = req.file.filename;
+        // Get file info based on storage type
+        let cloudinaryUrl, publicId, filePath, fileName;
+        
+        if (hasCloudinary) {
+            cloudinaryUrl = req.file.path;
+            publicId = req.file.filename;
+            fileName = req.file.originalname;
+        } else {
+            // Local storage
+            filePath = req.file.path;
+            fileName = req.file.filename;
+            cloudinaryUrl = null;
+            publicId = null;
+        }
 
         // Set all existing photos for this user to not primary
         await new Promise((resolve, reject) => {
@@ -1119,43 +1184,71 @@ app.post('/users/:id/photo', photoUpload.single('photo'), async (req, res) => {
             );
         });
 
-        // Insert new photo record with Cloudinary info
+        // Insert new photo record
         await new Promise((resolve, reject) => {
-            db.run(
-                `INSERT INTO member_documents 
-                 (member_email, document_type, document_title, cloudinary_url, public_id,
-                  file_name, file_size, mime_type, is_primary, uploaded_by, metadata)
-                 VALUES (?, 'photo', ?, ?, ?, ?, ?, ?, 1, ?, ?)`,
-                [
-                    user.member_email,
-                    req.file.originalname,
-                    cloudinaryUrl,
-                    publicId,
-                    req.file.originalname,
-                    req.file.size,
-                    req.file.mimetype,
-                    req.body.uploaded_by || 'admin',
-                    JSON.stringify({ 
-                        cloudinary: true,
-                        format: req.file.format,
-                        width: req.file.width,
-                        height: req.file.height
-                    })
-                ],
-                function (err) {
-                    if (err) reject(err);
-                    else resolve(this.lastID);
-                }
-            );
+            if (hasCloudinary) {
+                // Cloudinary storage
+                db.run(
+                    `INSERT INTO member_documents 
+                     (member_email, document_type, document_title, cloudinary_url, public_id,
+                      file_name, file_size, mime_type, is_primary, uploaded_by, metadata)
+                     VALUES (?, 'photo', ?, ?, ?, ?, ?, ?, 1, ?, ?)`,
+                    [
+                        user.member_email,
+                        req.file.originalname,
+                        cloudinaryUrl,
+                        publicId,
+                        req.file.originalname,
+                        req.file.size,
+                        req.file.mimetype,
+                        req.body.uploaded_by || 'admin',
+                        JSON.stringify({ 
+                            cloudinary: true,
+                            upload_date: new Date().toISOString()
+                        })
+                    ],
+                    (err) => err ? reject(err) : resolve()
+                );
+            } else {
+                // Local storage
+                db.run(
+                    `INSERT INTO member_documents 
+                     (member_email, document_type, document_title, file_name, file_size, mime_type,
+                      is_primary, uploaded_by, metadata)
+                     VALUES (?, 'photo', ?, ?, ?, ?, 1, ?, ?)`,
+                    [
+                        user.member_email,
+                        req.file.originalname,
+                        fileName,
+                        req.file.size,
+                        req.file.mimetype,
+                        req.body.uploaded_by || 'admin',
+                        JSON.stringify({ 
+                            cloudinary: false,
+                            local_path: filePath,
+                            upload_date: new Date().toISOString()
+                        })
+                    ],
+                    (err) => err ? reject(err) : resolve()
+                );
+            }
         });
 
-        res.json({ success: true, photo_url: cloudinaryUrl });
+        res.json({ 
+            success: true, 
+            message: 'Photo uploaded successfully',
+            photo_url: hasCloudinary ? cloudinaryUrl : `/uploads/photos/${fileName}`
+        });
 
     } catch (error) {
         console.error('Photo upload error:', error);
-        // Clean up from Cloudinary if error
-        if (req.file && req.file.filename) {
-            await cloudinary.uploader.destroy(req.file.filename).catch(e => {});
+        // Clean up uploaded file if error
+        if (req.file) {
+            if (hasCloudinary && req.file.filename) {
+                await cloudinary.uploader.destroy(req.file.filename).catch(e => {});
+            } else if (!hasCloudinary && req.file.path) {
+                fs.unlinkSync(req.file.path);
+            }
         }
         res.status(500).json({ error: error.message });
     }
@@ -1168,13 +1261,25 @@ app.get('/users/:email/photo', async (req, res) => {
             return res.status(404).json({ error: 'No photo found' });
         }
         
-        // Use only Cloudinary URL - no fallback to local files
-        if (!photo.cloudinary_url) {
+        let photo_url;
+        
+        if (hasCloudinary && photo.cloudinary_url) {
+            // Use Cloudinary URL if available
+            photo_url = photo.cloudinary_url;
+        } else if (!hasCloudinary) {
+            // Use local file path for local storage
+            const metadata = JSON.parse(photo.metadata || '{}');
+            if (metadata.local_path && fs.existsSync(metadata.local_path)) {
+                photo_url = `/uploads/photos/${photo.file_name}`;
+            } else {
+                return res.status(404).json({ error: 'Photo file not found' });
+            }
+        } else {
             return res.status(404).json({ error: 'No Cloudinary photo found' });
         }
         
         res.json({
-            photo_url: photo.cloudinary_url,
+            photo_url: photo_url,
             upload_date: photo.upload_date,
             is_primary: photo.is_primary
         });
@@ -1200,19 +1305,26 @@ app.delete('/users/:id/photo', async (req, res) => {
 
         const photo = await new Promise((resolve, reject) => {
             db.get(
-                `SELECT public_id FROM member_documents 
+                `SELECT public_id, metadata FROM member_documents 
                  WHERE member_email = ? AND document_type = 'photo' AND status = 'active'`,
                 [user.member_email],
                 (err, row) => err ? reject(err) : resolve(row)
             );
         });
 
-        // Delete from Cloudinary if it has a public_id
-        if (photo && photo.public_id) {
-            await cloudinary.uploader.destroy(photo.public_id).catch(e => {});
+        // Delete from storage based on type
+        if (photo) {
+            if (hasCloudinary && photo.public_id) {
+                // Delete from Cloudinary
+                await cloudinary.uploader.destroy(photo.public_id).catch(e => {});
+            } else if (!hasCloudinary && photo.metadata) {
+                // Delete local file
+                const metadata = JSON.parse(photo.metadata);
+                if (metadata.local_path && fs.existsSync(metadata.local_path)) {
+                    fs.unlinkSync(metadata.local_path);
+                }
+            }
         }
-
-        // No need to delete local files - we only use Cloudinary now
 
         // Update database
         await new Promise((resolve, reject) => {
