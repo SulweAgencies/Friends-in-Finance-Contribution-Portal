@@ -1949,7 +1949,7 @@
     // Function to update hero stats with dynamic data
     async function updateHeroStats() {
         try {
-            const response = await fetch('http://localhost:3000/contributions');
+            const response = await fetch('https://friends-in-finance-contribution-portal.onrender.com/contributions');
             if (!response.ok) throw new Error('Failed to fetch data');
             
             const contributions = await response.json();
