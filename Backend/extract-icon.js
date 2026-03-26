@@ -100,7 +100,7 @@ function generateManifest() {
         theme_color: CONFIG.themeColor,
         background_color: "#ffffff",
         display: "standalone",
-        start_url: "/index.html"
+        start_url: "/chart.html"
     };
     
     fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));

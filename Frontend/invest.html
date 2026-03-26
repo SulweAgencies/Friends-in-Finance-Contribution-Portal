@@ -1028,35 +1028,6 @@
             font-size: 1rem;
         }
 
-        .password-input-container {
-            position: relative;
-        }
-
-        .password-toggle-btn {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: #64748b;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 6px;
-            transition: all 0.2s ease;
-            font-size: 16px;
-        }
-
-        .password-toggle-btn:hover {
-            color: #667eea;
-            background: rgba(102, 126, 234, 0.1);
-        }
-
-        .password-toggle-btn:focus {
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
-        }
-
         .btn {
             width: 100%;
             padding: 14px;
@@ -1676,8 +1647,7 @@
         gap: 3px;
     }
     
-    .admin-header .download-btn,
-    .admin-header .login-btn-top {
+    .admin-header .download-btn {
         padding: 6px 3px;
         font-size: 0.7rem;
     }
@@ -1775,12 +1745,6 @@
                         </div>
                     </div>
                 </div>
-                <button class="login-btn-top" id="openLoginModal">
-                    <i class="fas fa-sign-in-alt"></i> Member Login
-                </button>
-                <button class="login-btn-top" id="logoutBtn" onclick="logout()" style="display:inline-flex;">
-                    <i class="fas fa-sign-out-alt"></i> Exit
-                </button>
             </nav>
         </div>
     </header>
@@ -1934,35 +1898,6 @@
                 <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;" id="fiveYearProjection">
                     <!-- Dynamically populated -->
                 </div>
-            </div>
-        </div>
-
-
-
-        <div class="login-modal" id="loginModal">
-            <div class="login-box">
-                <button class="close-modal" id="closeLoginModal">&times;</button>
-                <div class="login-header">
-                    <h3>Member Login</h3>
-                    <p>Access your contribution dashboard</p>
-                </div>
-                <form id="loginForm">
-                    <div class="form-group">
-                        <label for="username">Email</label>
-                        <input type="email" id="username" class="form-control" placeholder="you@domain.com" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <div class="password-input-container">
-                            <input type="password" id="password" class="form-control" placeholder="Enter your password"
-                                required>
-                            <button type="button" class="password-toggle-btn" onclick="togglePassword('password')" title="Toggle password visibility">
-                                <i class="far fa-eye" id="password-toggle-icon"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn">Login to Dashboard</button>
-                </form>
             </div>
         </div>
 
@@ -2139,9 +2074,10 @@
                     investmentData.runningTotalContributions.push(running);
 
                     // Store receipt info if available
-                    if (r.receipt_path) {
+                    if ((r.receipt_url && String(r.receipt_url).trim() !== '') || (r.receipt_path && String(r.receipt_path).trim() !== '')) {
                         investmentData.receipts[monthLabel] = {
-                            path: r.receipt_path,
+                            url: r.receipt_url || null,
+                            path: r.receipt_path || null,
                             filename: r.receipt_filename,
                             uploaded_at: r.receipt_uploaded_at,
                             uploaded_by: r.receipt_uploaded_by
@@ -2282,7 +2218,11 @@
 
                 for (let i = 0; i < investmentData.months.length; i++) {
                     const month = investmentData.months[i];
-                    const hasReceipt = investmentData.receipts && investmentData.receipts[month];
+                    const receiptInfo = investmentData.receipts && investmentData.receipts[month];
+                    const hasReceiptUrl = receiptInfo && receiptInfo.url && String(receiptInfo.url).trim() !== '';
+                    const hasReceiptPath = receiptInfo && receiptInfo.path && String(receiptInfo.path).trim() !== '';
+                    // Color-code based only on receipt URL existence (receipt_path may still be present).
+                    const hasReceipt = hasReceiptUrl;
 
                     tableHTML += `
                     <tr>
@@ -2293,11 +2233,17 @@
                         <td class="iandm-bg"><strong>KES ${investmentData.iandmBalance[i].toLocaleString()}</strong></td>
                         <td>KES ${investmentData.totalInvested[i].toLocaleString()}</td>
                         <td>
-                            <button class="btn-view-receipt" onclick="viewReceipt('${month}')" 
-                                    style="background: ${hasReceipt ? '#10b981' : '#f59e0b'}; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600;">
-                                <i class="fas fa-${hasReceipt ? 'file-invoice' : 'exclamation-circle'}"></i>
-                                ${hasReceipt ? 'View' : 'No Receipt'}
-                            </button>
+                            ${hasReceipt ? 
+                                `<button class="btn-view-receipt" onclick="viewReceipt('${month}')" 
+                                         style="background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                                    <i class="fas fa-external-link-alt"></i> View Reciept
+                                </button>` :
+                                `<button class="btn-view-receipt" onclick="viewReceipt('${month}')" 
+                                         style="background: #f59e0b; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600;"
+                                         title="Document not uploaded">
+                                    <i class="fas fa-exclamation-circle"></i> View Reciept
+                                </button>`
+                            }
                         </td>
                     </tr>
                 `;
@@ -2307,15 +2253,45 @@
             }
 
             // Function to view receipt
-            function viewReceipt(month) {
+            async function viewReceipt(month) {
                 const receipt = investmentData.receipts && investmentData.receipts[month];
+                const hasReceiptUrl = receipt && receipt.url && String(receipt.url).trim() !== '';
+                const hasReceiptPath = receipt && receipt.path && String(receipt.path).trim() !== '';
 
-                if (receipt) {
-                    // Open receipt in new tab
+                if (hasReceiptUrl) {
+                    // Open receipt URL directly (stored in investment_tracking.receipt_url)
+                    window.open(String(receipt.url), '_blank');
+                } else if (hasReceiptPath) {
+                    // Fallback to the backend file/URL resolver endpoint
                     window.open(`${API_BASE}/investments/${encodeURIComponent(month)}/receipt`, '_blank');
                 } else {
-                    // Show popup message
-                    showNotification('Receipt not yet provided for ' + month, 'warning');
+                    // If preloaded data doesn't include the receipt, try fetching receipt info on-demand.
+                    try {
+                        const receiptEndpoint = `${API_BASE}/investments/${encodeURIComponent(month)}/receipt`;
+                        const res = await fetch(receiptEndpoint);
+
+                        if (!res.ok) {
+                            showNotification('Document not uploaded for ' + month);
+                            return;
+                        }
+
+                        const contentType = (res.headers.get('content-type') || '').toLowerCase();
+                        if (contentType.includes('application/json')) {
+                            const data = await res.json();
+                            const url = data?.receipt?.url;
+                            if (url && String(url).trim() !== '') {
+                                window.open(String(url), '_blank');
+                            } else {
+                                showNotification('Document not uploaded for ' + month);
+                            }
+                        } else {
+                            // Non-JSON response likely means the backend sent the file directly.
+                            window.open(receiptEndpoint, '_blank');
+                        }
+                    } catch (e) {
+                        console.error('viewReceipt fetch error:', e);
+                        showNotification('Document not uploaded for ' + month);
+                    }
                 }
             }
 
@@ -2939,6 +2915,17 @@
                 });
             }
 
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', function(event) {
+                const downloadOptions = document.getElementById('downloadOptions');
+                const downloadDropdown = document.getElementById('downloadDropdown');
+                
+                // Close download dropdown
+                if (downloadOptions && !downloadOptions.contains(event.target) && downloadDropdown) {
+                    downloadDropdown.classList.remove('show');
+                }
+            });
+
             function showProgress(message, submessage) {
                 const progress = document.getElementById('downloadProgress');
                 const progressText = document.getElementById('progressText');
@@ -3338,209 +3325,11 @@
                     renderInsightCards();
                     renderQAAnalysis();
                     renderComparisonTable();
-                    renderRecommendations();
-                    renderFiveYearProjection();
-                    initializeCharts();
                 }
             };
         </script>
-        <script>
-            // Check authentication status on page load
-            async function checkAuthStatus() {
-                try {
-                    const response = await fetch('/api/auth/status');
-                    const data = await response.json();
 
-                    // Exit button is always visible — only toggle the Member Login button when explicitly authenticated
-                    const loginBtn = document.getElementById('openLoginModal');
-                    if (loginBtn) {
-                        // Only hide if explicitly authenticated and status is confirmed
-                        if (data.authenticated === true) {
-                            loginBtn.style.display = 'none';
-                        } else {
-                            // Always show login button unless explicitly authenticated
-                            loginBtn.style.display = 'inline-flex';
-                        }
-                    }
-                } catch (error) {
-                    console.error('Auth status check failed:', error);
-                }
-            }
-
-            // Handle login form submission
-            async function showComingSoon() {
-                alert('✨ This feature is coming soon! Check back later.');
-            }
-
-            // Logout function
-            async function logout() {
-                try {
-                    const response = await fetch('/api/logout', {
-                        method: 'POST',
-                        credentials: 'include'
-                    });
-
-                    if (response.ok) {
-                        // Clear any stored session data
-                        localStorage.removeItem('lastLoginEmail');
-
-                        // Redirect to gateway page
-                        window.location.href = 'chart.html';
-                    } else {
-                        alert('Logout failed. Please try again.');
-                    }
-                } catch (error) {
-                    console.error('Logout error:', error);
-                    alert('Network error during logout. Please try again.');
-                }
-            }
-
-            // Show notification function
-            function showNotification(message, type = 'info') {
-                const notification = document.createElement('div');
-                notification.className = `notification ${type}`;
-                notification.innerHTML = message;
-                document.body.appendChild(notification);
-
-                setTimeout(() => {
-                    notification.style.animation = 'slideOut 0.3s ease';
-                    setTimeout(() => {
-                        notification.remove();
-                    }, 300);
-                }, 5000);
-            }
-
-            async function handleLogin(e) {
-                e.preventDefault();
-
-                const email = document.getElementById('username').value;
-                const password = document.getElementById('password').value;
-                const submitBtn = e.target.querySelector('button[type="submit"]');
-                const originalText = submitBtn.innerHTML;
-
-                // Show loading state
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
-
-                try {
-                    const response = await fetch('/api/login', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ email, password })
-                    });
-
-                    const data = await response.json();
-
-                    if (data.success) {
-                        // Save email to localStorage for next time
-                        localStorage.setItem('lastLoginEmail', email);
-
-                        showNotification('Login successful! Redirecting...', 'success');
-
-                        // Successful login - redirect to appropriate dashboard
-                        setTimeout(() => {
-                            window.location.href = data.redirectTo;
-                        }, 1000);
-                    } else {
-                        // Failed login - show error
-                        showNotification(data.message || 'Login failed', 'error');
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = originalText;
-                    }
-                } catch (error) {
-                    console.error('Login error:', error);
-                    showNotification('Network error. Please try again.', 'error');
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalText;
-                }
-            }
-
-            // Initialize
-            document.addEventListener('DOMContentLoaded', function () {
-                // Check if user is already authenticated
-                checkAuthStatus();
-
-                // Auto-fill last used email
-                const lastEmail = localStorage.getItem('lastLoginEmail');
-                if (lastEmail) {
-                    document.getElementById('username').value = lastEmail;
-                }
-
-                // Add login form handler
-                const loginForm = document.getElementById('loginForm');
-                if (loginForm) {
-                    loginForm.addEventListener('submit', handleLogin);
-                }
-            });
-
-            // Password toggle function
-            function togglePassword(inputId) {
-                const input = document.getElementById(inputId);
-                const icon = document.getElementById(inputId + '-toggle-icon');
-                
-                if (input.type === 'password') {
-                    input.type = 'text';
-                    icon.classList.remove('far', 'fa-eye');
-                    icon.classList.add('far', 'fa-eye-slash');
-                } else {
-                    input.type = 'password';
-                    icon.classList.remove('far', 'fa-eye-slash');
-                    icon.classList.add('far', 'fa-eye');
-                }
-            }
-
-            (function () {
-                var modal = document.getElementById('loginModal');
-                var openBtn = document.getElementById('openLoginModal');
-                var closeBtn = document.getElementById('closeLoginModal');
-                if (openBtn && modal) {
-                    openBtn.addEventListener('click', function () { modal.classList.add('active'); });
-                    if (closeBtn) closeBtn.addEventListener('click', function () { modal.classList.remove('active'); });
-                    modal.addEventListener('click', function (e) { if (e.target === modal) modal.classList.remove('active'); });
-                }
-            })();
-
-            // Toggle download dropdown
-            function toggleDownloadDropdown() {
-                const dropdown = document.getElementById('downloadDropdown');
-                if (dropdown) {
-                    dropdown.classList.toggle('show');
-                }
-            }
-
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function (e) {
-                const dropdown = document.getElementById('downloadDropdown');
-                const exportBtn = document.getElementById('exportBtn');
-                if (dropdown && exportBtn && !exportBtn.contains(e.target) && !dropdown.contains(e.target)) {
-                    dropdown.classList.remove('show');
-                }
-            });
-
-            // Export Investment Report function
-            function exportInvestmentReport(format) {
-                const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-                const filename = `Investment_Dashboard_${timestamp}`;
-                switch (format) {
-                    case 'pdf':
-                        showNotification('PDF export coming soon!', 'info');
-                        break;
-                    case 'png':
-                        showNotification('PNG export coming soon!', 'info');
-                        break;
-                    case 'csv':
-                        showNotification('CSV export coming soon!', 'info');
-                        break;
-                    case 'print':
-                        window.print();
-                        break;
-                }
-            }
-        </script>
-
-        <!-- Close main content and dashboard container -->
+    <!-- Close main content and dashboard container -->
     </div><!-- end dashboard-container -->
     </div><!-- end main-content -->
 
@@ -3549,7 +3338,7 @@
         <div class="footer-content">
             <a href="chart.html" class="logo-section footer-logo">
                 <i class="fas fa-hand-holding-usd"></i>
-                <h1>Friends in Finance <span>Analytics</span></h1>
+                <h1>Friends in Finance <span>Contribution</span> Portal</h1>
             </a>
             <div class="footer-links">
                 <a href="about.html"><i class="fas fa-info-circle"></i> About</a>

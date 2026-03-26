@@ -214,6 +214,127 @@
             background: rgba(255, 255, 255, 0.3);
         }
 
+        /* Members Dropdown Styles */
+        .members-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .members-dropdown-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .members-dropdown-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .members-dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 110%;
+            background: white;
+            min-width: 280px;
+            max-width: 350px;
+            max-height: 400px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            overflow-y: auto;
+        }
+
+        .members-dropdown-content.show {
+            display: block;
+        }
+
+        .dropdown-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .member-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #1e293b;
+            font-weight: 500;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .member-item:hover {
+            background: #f8fafc;
+            transform: translateX(2px);
+        }
+
+        .member-item:last-child {
+            border-bottom: none;
+        }
+
+        .member-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .member-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .member-name {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .member-email {
+            font-size: 12px;
+            color: #64748b;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .member-arrow {
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
         /* Container */
         .member-container {
             max-width: 1400px;
@@ -238,19 +359,14 @@
             position: relative;
             width: 280px;
             height: auto;
-            min-height: 280px;
+            min-height: 320px;
             flex-shrink: 0;
             align-self: stretch;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         .member-photo {
-            max-width: 100%;
-            max-height: 400px;
-            width: auto;
-            height: auto;
+            width: 100%;
+            height: 100%;
             border-radius: 8px;
             object-fit: cover;
             border: 4px solid rgba(255, 255, 255, 0.3);
@@ -394,6 +510,63 @@
         .document-status.pending {
             background: rgba(241, 196, 15, 0.2);
             color: #F1C40F;
+        }
+
+        .document-status.upload {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .upload-item {
+            cursor: pointer;
+            border: 2px dashed #e2e8f0;
+            transition: all 0.3s;
+        }
+
+        .upload-item:hover {
+            border-color: #3b82f6;
+            background: #f8fafc;
+            transform: translateY(-2px);
+        }
+
+        .form-message {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .form-message.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+
+        .form-message.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-secondary {
+            background: #64748b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
         }
 
         /* Results Container */
@@ -545,20 +718,6 @@
         }
 
         /* Modal */
-        .member-photo-container {
-            position: relative;
-            width: 280px;
-            height: auto;
-            min-height: 280px;
-            border-radius: 8px;
-            overflow: hidden;
-            background: #f9fafb;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            align-self: stretch;
-        }
-
         .modal {
             position: fixed;
             top: 0;
@@ -1159,7 +1318,7 @@
                 color: white;
             }
             
-            /* Dashboard navigation menu - matching index.html style */
+            /* Dashboard navigation menu - matching chart.html style */
             .admin-header .dashboard-nav {
                 width: 100%;
                 justify-content: center;
@@ -1251,7 +1410,7 @@
             .member-photo-container {
                 width: 280px;
                 height: auto;
-                min-height: 280px;
+                min-height: 320px;
                 margin: 0 auto 20px;
                 display: flex;
                 align-items: center;
@@ -1582,7 +1741,7 @@
             .member-photo-container {
                 width: 260px;
                 height: auto;
-                min-height: 260px;
+                min-height: 300px;
                 margin: 0 auto 20px;
                 display: flex;
                 align-items: center;
@@ -1779,6 +1938,62 @@
         </div>
     </div>
 
+    <!-- Photo Upload Modal -->
+    <div class="modal" id="photoUploadModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-camera"></i> Upload Profile Photo</h2>
+                <button class="close-btn" id="closePhotoModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="photoUploadForm">
+                    <div class="form-group">
+                        <label for="photoFile">Select Photo (JPG, PNG, GIF)</label>
+                        <input type="file" id="photoFile" name="photoFile" accept="image/*" required />
+                    </div>
+                    <div id="photoUploadMessage" class="form-message" style="display:none"></div>
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Upload Photo</button>
+                        <button type="button" class="btn btn-secondary" id="cancelPhotoUpload">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Receipt Upload Modal -->
+    <div class="modal" id="receiptUploadModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-receipt"></i> Upload Receipt</h2>
+                <button class="close-btn" id="closeReceiptModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="receiptUploadForm">
+                    <div class="form-group">
+                        <label for="receiptMonth">Month</label>
+                        <select id="receiptMonth" name="receiptMonth" required>
+                            <option value="">Select Month</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="receiptAmount">Amount (KES)</label>
+                        <input type="number" id="receiptAmount" name="receiptAmount" min="0" step="0.01" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="receiptFile">Select Receipt (JPG, PNG, PDF)</label>
+                        <input type="file" id="receiptFile" name="receiptFile" accept="image/*,.pdf" required />
+                    </div>
+                    <div id="receiptUploadMessage" class="form-message" style="display:none"></div>
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Upload Receipt</button>
+                        <button type="button" class="btn btn-secondary" id="cancelReceiptUpload">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- MOU Upload / Replace Modal -->
     <div class="modal" id="mouUploadModal">
         <div class="modal-content">
@@ -1911,12 +2126,10 @@
                             </div>
                         </div>
                     </div>
-                    <button class="login-btn-top" id="changePasswordBtn" title="Change Password">
-                        <i class="fas fa-key"></i> Change Password
-                    </button>
-                    <button class="login-btn-top" id="logoutBtn">
+                    <!-- Logout (replaces Members dropdown) -->
+                    <a class="members-dropdown-btn" href="chart.html">
                         <i class="fas fa-sign-out-alt"></i> Logout
-                    </button>
+                    </a>
                 </div>
             </div>
         </header>
@@ -2103,6 +2316,7 @@
             const adminToken = urlParams.get('admin_token');
             const adminView = urlParams.get('admin_view') === 'true';
             const requestedEmail = urlParams.get('email');
+            const directAccess = urlParams.get('direct_access') === 'true';
 
             // Simple admin token validation (you can make this more secure)
             function validateAdminToken(token) {
@@ -2113,6 +2327,20 @@
                 } catch {
                     return false;
                 }
+            }
+
+            if (directAccess && requestedEmail) {
+                // Direct access - skip authentication
+                console.log('Direct access for member:', requestedEmail);
+                
+                // Hide loading, show dashboard
+                document.getElementById('loadingScreen').style.display = 'none';
+                document.getElementById('dashboardMain').style.display = 'block';
+
+                // Load data for specific member
+                loadMemberData(requestedEmail);
+                
+                return; // Skip normal authentication
             }
 
             if (adminView && validateAdminToken(adminToken) && requestedEmail) {
@@ -2161,46 +2389,17 @@
             setupPasswordValidation();
         });
 
-        // Add this temporary debug function
-        async function debugSession() {
+        // Check if user is authenticated
+        async function checkAuth() {
             try {
-                const response = await fetch(`${API_BASE}/api/debug/session`, {
+                const response = await fetch(`${API_BASE}/api/auth/status`, {
                     credentials: 'include'
                 });
                 const data = await response.json();
-                console.log('Session debug:', data);
-                return data;
-            } catch (error) {
-                console.error('Debug session error:', error);
-            }
-        }
-
-        // Check if user is authenticated
-        // Check if user is authenticated
-        async function checkAuth() {
-            await debugSession(); // Add this line temporarily
-            try {
-                const response = await fetch(`${API_BASE}/api/auth/status`, {
-                    credentials: 'include', // This is crucial - sends cookies
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`Auth status check failed: ${response.status}`);
-                }
-                
-                const data = await response.json();
 
                 if (!data.authenticated) {
-                    console.log('❌ Member auth check failed:', data);
-                    console.log('Not authenticated, redirecting to chart page');
-                    // Show a message before redirecting
-                    showNotification('Session expired. Please login again.', 'warning');
-                    setTimeout(() => {
-                        window.location.href = 'chart.html';
-                    }, 2000);
+                    console.log('Not authenticated, redirecting to gateway');
+                    window.location.href = 'chart.html';
                     return;
                 }
 
@@ -2213,7 +2412,7 @@
 
             } catch (error) {
                 console.error('Auth check failed:', error);
-                showNotification('Authentication error. Please login again.', 'error');
+                showNotification('Authentication failed. Please login again.', 'error');
                 setTimeout(() => {
                     window.location.href = 'chart.html';
                 }, 2000);
@@ -2228,16 +2427,8 @@
                 document.getElementById('dashboardMain').style.display = 'none';
 
                 // First, get contributions data
-                const response = await fetch(`${API_BASE}/contributions`, {
-                    credentials: 'include' // Add this
-                });
-                
+                const response = await fetch(`${API_BASE}/contributions`);
                 if (!response.ok) {
-                    if (response.status === 401) {
-                        // Unauthorized - redirect to login
-                        window.location.href = 'chart.html';
-                        return;
-                    }
                     throw new Error(`Database error: ${response.status}`);
                 }
 
@@ -2259,21 +2450,21 @@
                 document.getElementById('loadingScreen').style.display = 'none';
                 document.getElementById('dashboardMain').style.display = 'block';
 
-                // Try to enrich memberData with user record (to get photo_url)
+                // Try to enrich memberData with photo from members_document table
                 try {
-                    const usersResp = await fetch(`${API_BASE}/users`);
-                    if (usersResp.ok) {
-                        const users = await usersResp.json();
-                        const userRecord = users.find(u =>
-                            (u.member_email && u.member_email.toLowerCase()) === (email && email.toLowerCase()) ||
-                            (u.member_email && u.member_email.toLowerCase()) === (member.member_email && member.member_email.toLowerCase())
-                        );
-                        if (userRecord && userRecord.photo_url) {
-                            memberData.photo_url = userRecord.photo_url;
+                    const photoResp = await fetch(`${API_BASE}/users/${encodeURIComponent(email)}/photo`);
+                    if (photoResp.ok) {
+                        const photoData = await photoResp.json();
+                        console.log('Photo data received:', photoData);
+                        if (photoData.photo_url) {
+                            memberData.photo_url = photoData.photo_url;
+                            console.log('Photo URL set:', memberData.photo_url);
                         }
+                    } else {
+                        console.warn('Photo fetch failed:', photoResp.status);
                     }
                 } catch (e) {
-                    console.warn('Could not fetch user record for photo:', e);
+                    console.warn('Failed to fetch photo:', e);
                 }
 
                 // Try to fetch MOU record
@@ -2355,6 +2546,7 @@
             const photoElement = document.getElementById('memberPhoto');
 
             // If a photo_url exists (from users table), render it; otherwise show initials with gradient
+            console.log('Checking photo URL:', memberData.photo_url);
             if (memberData.photo_url) {
                 // Resolve absolute URL for the photo (prefix API_BASE if path is relative)
                 const photoSrc = (memberData.photo_url && (memberData.photo_url.startsWith('http://') || memberData.photo_url.startsWith('https://')))
@@ -2363,14 +2555,20 @@
                 console.log('Member photo URL resolved:', photoSrc);
 
                 // Render image with error fallback
-                photoElement.innerHTML = `<img src="${photoSrc}" alt="${name}" style="width:100%;height:100%;border-radius:8px;object-fit:cover;display:block">`;
+                photoElement.innerHTML = `<img src="${photoSrc}" alt="${name}" style="width:100%;height:100%;border-radius:8px;object-fit:cover;display:block" crossorigin="anonymous">`;
                 const img = photoElement.querySelector('img');
-                if (img) img.onerror = function () {
-                    const avatar = document.createElement('div');
-                    avatar.style = `width:100%;height:100%;border-radius:8px;display:flex;align-items:center;justify-content:center;background:${getAvatarColor(name)};color:#fff;font-weight:700;font-size:48px;`;
-                    avatar.textContent = (name || '').charAt(0).toUpperCase();
-                    this.replaceWith(avatar);
-                };
+                if (img) {
+                    img.onload = function() {
+                        console.log('Photo loaded successfully');
+                    };
+                    img.onerror = function () {
+                        console.error('Photo failed to load:', photoSrc);
+                        const avatar = document.createElement('div');
+                        avatar.style = `width:100%;height:100%;border-radius:8px;display:flex;align-items:center;justify-content:center;background:${getAvatarColor(name)};color:#fff;font-weight:700;font-size:48px;`;
+                        avatar.textContent = (name || '').charAt(0).toUpperCase();
+                        this.replaceWith(avatar);
+                    };
+                }
                 // show status
                 const statusEl = document.getElementById('photoStatus');
                 if (statusEl) {
@@ -3002,53 +3200,259 @@
 
         // Setup event listeners
         function setupEventListeners() {
-            // Logout button
-            document.getElementById('logoutBtn').addEventListener('click', async function () {
-                try {
-                    await fetch(`${API_BASE}/api/logout`, {
-                        method: 'POST',
-                        credentials: 'include'
-                    });
-                } catch (e) {
-                    console.error('Logout error:', e);
+            // Photo upload handlers
+            const photoForm = document.getElementById('photoUploadForm');
+            if (photoForm) {
+                photoForm.addEventListener('submit', handlePhotoUpload);
+            }
+            
+            const closePhotoModal = document.getElementById('closePhotoModal');
+            const cancelPhotoUpload = document.getElementById('cancelPhotoUpload');
+            if (closePhotoModal) closePhotoModal.addEventListener('click', () => closeModal('photoUploadModal'));
+            if (cancelPhotoUpload) cancelPhotoUpload.addEventListener('click', () => closeModal('photoUploadModal'));
+
+            // Receipt upload handlers
+            const receiptForm = document.getElementById('receiptUploadForm');
+            if (receiptForm) {
+                receiptForm.addEventListener('submit', handleReceiptUpload);
+            }
+            
+            const closeReceiptModal = document.getElementById('closeReceiptModal');
+            const cancelReceiptUpload = document.getElementById('cancelReceiptUpload');
+            if (closeReceiptModal) closeReceiptModal.addEventListener('click', () => closeModal('receiptUploadModal'));
+            if (cancelReceiptUpload) cancelReceiptUpload.addEventListener('click', () => closeModal('receiptUploadModal'));
+
+            // MOU upload handlers
+            const mouForm = document.getElementById('mouUploadForm');
+            if (mouForm) {
+                mouForm.addEventListener('submit', handleMOUUpload);
+            }
+            
+            const closeMouModal = document.getElementById('closeMouModal');
+            const cancelMouUpload = document.getElementById('cancelMouUpload');
+            if (closeMouModal) closeMouModal.addEventListener('click', () => closeModal('mouUploadModal'));
+            if (cancelMouUpload) cancelMouUpload.addEventListener('click', () => closeModal('mouUploadModal'));
+
+            // Members dropdown functionality is handled by the global event listeners
+        }
+
+        // Modal functions
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        function showModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'flex';
+            }
+        }
+
+        // Upload modal show functions
+        function showPhotoUpload() {
+            if (!memberData) {
+                showNotification('Please load member data first', 'error');
+                return;
+            }
+            showModal('photoUploadModal');
+        }
+
+        function showReceiptUpload() {
+            if (!memberData) {
+                showNotification('Please load member data first', 'error');
+                return;
+            }
+            populateMonthOptions();
+            showModal('receiptUploadModal');
+        }
+
+        function showMOUUpload() {
+            if (!memberData) {
+                showNotification('Please load member data first', 'error');
+                return;
+            }
+            showModal('mouUploadModal');
+        }
+
+        // Populate month options for receipt upload
+        function populateMonthOptions() {
+            const monthSelect = document.getElementById('receiptMonth');
+            if (!monthSelect || !memberData) return;
+            
+            const months = getMonthColumns(memberData);
+            monthSelect.innerHTML = '<option value="">Select Month</option>';
+            
+            months.forEach(month => {
+                const option = document.createElement('option');
+                option.value = month;
+                option.textContent = month;
+                monthSelect.appendChild(option);
+            });
+        }
+
+        // Upload handlers
+        async function handlePhotoUpload(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const messageDiv = document.getElementById('photoUploadMessage');
+            
+            try {
+                messageDiv.style.display = 'block';
+                messageDiv.className = 'form-message';
+                messageDiv.textContent = 'Uploading photo...';
+                
+                const response = await fetch(`${API_BASE}/users/${memberData.member_email}/photo`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    messageDiv.className = 'form-message success';
+                    messageDiv.textContent = 'Photo uploaded successfully!';
+                    
+                    // Update member photo display
+                    if (result.photo_url) {
+                        memberData.photo_url = result.photo_url;
+                        renderMemberPhoto();
+                    }
+                    
+                    // Close modal after success
+                    setTimeout(() => {
+                        closeModal('photoUploadModal');
+                        e.target.reset();
+                    }, 2000);
+                } else {
+                    throw new Error(result.message || 'Upload failed');
                 }
-                window.location.href = 'chart.html'; // Redirect to chart, NOT index.html
-            });
+            } catch (error) {
+                messageDiv.className = 'form-message error';
+                messageDiv.textContent = `Upload failed: ${error.message}`;
+            }
+        }
 
-            // Change password modal
-            const changePasswordBtn = document.getElementById('changePasswordBtn');
-            const changePasswordModal = document.getElementById('changePasswordModal');
-            const closePasswordModal = document.getElementById('closePasswordModal');
-            const cancelPasswordBtn = document.getElementById('cancelPasswordBtn');
-
-            changePasswordBtn.addEventListener('click', function () {
-                changePasswordModal.classList.add('active');
-                document.getElementById('currentPassword').focus();
-            });
-
-            closePasswordModal.addEventListener('click', function () {
-                changePasswordModal.classList.remove('active');
-                resetPasswordForm();
-            });
-
-            cancelPasswordBtn.addEventListener('click', function () {
-                changePasswordModal.classList.remove('active');
-                resetPasswordForm();
-            });
-
-            // Close modal when clicking outside
-            changePasswordModal.addEventListener('click', function (e) {
-                if (e.target === changePasswordModal) {
-                    changePasswordModal.classList.remove('active');
-                    resetPasswordForm();
+        async function handleReceiptUpload(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const messageDiv = document.getElementById('receiptUploadMessage');
+            
+            try {
+                messageDiv.style.display = 'block';
+                messageDiv.className = 'form-message';
+                messageDiv.textContent = 'Uploading receipt...';
+                
+                // Add member email to form data
+                formData.append('member_email', memberData.member_email);
+                
+                const response = await fetch(`${API_BASE}/receipts`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    messageDiv.className = 'form-message success';
+                    messageDiv.textContent = 'Receipt uploaded successfully!';
+                    
+                    // Close modal after success
+                    setTimeout(() => {
+                        closeModal('receiptUploadModal');
+                        e.target.reset();
+                    }, 2000);
+                } else {
+                    throw new Error(result.message || 'Upload failed');
                 }
-            });
+            } catch (error) {
+                messageDiv.className = 'form-message error';
+                messageDiv.textContent = `Upload failed: ${error.message}`;
+            }
+        }
 
-            // Password form submission
-            document.getElementById('changePasswordForm').addEventListener('submit', function (e) {
-                e.preventDefault();
-                changePassword();
-            });
+        async function handleMOUUpload(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const messageDiv = document.getElementById('mouUploadMessage');
+            
+            try {
+                messageDiv.style.display = 'block';
+                messageDiv.className = 'form-message';
+                messageDiv.textContent = 'Uploading MOU...';
+                
+                // Add member email to form data
+                formData.append('member_email', memberData.member_email);
+                formData.append('document_type', 'mou');
+                
+                const response = await fetch(`${API_BASE}/mou`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    messageDiv.className = 'form-message success';
+                    messageDiv.textContent = 'MOU uploaded successfully!';
+                    
+                    // Refresh MOU status
+                    checkMOUAvailability();
+                    
+                    // Close modal after success
+                    setTimeout(() => {
+                        closeModal('mouUploadModal');
+                        e.target.reset();
+                    }, 2000);
+                } else {
+                    throw new Error(result.message || 'Upload failed');
+                }
+            } catch (error) {
+                messageDiv.className = 'form-message error';
+                messageDiv.textContent = `Upload failed: ${error.message}`;
+            }
+        }
+
+        // Render member photo function
+        function renderMemberPhoto() {
+            const photoElement = document.getElementById('memberPhoto');
+            const photoStatus = document.getElementById('photoStatus');
+            
+            if (!memberData || !photoElement) return;
+            
+            const name = memberData.member_name || 'Member';
+            
+            if (memberData.photo_url) {
+                // Resolve absolute URL for the photo
+                const photoSrc = (memberData.photo_url && (memberData.photo_url.startsWith('http://') || memberData.photo_url.startsWith('https://')))
+                    ? memberData.photo_url
+                    : (API_BASE + memberData.photo_url);
+                
+                // Render image with error fallback
+                photoElement.innerHTML = `<img src="${photoSrc}" alt="${name}" style="width:100%;height:100%;border-radius:8px;object-fit:cover;display:block" crossorigin="anonymous">`;
+                
+                if (photoStatus) {
+                    photoStatus.innerHTML = '<i class="fas fa-check-circle"></i> Photo Updated';
+                    photoStatus.className = 'photo-status visible';
+                }
+            } else {
+                // Show initials with gradient background
+                const initials = name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                const avatarColor = getAvatarColor(name);
+                
+                photoElement.innerHTML = `
+                    <div style="width:100%;height:100%;border-radius:8px;background:${avatarColor};display:flex;align-items:center;justify-content:center;color:white;font-size:48px;font-weight:700;">
+                        ${initials}
+                    </div>
+                `;
+                
+                if (photoStatus) {
+                    photoStatus.innerHTML = '<i class="fas fa-check-circle"></i> Default Avatar';
+                    photoStatus.className = 'photo-status visible';
+                }
+            }
         }
 
         // Helper functions
@@ -3132,6 +3536,119 @@
             });
         }
 
+        // Members dropdown functions
+        function toggleMembersDropdown() {
+            const dropdown = document.getElementById('membersDropdownContent');
+            if (!dropdown) return;
+            
+            if (dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
+            } else {
+                dropdown.classList.add('show');
+                loadMembersList();
+            }
+            
+            // Close download dropdown if open
+            const downloadDropdown = document.getElementById('downloadDropdown');
+            if (downloadDropdown) {
+                downloadDropdown.classList.remove('show');
+            }
+        }
+
+        async function loadMembersList() {
+            const dropdownContent = document.getElementById('membersDropdownContent');
+            if (!dropdownContent) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/contributions`);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch members: ${response.status}`);
+                }
+                
+                const members = await response.json();
+                
+                if (!Array.isArray(members) || members.length === 0) {
+                    dropdownContent.innerHTML = '<div class="dropdown-loading">No members found</div>';
+                    return;
+                }
+                
+                // Sort members by name (handle both field name variations)
+                members.sort((a, b) => {
+                    const nameA = a.member_name || a.name || '';
+                    const nameB = b.member_name || b.name || '';
+                    return nameA.localeCompare(nameB);
+                });
+                
+                // Generate HTML for members list
+                let membersHTML = '';
+                members.forEach(member => {
+                    // Handle both field name variations
+                    const memberName = member.member_name || member.name || 'Unknown Member';
+                    const memberEmail = member.member_email || member.email || 'No email';
+                    
+                    const initials = getInitials(memberName);
+                    
+                    membersHTML += `
+                        <div class="member-item" onclick="openMemberDashboard('${memberEmail}', '${memberName}')">
+                            <div class="member-avatar">${initials}</div>
+                            <div class="member-info">
+                                <div class="member-name">${memberName}</div>
+                                <div class="member-email">${memberEmail}</div>
+                            </div>
+                            <div class="member-arrow">
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                dropdownContent.innerHTML = membersHTML;
+                
+            } catch (error) {
+                console.error('Error loading members:', error);
+                dropdownContent.innerHTML = '<div class="dropdown-loading">Error loading members</div>';
+            }
+        }
+
+        function getInitials(name) {
+            if (!name) return '?';
+            return name.split(' ')
+                .map(word => word.charAt(0).toUpperCase())
+                .slice(0, 2)
+                .join('');
+        }
+
+        function openMemberDashboard(email, name) {
+            // Open member dashboard directly without authentication
+            const url = `member-dashboard.html?email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}&direct_access=true`;
+            window.open(url, '_blank');
+            
+            // Close dropdown
+            const dropdown = document.getElementById('membersDropdownContent');
+            if (dropdown) {
+                dropdown.classList.remove('show');
+            }
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            const downloadOptions = document.getElementById('downloadOptions');
+            const membersDropdown = document.getElementById('membersDropdown');
+            const downloadDropdown = document.getElementById('downloadDropdown');
+            const membersDropdownContent = document.getElementById('membersDropdownContent');
+            
+            // Close download dropdown
+            if (downloadOptions && !downloadOptions.contains(event.target) && downloadDropdown) {
+                downloadDropdown.classList.remove('show');
+            }
+            
+            // Close members dropdown
+            if (membersDropdown && !membersDropdown.contains(event.target) && membersDropdownContent) {
+                membersDropdownContent.classList.remove('show');
+            }
+        });
+
+        
         // Export dashboard
         async function exportDashboard(format) {
             const dd = document.getElementById('downloadDropdown');
@@ -3333,15 +3850,18 @@
                 const data = await response.json();
                 const mouDocument = data.find(doc =>
                     doc.document_type === 'mou' &&
-                    doc.status === 'active' &&
                     doc.member_email === memberData.member_email
                 );
                 if (!mouDocument) {
                     showNotification('No MOU document available', 'info');
                     return;
                 }
+                
                 let fileUrl;
-                if (mouDocument.id === null) {
+                if (mouDocument.file_url) {
+                    // Use the file_url from the response (handles Google Drive URLs)
+                    fileUrl = mouDocument.file_url;
+                } else if (mouDocument.id === null) {
                     // Default unsigned MOU
                     fileUrl = `${API_BASE}/uploads/mou/${mouDocument.file_name}`;
                 } else if (mouDocument.file_path && mouDocument.file_path.includes('Backend\\uploads')) {

@@ -23,115 +23,20 @@ const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
 
-// ===== CLOUDINARY CONFIGURATION WITH ERROR HANDLING =====
-let cloudinary, CloudinaryStorage;
-let photoStorage, mouStorage, receiptStorage;
-let hasCloudinary = false;
-
-try {
-  cloudinary = require('cloudinary').v2;
-  CloudinaryStorage = require('multer-storage-cloudinary').CloudinaryStorage;
-  
-  if (process.env.CLOUDINARY_CLOUD_NAME && 
-      process.env.CLOUDINARY_API_KEY && 
-      process.env.CLOUDINARY_API_SECRET) {
-    
-    cloudinary.config({
-      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-      api_key: process.env.CLOUDINARY_API_KEY,
-      api_secret: process.env.CLOUDINARY_API_SECRET
-    });
-    
-    hasCloudinary = true;
-    console.log('✅ Cloudinary configured and connected');
-  } else {
-    console.warn('⚠️ Cloudinary environment variables missing - using local storage');
-  }
-} catch (error) {
-  console.warn('⚠️ Cloudinary not available - using local storage:', error.message);
-}
-
 const app = express();
 
-// Production environment check
-const isProduction = process.env.NODE_ENV === 'production';
-const isRenderEnvironment = process.env.RENDER || process.env.RENDER_SERVICE_ID || process.env.RENDER_EXTERNAL_URL;
-
-// Test Cloudinary connection on startup
-if (hasCloudinary) {
-  cloudinary.api.ping()
-    .then(() => console.log('✅ Cloudinary connected successfully'))
-    .catch(err => console.log('❌ Cloudinary connection error:', err.message));
-}
-
 // Middleware
-const corsOptions = {
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    // In production or Render environment, allow specific origins
-    if (isProduction || isRenderEnvironment) {
-      const allowedOrigins = [
-        'https://friendsinfinancecontributionportal.netlify.app',
-        'https://www.friendsinfinancecontributionportal.netlify.app',
-        'https://friends-in-finance-contribution-portal.onrender.com'
-      ];
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-    } else {
-      // In development, allow localhost
-      if (/^http:\/\/localhost:\d+$/.test(origin)) {
-        return callback(null, true);
-      }
-    }
-    callback(new Error('Not allowed by CORS'));
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
-  optionsSuccessStatus: 200
-};
-
-app.use(cors(corsOptions));
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Add CORS pre-flight handling
-app.options('*', cors(corsOptions));
-
 // Session middleware
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'your-secret-key-change-in-production',
+    secret: 'your-secret-key-change-in-production',
     resave: false,
     saveUninitialized: false,
-    name: 'finance-portal.sid',
-    cookie: { 
-        secure: isProduction || isRenderEnvironment, // Use secure cookies in production or Render
-        httpOnly: true,
-        sameSite: 'lax', // Always use lax for better compatibility
-        maxAge: 24 * 60 * 60 * 1000,
-        domain: undefined // Remove domain restriction for better compatibility
-    },
-    proxy: isProduction || isRenderEnvironment // Trust proxy in production/Render
+    cookie: { secure: false, maxAge: 24 * 1024 * 60 * 60 * 1000 } // 24 hours
 }));
-
-// Session debugging middleware
-app.use((req, res, next) => {
-    console.log(`🔑 Session: ${req.sessionID}, User: ${req.session.userEmail || 'Not logged in'}`);
-    console.log(`🌍 Environment: NODE_ENV=${process.env.NODE_ENV}, isProduction=${isProduction}, isRender=${isRenderEnvironment}`);
-    console.log(`🔗 Origin: ${req.get('origin') || 'No origin'}`);
-    next();
-});
-
-// Add request logging middleware for debugging
-if (process.env.NODE_ENV === 'production') {
-    app.use((req, res, next) => {
-        console.log(`[${new Date().toISOString()}] ${req.method} ${req.url} - Origin: ${req.headers.origin}`);
-        next();
-    });
-}
 
 // ===== AUTHENTICATION MIDDLEWARE =====
 const requireAuth = (req, res, next) => {
@@ -240,9 +145,9 @@ async function sendGatewayCodeNotification(newGatewayCode, changedBy) {
 // Serve frontend static files
 app.use(express.static(path.join(__dirname, '..', 'Frontend')));
 
-// ===== ROOT ROUTE - REDIRECT TO INDEX =====
+// ===== ROOT ROUTE - REDIRECT TO CHART =====
 app.get('/', (req, res) => {
-    res.redirect('/index.html');
+    res.redirect('/chart.html');
 });
 
 // ===== HEALTH CHECK =====
@@ -250,8 +155,7 @@ app.get("/health", (req, res) => {
     res.json({
         status: "ok",
         timestamp: new Date().toISOString(),
-        database: db.filename || "contributions.db",
-        cloudinary: "connected"
+        database: db.filename || "contributions.db"
     });
 });
 
@@ -632,8 +536,8 @@ app.get("/users", (req, res) => {
     console.log("👥 Fetching users with photos...");
     db.all(
         `SELECT u.*, 
-                md.cloudinary_url as photo_url,
-                md.public_id as photo_public_id
+                md.file_url as photo_url,
+                md.document_title as photo_title
          FROM users u
          LEFT JOIN member_documents md ON LOWER(u.member_email) = LOWER(md.member_email) 
                                        AND md.document_type = 'photo' 
@@ -855,6 +759,8 @@ app.get("/analytics", async (req, res) => {
     }
 });
 
+// --- New API endpoints for dashboards ---
+
 // Investment tracking endpoint
 app.get('/api/investment-tracking', (req, res) => {
     const q = `SELECT month, total_contributions, mansa_x, i_and_m, cumulative_mansa_x, total_invested, running_total_contributions, mansa_x_percentage, i_and_m_percentage FROM investment_tracking ORDER BY month`;
@@ -883,6 +789,7 @@ app.get('/api/members/summary', (req, res) => {
 
     db.all(q, (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
+        // Normalize output keys
         const out = (rows || []).map(r => ({
             id: r.id,
             name: r.name,
@@ -895,7 +802,7 @@ app.get('/api/members/summary', (req, res) => {
     });
 });
 
-// Member monthly contributions endpoint
+// Member monthly contributions endpoint (optionally filter by email)
 app.get('/api/members/contributions', (req, res) => {
     const email = req.query.email;
 
@@ -958,6 +865,7 @@ app.get("/db/tables", (req, res) => {
 // ===== GET TABLE DATA =====
 app.get("/db/tables/:name", (req, res) => {
     const tableName = req.params.name;
+    // Allow alphanumeric and underscores, but be careful of SQL injection
     if (!/^[a-zA-Z0-9_\-]+$/.test(tableName)) {
         return res.status(400).json({ error: "Invalid table name" });
     }
@@ -1018,128 +926,92 @@ app.get("/api/test/populate-logs", async (req, res) => {
     }
 });
 
-// ===== STORAGE CONFIGURATION (Cloudinary or Local) =====
-if (hasCloudinary) {
-  // Use Cloudinary storage
-  photoStorage = new CloudinaryStorage({
-    cloudinary: cloudinary,
-    params: {
-      folder: 'friends-finance/photos',
-      allowed_formats: ['jpg', 'jpeg', 'png', 'gif'],
-      transformation: [{ width: 500, height: 500, crop: 'limit' }],
-      public_id: (req, file) => {
-        const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        return `PHOTO-${unique}`;
-      }
-    }
-  });
+// ===== DOCUMENT MANAGEMENT =====
+const photosDir = path.join(__dirname, 'uploads', 'photos');
+const mouDir = path.join(__dirname, 'uploads', 'mou');
+if (!fs.existsSync(photosDir)) fs.mkdirSync(photosDir, { recursive: true });
+if (!fs.existsSync(mouDir)) fs.mkdirSync(mouDir, { recursive: true });
 
-  mouStorage = new CloudinaryStorage({
-    cloudinary: cloudinary,
-    params: {
-      folder: 'friends-finance/mou',
-      allowed_formats: ['pdf', 'doc', 'docx'],
-      resource_type: 'raw',
-      public_id: (req, file) => {
-        const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        return `MOU-${unique}`;
-      }
-    }
-  });
-
-  receiptStorage = new CloudinaryStorage({
-    cloudinary: cloudinary,
-    params: {
-      folder: 'friends-finance/receipts',
-      allowed_formats: ['pdf', 'jpg', 'jpeg', 'png'],
-      resource_type: 'auto',
-      public_id: (req, file) => {
-        const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        return `RECEIPT-${unique}`;
-      }
-    }
-  });
-} else {
-  // Use local disk storage as fallback
-  const diskStorage = multer.diskStorage({
-    destination: (req, file, cb) => {
-      if (file.fieldname === 'photo') {
-        const uploadPath = path.join(__dirname, 'uploads', 'photos');
-        if (!fs.existsSync(uploadPath)) fs.mkdirSync(uploadPath, { recursive: true });
-        cb(null, uploadPath);
-      } else if (file.fieldname === 'mouFile') {
-        const uploadPath = path.join(__dirname, 'uploads', 'mou');
-        if (!fs.existsSync(uploadPath)) fs.mkdirSync(uploadPath, { recursive: true });
-        cb(null, uploadPath);
-      } else if (file.fieldname === 'receipt') {
-        const uploadPath = path.join(__dirname, 'uploads', 'receipts');
-        if (!fs.existsSync(uploadPath)) fs.mkdirSync(uploadPath, { recursive: true });
-        cb(null, uploadPath);
-      }
-    },
-    filename: (req, file, cb) => {
-      const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
-      const ext = path.extname(file.originalname);
-      cb(null, `${file.fieldname}-${unique}${ext}`);
-    }
-  });
-
-  photoStorage = diskStorage;
-  mouStorage = diskStorage;
-  receiptStorage = diskStorage;
-}
-
-// Multer upload configurations
-const photoUpload = multer({
-  storage: photoStorage,
-  limits: { fileSize: 5 * 1024 * 1024 },
-  fileFilter: function (req, file, cb) {
-    const allowed = /jpeg|jpg|png|gif/;
-    const ext = path.extname(file.originalname).toLowerCase().substring(1);
-    const mimetype = file.mimetype.split('/')[1];
-    if (allowed.test(ext) && allowed.test(mimetype)) {
-      cb(null, true);
-    } else {
-      cb(new Error('Only image files are allowed'));
-    }
-  }
-});
-
-const mouUpload = multer({
-  storage: mouStorage,
-  limits: { fileSize: 10 * 1024 * 1024 },
-  fileFilter: function (req, file, cb) {
-    const allowedTypes = ['pdf', 'doc', 'docx'];
-    const ext = path.extname(file.originalname).toLowerCase().substring(1);
-    if (allowedTypes.includes(ext)) {
-      cb(null, true);
-    } else {
-      cb(new Error('Only PDF and DOC files are allowed'));
-    }
-  }
-});
-
-const receiptUpload = multer({
-  storage: receiptStorage,
-  limits: { fileSize: 10 * 1024 * 1024 },
-  fileFilter: function (req, file, cb) {
-    const allowedTypes = ['pdf', 'jpg', 'jpeg', 'png', 'gif'];
-    const ext = path.extname(file.originalname).toLowerCase().substring(1);
-    if (allowedTypes.includes(ext)) {
-      cb(null, true);
-    } else {
-      cb(new Error('Only PDF and image files are allowed'));
-    }
-  }
-});
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Import document functions
 const { getMemberPhoto, getMemberMOU, getAllPhotos, getAllMOUs } = require("./db");
 
 // ===== PHOTO ENDPOINTS =====
-app.post('/users/:id/photo', photoUpload.single('photo'), async (req, res) => {
+const photoStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, photosDir);
+    },
+    filename: function (req, file, cb) {
+        const ext = path.extname(file.originalname).toLowerCase();
+        const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
+        cb(null, 'PHOTO-' + unique + ext);
+    }
+});
+
+const photoUpload = multer({
+    storage: photoStorage,
+    limits: { fileSize: 5 * 1024 * 1024 },
+    fileFilter: function (req, file, cb) {
+        const allowed = /jpeg|jpg|png|gif/;
+        const ext = path.extname(file.originalname).toLowerCase();
+        if (allowed.test(ext) && allowed.test(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(new Error('Only image files are allowed'));
+        }
+    }
+});
+
+// Configure multer for receipt uploads
+const receiptStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        const receiptDir = path.join(__dirname, 'uploads', 'receipts');
+        if (!fs.existsSync(receiptDir)) {
+            fs.mkdirSync(receiptDir, { recursive: true });
+        }
+        cb(null, receiptDir);
+    },
+    filename: function (req, file, cb) {
+        const month = req.params.month.replace(/[^a-zA-Z0-9-]/g, '_');
+        const timestamp = Date.now();
+        const ext = path.extname(file.originalname);
+        cb(null, `receipt_${month}_${timestamp}${ext}`);
+    }
+});
+
+const receiptUpload = multer({
+    storage: receiptStorage,
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+    fileFilter: function (req, file, cb) {
+        const allowedTypes = /pdf|jpg|jpeg|png|gif/;
+        const ext = path.extname(file.originalname).toLowerCase();
+        const allowed = allowedTypes.test(ext) &&
+            (file.mimetype.startsWith('image/') || file.mimetype === 'application/pdf');
+
+        if (allowed) {
+            cb(null, true);
+        } else {
+            cb(new Error('Only PDF and image files (jpg, png, gif) are allowed'));
+        }
+    }
+});
+
+
+app.post('/users/:id/photo', express.json(), async (req, res) => {
     const id = req.params.id;
-    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+    const { file_url } = req.body;
+
+    if (!file_url) {
+        return res.status(400).json({ error: 'Photo URL is required' });
+    }
+
+    // Validate URL format
+    try {
+        new URL(file_url);
+    } catch (e) {
+        return res.status(400).json({ error: 'Invalid URL format' });
+    }
 
     try {
         const user = await new Promise((resolve, reject) => {
@@ -1150,31 +1022,9 @@ app.post('/users/:id/photo', photoUpload.single('photo'), async (req, res) => {
         });
 
         if (!user) {
-            // Delete uploaded file if user not found
-            if (hasCloudinary && req.file.filename) {
-                await cloudinary.uploader.destroy(req.file.filename).catch(e => {});
-            } else if (!hasCloudinary && req.file.path) {
-                fs.unlinkSync(req.file.path);
-            }
             return res.status(404).json({ error: 'User not found' });
         }
 
-        // Get file info based on storage type
-        let cloudinaryUrl, publicId, filePath, fileName;
-        
-        if (hasCloudinary) {
-            cloudinaryUrl = req.file.path;
-            publicId = req.file.filename;
-            fileName = req.file.originalname;
-        } else {
-            // Local storage
-            filePath = req.file.path;
-            fileName = req.file.filename;
-            cloudinaryUrl = null;
-            publicId = null;
-        }
-
-        // Set all existing photos for this user to not primary
         await new Promise((resolve, reject) => {
             db.run(
                 `UPDATE member_documents SET is_primary = 0 
@@ -1184,72 +1034,57 @@ app.post('/users/:id/photo', photoUpload.single('photo'), async (req, res) => {
             );
         });
 
-        // Insert new photo record
         await new Promise((resolve, reject) => {
-            if (hasCloudinary) {
-                // Cloudinary storage
-                db.run(
-                    `INSERT INTO member_documents 
-                     (member_email, document_type, document_title, cloudinary_url, public_id,
-                      file_name, file_size, mime_type, is_primary, uploaded_by, metadata)
-                     VALUES (?, 'photo', ?, ?, ?, ?, ?, ?, 1, ?, ?)`,
-                    [
-                        user.member_email,
-                        req.file.originalname,
-                        cloudinaryUrl,
-                        publicId,
-                        req.file.originalname,
-                        req.file.size,
-                        req.file.mimetype,
-                        req.body.uploaded_by || 'admin',
-                        JSON.stringify({ 
-                            cloudinary: true,
-                            upload_date: new Date().toISOString()
-                        })
-                    ],
-                    (err) => err ? reject(err) : resolve()
-                );
-            } else {
-                // Local storage
-                db.run(
-                    `INSERT INTO member_documents 
-                     (member_email, document_type, document_title, file_name, file_size, mime_type,
-                      is_primary, uploaded_by, metadata)
-                     VALUES (?, 'photo', ?, ?, ?, ?, 1, ?, ?)`,
-                    [
-                        user.member_email,
-                        req.file.originalname,
-                        fileName,
-                        req.file.size,
-                        req.file.mimetype,
-                        req.body.uploaded_by || 'admin',
-                        JSON.stringify({ 
-                            cloudinary: false,
-                            local_path: filePath,
-                            upload_date: new Date().toISOString()
-                        })
-                    ],
-                    (err) => err ? reject(err) : resolve()
-                );
-            }
+            db.run(
+                `INSERT INTO member_documents 
+                 (member_email, document_type, document_title, file_url, is_primary, uploaded_by, metadata)
+                 VALUES (?, 'photo', ?, ?, 1, ?, ?)`,
+                [
+                    user.member_email,
+                    'Profile Photo',
+                    file_url,
+                    req.body.uploaded_by || 'admin',
+                    JSON.stringify({ upload_source: 'url', upload_date: new Date().toISOString() })
+                ],
+                function (err) {
+                    if (err) reject(err);
+                    else resolve(this.lastID);
+                }
+            );
         });
 
-        res.json({ 
-            success: true, 
-            message: 'Photo uploaded successfully',
-            photo_url: hasCloudinary ? cloudinaryUrl : `/uploads/photos/${fileName}`
-        });
+        res.json({ success: true, photo_url: file_url });
 
     } catch (error) {
         console.error('Photo upload error:', error);
-        // Clean up uploaded file if error
-        if (req.file) {
-            if (hasCloudinary && req.file.filename) {
-                await cloudinary.uploader.destroy(req.file.filename).catch(e => {});
-            } else if (!hasCloudinary && req.file.path) {
-                fs.unlinkSync(req.file.path);
-            }
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Proxy endpoint for Google Drive images
+app.get('/proxy/image', async (req, res) => {
+    try {
+        const { url } = req.query;
+        if (!url) {
+            return res.status(400).json({ error: 'URL parameter required' });
         }
+
+        // Fetch the image from Google Drive
+        const response = await fetch(url);
+        if (!response.ok) {
+            return res.status(response.status).json({ error: 'Failed to fetch image' });
+        }
+
+        // Set appropriate headers
+        res.set('Content-Type', response.headers.get('Content-Type') || 'image/jpeg');
+        res.set('Cache-Control', 'public, max-age=3600'); // Cache for 1 hour
+
+        // Get the image data as buffer and send it
+        const arrayBuffer = await response.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        res.send(buffer);
+    } catch (error) {
+        console.error('Proxy image error:', error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -1261,30 +1096,29 @@ app.get('/users/:email/photo', async (req, res) => {
             return res.status(404).json({ error: 'No photo found' });
         }
         
-        let photo_url;
-        
-        if (hasCloudinary && photo.cloudinary_url) {
-            // Use Cloudinary URL if available
-            photo_url = photo.cloudinary_url;
-        } else if (!hasCloudinary) {
-            // Use local file path for local storage
-            const metadata = JSON.parse(photo.metadata || '{}');
-            if (metadata.local_path && fs.existsSync(metadata.local_path)) {
-                photo_url = `/uploads/photos/${photo.file_name}`;
-            } else {
-                return res.status(404).json({ error: 'Photo file not found' });
+        // Handle Google Drive URLs
+        let photoUrl = photo.file_url;
+        if (photoUrl && photoUrl.includes('drive.google.com')) {
+            // Convert Google Drive URL to proxy URL
+            const fileId = photoUrl.match(/\/file\/d\/([^\/]+)/);
+            if (fileId && fileId[1]) {
+                const directUrl = `https://drive.google.com/uc?export=view&id=${fileId[1]}`;
+                photoUrl = `${req.protocol}://${req.get('host')}/proxy/image?url=${encodeURIComponent(directUrl)}`;
             }
-        } else {
-            return res.status(404).json({ error: 'No Cloudinary photo found' });
+        } else if (photoUrl && photoUrl.startsWith('/uploads/')) {
+            // Keep local file URLs as is
+            photoUrl = photoUrl;
+        } else if (photo.file_name) {
+            // Fallback to local file path
+            photoUrl = `/uploads/photos/${photo.file_name}`;
         }
         
         res.json({
-            photo_url: photo_url,
+            photo_url: photoUrl,
             upload_date: photo.upload_date,
-            is_primary: photo.is_primary
+            document_title: photo.document_title
         });
     } catch (error) {
-        console.error('Error fetching photo:', error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -1305,28 +1139,13 @@ app.delete('/users/:id/photo', async (req, res) => {
 
         const photo = await new Promise((resolve, reject) => {
             db.get(
-                `SELECT public_id, metadata FROM member_documents 
+                `SELECT file_path FROM member_documents 
                  WHERE member_email = ? AND document_type = 'photo' AND status = 'active'`,
                 [user.member_email],
                 (err, row) => err ? reject(err) : resolve(row)
             );
         });
 
-        // Delete from storage based on type
-        if (photo) {
-            if (hasCloudinary && photo.public_id) {
-                // Delete from Cloudinary
-                await cloudinary.uploader.destroy(photo.public_id).catch(e => {});
-            } else if (!hasCloudinary && photo.metadata) {
-                // Delete local file
-                const metadata = JSON.parse(photo.metadata);
-                if (metadata.local_path && fs.existsSync(metadata.local_path)) {
-                    fs.unlinkSync(metadata.local_path);
-                }
-            }
-        }
-
-        // Update database
         await new Promise((resolve, reject) => {
             db.run(
                 `UPDATE member_documents 
@@ -1336,6 +1155,10 @@ app.delete('/users/:id/photo', async (req, res) => {
                 (err) => err ? reject(err) : resolve()
             );
         });
+
+        if (photo && fs.existsSync(photo.file_path)) {
+            try { fs.unlinkSync(photo.file_path); } catch (e) { }
+        }
 
         res.json({ success: true });
 
@@ -1348,16 +1171,14 @@ app.delete('/users/:id/photo', async (req, res) => {
 app.get("/photos", async (req, res) => {
     try {
         const photos = await getAllPhotos();
-        const formattedPhotos = photos
-            .filter(p => p.cloudinary_url) // Only include photos with Cloudinary URLs
-            .map(p => ({
-                ...p,
-                photo_url: p.cloudinary_url, // Use only Cloudinary URL
-                member: {
-                    name: p.member_name,
-                    email: p.member_email
-                }
-            }));
+        const formattedPhotos = photos.map(p => ({
+            ...p,
+            photo_url: `/uploads/photos/${p.file_name}`,
+            member: {
+                name: p.member_name,
+                email: p.member_email
+            }
+        }));
         res.json(formattedPhotos);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -1365,17 +1186,47 @@ app.get("/photos", async (req, res) => {
 });
 
 // ===== MOU ENDPOINTS =====
-app.post("/mou/upload", mouUpload.single('mouFile'), async (req, res) => {
-    if (!req.file) {
-        return res.status(400).json({ error: "No file uploaded" });
+const mouStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, mouDir);
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, 'MOU-' + uniqueSuffix + path.extname(file.originalname));
     }
+});
 
-    const { member_email, document_title, expiry_date, uploaded_by } = req.body;
+const mouUpload = multer({
+    storage: mouStorage,
+    limits: { fileSize: 10 * 1024 * 1024 },
+    fileFilter: function (req, file, cb) {
+        const allowedTypes = /pdf|doc|docx/;
+        const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+        const mimetype = allowedTypes.test(file.mimetype);
+        if (mimetype && extname) {
+            cb(null, true);
+        } else {
+            cb(new Error('Only PDF and DOC files are allowed'));
+        }
+    }
+});
+
+app.post("/mou/upload", express.json(), async (req, res) => {
+    const { member_email, document_title, expiry_date, uploaded_by, file_url } = req.body;
 
     if (!member_email || !document_title) {
-        // Delete from Cloudinary if validation fails
-        await cloudinary.uploader.destroy(req.file.filename, { resource_type: 'raw' }).catch(e => {});
         return res.status(400).json({ error: "Member email and document title are required" });
+    }
+
+    if (!file_url) {
+        return res.status(400).json({ error: "Document URL is required" });
+    }
+
+    // Validate URL format
+    try {
+        new URL(file_url);
+    } catch (e) {
+        return res.status(400).json({ error: "Invalid URL format" });
     }
 
     try {
@@ -1386,63 +1237,61 @@ app.post("/mou/upload", mouUpload.single('mouFile'), async (req, res) => {
             });
         });
 
-        // Get existing MOUs from database to delete from Cloudinary later
-        const existingMOUs = await new Promise((resolve, reject) => {
+        await new Promise((resolve, reject) => {
             db.all(
-                `SELECT public_id FROM member_documents 
+                `SELECT id, file_path, file_name FROM member_documents 
                  WHERE LOWER(member_email) = LOWER(?) AND document_type = 'mou' AND status = 'active'`,
                 [member_email],
                 (err, rows) => {
-                    if (err) reject(err);
-                    else resolve(rows || []);
+                    if (err) return reject(err);
+                    try {
+                        const backupDir = path.join(mouDir, 'backups');
+                        if (!fs.existsSync(backupDir)) fs.mkdirSync(backupDir, { recursive: true });
+
+                        (rows || []).forEach(r => {
+                            try {
+                                if (r.file_path && fs.existsSync(r.file_path)) {
+                                    const timestamp = Date.now();
+                                    const safeName = `${timestamp}-${r.file_name}`;
+                                    const dest = path.join(backupDir, safeName);
+                                    fs.copyFileSync(r.file_path, dest);
+                                }
+                            } catch (copyErr) {
+                                console.warn('Failed to backup MOU file', r.file_path, copyErr);
+                            }
+                        });
+
+                        db.run(
+                            `UPDATE member_documents SET status = 'deleted' 
+                             WHERE LOWER(member_email) = LOWER(?) AND document_type = 'mou'`,
+                            [member_email],
+                            (uErr) => uErr ? reject(uErr) : resolve()
+                        );
+                    } catch (e) {
+                        return reject(e);
+                    }
                 }
             );
         });
 
-        // Mark existing MOUs as deleted in database
-        await new Promise((resolve, reject) => {
-            db.run(
-                `UPDATE member_documents SET status = 'deleted' 
-                 WHERE LOWER(member_email) = LOWER(?) AND document_type = 'mou'`,
-                [member_email],
-                (err) => err ? reject(err) : resolve()
-            );
-        });
-
-        // Delete old files from Cloudinary
-        for (const mou of existingMOUs) {
-            if (mou.public_id) {
-                await cloudinary.uploader.destroy(mou.public_id, { resource_type: 'raw' }).catch(e => {});
-            }
-        }
-
-        // Insert new MOU record with Cloudinary info
         await new Promise((resolve, reject) => {
             db.run(
                 `INSERT INTO member_documents 
-                 (member_email, member_name, document_type, document_title, cloudinary_url,
-                  public_id, file_name, file_size, mime_type, expiry_date, uploaded_by, status, metadata)
-                 VALUES (?, ?, 'mou', ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?)`,
+                 (member_email, member_name, document_type, document_title, file_url, 
+                  expiry_date, uploaded_by, status, metadata)
+                 VALUES (?, ?, 'mou', ?, ?, ?, ?, 'active', ?)`,
                 [
                     member_email,
                     user?.member_name || null,
                     document_title,
-                    req.file.path,
-                    req.file.filename,
-                    req.file.originalname,
-                    req.file.size,
-                    req.file.mimetype,
+                    file_url,
                     expiry_date || null,
                     uploaded_by || 'admin',
-                    JSON.stringify({ 
-                        cloudinary: true,
-                        format: req.file.format,
-                        resource_type: 'raw'
-                    })
+                    JSON.stringify({ upload_source: 'url', upload_date: new Date().toISOString() })
                 ],
-                function (err) {
-                    if (err) reject(err);
-                    else resolve(this.lastID);
+                (err) => {
+                    if (err) return reject(err);
+                    else resolve();
                 }
             );
         });
@@ -1450,15 +1299,11 @@ app.post("/mou/upload", mouUpload.single('mouFile'), async (req, res) => {
         res.json({
             success: true,
             message: "MOU document uploaded successfully",
-            url: req.file.path
+            file_url: file_url
         });
 
     } catch (error) {
         console.error('MOU upload error:', error);
-        // Clean up from Cloudinary if error
-        if (req.file && req.file.filename) {
-            await cloudinary.uploader.destroy(req.file.filename, { resource_type: 'raw' }).catch(e => {});
-        }
         res.status(500).json({ error: error.message });
     }
 });
@@ -1480,7 +1325,35 @@ app.get("/mou", async (req, res) => {
             });
         });
 
-        const mouMap = mous.reduce((acc, m) => {
+        // Process MOU documents to handle Google Drive URLs
+        const processedMous = mous.map(mou => {
+            let fileUrl = mou.file_url;
+            
+            // Handle Google Drive URLs
+            if (fileUrl && fileUrl.includes('drive.google.com')) {
+                // Convert Google Drive URL to direct download format
+                const fileId = fileUrl.match(/\/file\/d\/([^\/]+)/);
+                if (fileId && fileId[1]) {
+                    fileUrl = `https://drive.google.com/uc?export=view&id=${fileId[1]}`;
+                }
+            } else if (mou.file_path && mou.file_path.includes('uploads')) {
+                // Handle local file paths
+                const publicPath = mou.file_path.split('Backend')[1]?.replace(/\\/g, '/');
+                if (publicPath) {
+                    fileUrl = `${API_BASE}${publicPath}`;
+                }
+            } else if (mou.file_name) {
+                // Fallback to file name
+                fileUrl = `/uploads/mou/${mou.file_name}`;
+            }
+            
+            return {
+                ...mou,
+                file_url: fileUrl
+            };
+        });
+
+        const mouMap = processedMous.reduce((acc, m) => {
             if (m.member_email) {
                 const email = m.member_email.toLowerCase();
                 acc[email] = acc[email] || [];
@@ -1489,29 +1362,11 @@ app.get("/mou", async (req, res) => {
             return acc;
         }, {});
 
-        // Use Cloudinary URL for default MOU if needed
         const defaultFileName = 'default-unsigned-mou.pdf';
-        const defaultPath = path.join(__dirname, 'uploads', 'mou', defaultFileName);
-        let defaultCloudinaryUrl = null;
-        
-        // Try to upload default MOU to Cloudinary if it exists locally
-        if (fs.existsSync(defaultPath)) {
-            try {
-                const result = await cloudinary.uploader.upload(defaultPath, {
-                    folder: 'friends-finance/mou',
-                    public_id: 'default-unsigned-mou',
-                    resource_type: 'raw',
-                    overwrite: true
-                });
-                defaultCloudinaryUrl = result.secure_url;
-            } catch (e) {
-                console.warn('Could not upload default MOU to Cloudinary:', e.message);
-            }
-        }
+        const defaultPublicUrl = `/uploads/mou/${defaultFileName}`;
+        const result = [...processedMous];
 
-        const result = [...mous];
-
-        // Ensure every member has at least one MOU
+        // Ensure every member has at least one MOU (the default if no signed one exists)
         membersList.forEach(m => {
             if (!m.member_email) return;
             const email = m.member_email.toLowerCase();
@@ -1522,8 +1377,7 @@ app.get("/mou", async (req, res) => {
                     member_name: m.member_name,
                     document_type: 'mou',
                     document_title: 'Unsigned MOU (default)',
-                    cloudinary_url: defaultCloudinaryUrl,
-                    public_id: 'default-unsigned-mou',
+                    file_path: path.join(mouDir, defaultFileName),
                     file_name: defaultFileName,
                     file_size: 0,
                     mime_type: 'application/pdf',
@@ -1534,7 +1388,7 @@ app.get("/mou", async (req, res) => {
                     is_primary: 0,
                     download_count: 0,
                     last_downloaded: null,
-                    metadata: JSON.stringify({ default: true, cloudinary: true })
+                    metadata: JSON.stringify({ default: true, original_url: defaultPublicUrl })
                 });
             }
         });
@@ -1568,44 +1422,40 @@ app.get("/mou/:id/download", (req, res) => {
         (err, row) => {
             if (err) return res.status(500).json({ error: err.message });
             if (!row) return res.status(404).json({ error: "MOU document not found" });
-            
-            // Use only Cloudinary URL - no fallback to local files
-            if (!row.cloudinary_url) {
-                return res.status(404).json({ error: "MOU Cloudinary URL not found" });
+            if (!fs.existsSync(row.file_path)) {
+                return res.status(404).json({ error: "File not found on server" });
             }
-            
-            // Update download count
+
             db.run(
                 `UPDATE member_documents 
                  SET download_count = download_count + 1, last_downloaded = CURRENT_TIMESTAMP 
                  WHERE id = ?`,
                 [req.params.id]
             );
-            return res.redirect(row.cloudinary_url);
+
+            res.download(row.file_path, row.file_name);
         }
     );
 });
 
 app.delete("/mou/:id", (req, res) => {
     db.get(
-        "SELECT public_id FROM member_documents WHERE id = ? AND document_type = 'mou'",
+        "SELECT file_path FROM member_documents WHERE id = ? AND document_type = 'mou'",
         [req.params.id],
-        async (err, row) => {
+        (err, row) => {
             if (err) return res.status(500).json({ error: err.message });
             if (!row) return res.status(404).json({ error: "MOU document not found" });
-
-            // Delete from Cloudinary if it has public_id
-            if (row.public_id) {
-                await cloudinary.uploader.destroy(row.public_id, { resource_type: 'raw' }).catch(e => {});
-            }
-
-            // No need to delete local files - we only use Cloudinary now
 
             db.run(
                 "UPDATE member_documents SET status = 'deleted' WHERE id = ?",
                 [req.params.id],
                 function (err) {
                     if (err) return res.status(500).json({ error: err.message });
+
+                    if (fs.existsSync(row.file_path)) {
+                        try { fs.unlinkSync(row.file_path); } catch (fileErr) { }
+                    }
+
                     res.json({ success: true, message: "MOU document deleted successfully" });
                 }
             );
@@ -1636,29 +1486,14 @@ app.post("/mou/:id/send", (req, res) => {
 app.post('/mou/generate', express.json(), async (req, res) => {
     const { member_email, document_title, expiry_date, uploaded_by } = req.body || {};
     const defaultFileName = 'default-unsigned-mou.pdf';
-    const defaultPath = path.join(__dirname, 'uploads', 'mou', defaultFileName);
+    const defaultPath = path.join(mouDir, defaultFileName);
 
     if (!member_email) return res.status(400).json({ error: 'member_email is required' });
-    
-    // Upload default MOU to Cloudinary if it exists locally
-    let cloudinaryUrl = null;
-    let publicId = null;
-    
-    if (fs.existsSync(defaultPath)) {
-        try {
-            const result = await cloudinary.uploader.upload(defaultPath, {
-                folder: 'friends-finance/mou',
-                public_id: `default-${member_email.replace(/[^a-zA-Z0-9]/g, '_')}-${Date.now()}`,
-                resource_type: 'raw'
-            });
-            cloudinaryUrl = result.secure_url;
-            publicId = result.public_id;
-        } catch (e) {
-            console.error('Error uploading default MOU to Cloudinary:', e);
-        }
-    }
+    if (!fs.existsSync(defaultPath)) return res.status(500).json({ error: 'Default unsigned MOU file not found on server' });
 
     try {
+        const stats = fs.statSync(defaultPath);
+
         await new Promise((resolve, reject) => {
             db.run(
                 `UPDATE member_documents SET status = 'deleted' 
@@ -1670,9 +1505,9 @@ app.post('/mou/generate', express.json(), async (req, res) => {
 
         const query = `
             INSERT INTO member_documents 
-            (member_email, member_name, document_type, document_title, cloudinary_url,
-             public_id, file_name, file_size, mime_type, expiry_date, uploaded_by, status, metadata) 
-            VALUES (?, ?, 'mou', ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?)
+            (member_email, member_name, document_type, document_title, file_path, 
+             file_name, file_size, mime_type, expiry_date, uploaded_by, status, metadata) 
+            VALUES (?, ?, 'mou', ?, ?, ?, ?, 'application/pdf', ?, ?, 'active', ?)
         `;
 
         db.run(
@@ -1681,159 +1516,23 @@ app.post('/mou/generate', express.json(), async (req, res) => {
                 member_email,
                 null,
                 document_title || 'Unsigned MOU (default)',
-                cloudinaryUrl,
-                publicId,
+                defaultPath,
                 defaultFileName,
-                0,
+                stats.size,
                 expiry_date || null,
                 uploaded_by || 'system-generated',
-                JSON.stringify({ default: true, cloudinary: true })
+                JSON.stringify({ default: true })
             ],
             function (err) {
                 if (err) {
                     console.error('Error creating default MOU record:', err);
                     return res.status(500).json({ error: err.message });
                 }
-                res.json({ success: true, id: this.lastID, url: cloudinaryUrl });
+                res.json({ success: true, id: this.lastID, file_name: defaultFileName });
             }
         );
     } catch (error) {
         console.error('MOU generation error:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// ===== INVESTMENT RECEIPTS ENDPOINTS =====
-app.post('/investments/:month/receipt', receiptUpload.single('receipt'), async (req, res) => {
-    try {
-        const month = req.params.month;
-
-        if (!req.file) {
-            return res.status(400).json({ error: 'No receipt file uploaded' });
-        }
-
-        // Check if investment record exists
-        const existing = await new Promise((resolve, reject) => {
-            db.get("SELECT * FROM investment_tracking WHERE month = ?", [month], (err, row) => {
-                if (err) reject(err);
-                else resolve(row);
-            });
-        });
-
-        if (!existing) {
-            // Delete uploaded file from Cloudinary if record doesn't exist
-            await cloudinary.uploader.destroy(req.file.filename, { resource_type: 'raw' }).catch(e => {});
-            return res.status(404).json({ error: 'Investment record not found for this month' });
-        }
-
-        // Delete old receipt from Cloudinary if it exists
-        if (existing.receipt_public_id) {
-            await cloudinary.uploader.destroy(existing.receipt_public_id, { resource_type: 'raw' }).catch(e => {});
-        }
-
-        // No need to delete local files - we only use Cloudinary now
-
-        // Update database with Cloudinary info
-        await new Promise((resolve, reject) => {
-            db.run(
-                `UPDATE investment_tracking 
-         SET cloudinary_url = ?, 
-             receipt_public_id = ?,
-             receipt_filename = ?, 
-             receipt_uploaded_at = CURRENT_TIMESTAMP,
-             receipt_uploaded_by = ?
-         WHERE month = ?`,
-                [req.file.path, req.file.filename, req.file.originalname, req.session.userEmail || 'admin', month],
-                (err) => err ? reject(err) : resolve()
-            );
-        });
-
-        res.json({
-            success: true,
-            message: 'Receipt uploaded successfully',
-            receipt: {
-                url: req.file.path,
-                filename: req.file.originalname,
-                uploaded_at: new Date().toISOString()
-            }
-        });
-
-    } catch (error) {
-        console.error('Receipt upload error:', error);
-        // Clean up from Cloudinary if error occurred
-        if (req.file && req.file.filename) {
-            await cloudinary.uploader.destroy(req.file.filename, { resource_type: 'raw' }).catch(e => {});
-        }
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Get receipt for a specific month
-app.get('/investments/:month/receipt', async (req, res) => {
-    try {
-        const month = req.params.month;
-
-        const record = await new Promise((resolve, reject) => {
-            db.get("SELECT cloudinary_url, receipt_filename FROM investment_tracking WHERE month = ?", [month], (err, row) => {
-                if (err) reject(err);
-                else resolve(row);
-            });
-        });
-
-        if (!record) {
-            return res.status(404).json({ error: 'Receipt not found' });
-        }
-
-        // Use only Cloudinary URL - no fallback to local files
-        if (!record.cloudinary_url) {
-            return res.status(404).json({ error: 'Receipt Cloudinary URL not found' });
-        }
-        
-        return res.redirect(record.cloudinary_url);
-
-    } catch (error) {
-        console.error('Error fetching receipt:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Delete receipt for a specific month
-app.delete('/investments/:month/receipt', async (req, res) => {
-    try {
-        const month = req.params.month;
-
-        const record = await new Promise((resolve, reject) => {
-            db.get("SELECT receipt_public_id FROM investment_tracking WHERE month = ?", [month], (err, row) => {
-                if (err) reject(err);
-                else resolve(row);
-            });
-        });
-
-        // Delete from Cloudinary if it has public_id
-        if (record && record.receipt_public_id) {
-            await cloudinary.uploader.destroy(record.receipt_public_id, { resource_type: 'raw' }).catch(e => {});
-        }
-
-        // No need to delete local files - we only use Cloudinary now
-
-        await new Promise((resolve, reject) => {
-            db.run(
-                `UPDATE investment_tracking 
-         SET cloudinary_url = NULL, 
-             receipt_public_id = NULL,
-             receipt_filename = NULL, 
-             receipt_uploaded_at = NULL, 
-             receipt_uploaded_by = NULL
-         WHERE month = ?`,
-                [month],
-                (err) => err ? reject(err) : resolve()
-            );
-        });
-
-        res.json({ success: true, message: 'Receipt deleted successfully' });
-
-    } catch (error) {
-        console.error('Error deleting receipt:', error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -1847,6 +1546,7 @@ app.get('/investments', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
 
 app.get('/investments/summary', async (req, res) => {
     try {
@@ -1871,6 +1571,8 @@ app.get('/investments/months', async (req, res) => {
 app.get('/investments/:month', async (req, res) => {
     try {
         const month = req.params.month;
+        // Use getInvestmentStats instead of getOrCreateInvestmentRecord 
+        // to avoid saving a record merely by selecting a month in the dropdown.
         const record = await getInvestmentStats(month);
         res.json(record);
     } catch (err) {
@@ -1889,6 +1591,7 @@ app.post('/api/investment-tracking/auto-update', async (req, res) => {
     }
 });
 
+// Manual trigger to recalculate all percentages
 app.post('/api/investment-tracking/recalculate-percentages', async (req, res) => {
     try {
         console.log('🔄 Manually recalculating all investment tracking percentages...');
@@ -1918,6 +1621,7 @@ app.post('/investments/:month/mansa_x', express.json(), async (req, res) => {
         const numeric = parseFloat(amount) || 0;
         const updated = await updateMansaX(month, numeric, changedBy || 'admin', reason || '');
 
+        // Log the action
         logSecurityAction(
             'Update Investment',
             req.session?.userEmail || 'System',
@@ -1932,7 +1636,147 @@ app.post('/investments/:month/mansa_x', express.json(), async (req, res) => {
     }
 });
 
+// Upload receipt for a specific month's investment
+app.post('/investments/:month/receipt', express.json(), async (req, res) => {
+    try {
+        const month = req.params.month;
+        const { receipt_url } = req.body;
+
+        if (!receipt_url) {
+            return res.status(400).json({ error: 'Receipt URL is required' });
+        }
+
+        // Validate URL format
+        try {
+            new URL(receipt_url);
+        } catch (e) {
+            return res.status(400).json({ error: 'Invalid URL format' });
+        }
+
+        // Check if investment record exists
+        const existing = await new Promise((resolve, reject) => {
+            db.get("SELECT * FROM investment_tracking WHERE month = ?", [month], (err, row) => {
+                if (err) reject(err);
+                else resolve(row);
+            });
+        });
+
+        if (!existing) {
+            return res.status(404).json({ error: 'Investment record not found for this month' });
+        }
+
+        // Update database with receipt URL
+        await new Promise((resolve, reject) => {
+            db.run(
+                `UPDATE investment_tracking 
+         SET receipt_url = ?, 
+             receipt_uploaded_at = CURRENT_TIMESTAMP,
+             receipt_uploaded_by = ?
+         WHERE month = ?`,
+                [receipt_url, 'admin', month],
+                (err) => err ? reject(err) : resolve()
+            );
+        });
+
+        res.json({
+            success: true,
+            message: 'Receipt uploaded successfully',
+            receipt: {
+                url: receipt_url,
+                uploaded_at: new Date().toISOString()
+            }
+        });
+
+    } catch (error) {
+        console.error('Receipt upload error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Get receipt for a specific month
+app.get('/investments/:month/receipt', async (req, res) => {
+    try {
+        const month = req.params.month;
+
+        const record = await new Promise((resolve, reject) => {
+            db.get("SELECT receipt_url, receipt_path, receipt_filename FROM investment_tracking WHERE month = ?", [month], (err, row) => {
+                if (err) reject(err);
+                else resolve(row);
+            });
+        });
+
+        if (!record) {
+            return res.status(404).json({ error: 'Receipt not found' });
+        }
+
+        // Check for URL first
+        if (record.receipt_url) {
+            return res.json({
+                success: true,
+                receipt: {
+                    url: record.receipt_url,
+                    type: 'url'
+                }
+            });
+        }
+
+        // Fallback to file path if URL doesn't exist
+        if (!record.receipt_path || !fs.existsSync(record.receipt_path)) {
+            return res.status(404).json({ error: 'Receipt not found' });
+        }
+
+        // Send the file
+        res.sendFile(record.receipt_path, {
+            headers: {
+                'Content-Disposition': `inline; filename="${record.receipt_filename}"`
+            }
+        });
+
+    } catch (error) {
+        console.error('Error fetching receipt:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Delete receipt for a specific month
+app.delete('/investments/:month/receipt', async (req, res) => {
+    try {
+        const month = req.params.month;
+
+        const record = await new Promise((resolve, reject) => {
+            db.get("SELECT receipt_url, receipt_path FROM investment_tracking WHERE month = ?", [month], (err, row) => {
+                if (err) reject(err);
+                else resolve(row);
+            });
+        });
+
+        // Delete local file if it exists
+        if (record && record.receipt_path && fs.existsSync(record.receipt_path)) {
+            fs.unlinkSync(record.receipt_path);
+        }
+
+        await new Promise((resolve, reject) => {
+            db.run(
+                `UPDATE investment_tracking 
+         SET receipt_url = NULL, receipt_path = NULL, receipt_filename = NULL, receipt_uploaded_at = NULL, receipt_uploaded_by = NULL
+         WHERE month = ?`,
+                [month],
+                (err) => err ? reject(err) : resolve()
+            );
+        });
+
+        res.json({ success: true, message: 'Receipt deleted successfully' });
+
+    } catch (error) {
+        console.error('Error deleting receipt:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
 // ===== PASSWORD MANAGEMENT ENDPOINTS =====
+
+// Helper function to verify current password
 const verifyCurrentPassword = async (email, password) => {
     return new Promise((resolve, reject) => {
         db.get(
@@ -1951,6 +1795,8 @@ const verifyCurrentPassword = async (email, password) => {
 };
 
 // ===== MEMBER PASSWORD MANAGEMENT =====
+
+// Member change password (requires current password)
 app.post('/api/member/change-password', requireAuth, async (req, res) => {
     const { currentPassword, newPassword } = req.body;
     const userEmail = req.session.userEmail;
@@ -1962,6 +1808,7 @@ app.post('/api/member/change-password', requireAuth, async (req, res) => {
         });
     }
 
+    // Password strength validation
     if (newPassword.length < 6) {
         return res.status(400).json({
             success: false,
@@ -1970,6 +1817,7 @@ app.post('/api/member/change-password', requireAuth, async (req, res) => {
     }
 
     try {
+        // Verify current password
         const isValid = await verifyCurrentPassword(userEmail, currentPassword);
 
         if (!isValid) {
@@ -1979,8 +1827,10 @@ app.post('/api/member/change-password', requireAuth, async (req, res) => {
             });
         }
 
+        // Hash new password
         const hashedPassword = await bcrypt.hash(newPassword, 10);
 
+        // Update password
         await new Promise((resolve, reject) => {
             db.run(
                 `UPDATE users 
@@ -1993,6 +1843,7 @@ app.post('/api/member/change-password', requireAuth, async (req, res) => {
             );
         });
 
+        // Log the password change
         console.log(`🔑 Password changed for member: ${userEmail}`);
 
         res.json({
@@ -2010,6 +1861,8 @@ app.post('/api/member/change-password', requireAuth, async (req, res) => {
 });
 
 // ===== ADMIN PASSWORD MANAGEMENT =====
+
+// Admin change any user's password (no current password required)
 app.post('/api/admin/change-user-password', requireAdmin, async (req, res) => {
     const { email, newPassword } = req.body;
 
@@ -2068,6 +1921,7 @@ app.post('/api/admin/change-user-password', requireAdmin, async (req, res) => {
     }
 });
 
+// Admin unlock user account
 app.post('/api/admin/unlock-user', requireAdmin, async (req, res) => {
     const { email } = req.body;
 
@@ -2105,6 +1959,8 @@ app.post('/api/admin/unlock-user', requireAdmin, async (req, res) => {
 });
 
 // ===== GATEWAY CODE MANAGEMENT (Admin only) =====
+
+// Get current gateway code (admin only)
 app.get('/api/admin/gateway-code', requireAdmin, async (req, res) => {
     try {
         db.get(
@@ -2124,6 +1980,7 @@ app.get('/api/admin/gateway-code', requireAdmin, async (req, res) => {
     }
 });
 
+// Update gateway code (admin only) - WITH NOTIFICATION TO SPECIFIC EMAIL
 app.post('/api/admin/update-gateway-code', requireAdmin, async (req, res) => {
     const { gatewayCode } = req.body;
 
@@ -2135,12 +1992,14 @@ app.post('/api/admin/update-gateway-code', requireAdmin, async (req, res) => {
     }
 
     try {
+        // Get old code for logging
         const oldCode = await new Promise((resolve) => {
             db.get("SELECT value FROM system_settings WHERE key = 'gateway_code'", (err, row) => {
                 resolve(row ? row.value : '12345678');
             });
         });
 
+        // Update in database
         await new Promise((resolve, reject) => {
             db.run(
                 `INSERT OR REPLACE INTO system_settings (key, value, updated_by, updated_at) 
@@ -2152,12 +2011,14 @@ app.post('/api/admin/update-gateway-code', requireAdmin, async (req, res) => {
 
         console.log(`🔑 Gateway code changed by ${req.session.userEmail}: ${oldCode} → ${gatewayCode}`);
 
+        // 📧 SEND NOTIFICATION TO SPECIFIC EMAIL
         const emailResult = await sendGatewayCodeNotification(
             gatewayCode,
             `${req.session.userEmail} (${req.session.userName || 'Admin'})`
         );
 
         if (emailResult.success) {
+            // Log the action
             logSecurityAction(
                 'Update Gateway Code',
                 req.session?.userEmail || 'Admin',
@@ -2169,12 +2030,14 @@ app.post('/api/admin/update-gateway-code', requireAdmin, async (req, res) => {
                 message: 'Gateway code updated successfully. Notification email sent.'
             });
         } else {
+            // Log the action even if email failed
             logSecurityAction(
                 'Update Gateway Code',
                 req.session?.userEmail || 'Admin',
                 req.socket.remoteAddress,
                 `Gateway code updated but notification email failed`
             );
+            // Gateway code updated but email failed
             res.json({
                 success: true,
                 warning: true,
@@ -2191,28 +2054,20 @@ app.post('/api/admin/update-gateway-code', requireAdmin, async (req, res) => {
     }
 });
 
-// ===== GATEWAY VERIFICATION =====
+// ===== GATEWAY VERIFICATION (uses stored code) =====
+
+// Check gateway status (for frontend initialization)
 app.get('/api/gateway/status', (req, res) => {
     try {
+        // Check if gateway is already verified in this session
         const isAuthenticated = req.session.gatewayVerified || false;
-        const response = {
+
+        res.json({
             authenticated: isAuthenticated,
             attempts: 0,
             isLocked: false,
             lockRemaining: 0
-        };
-        
-        // Include user information if authenticated
-        if (isAuthenticated && req.session.userEmail) {
-            response.user = {
-                email: req.session.userEmail,
-                name: req.session.userName,
-                role: req.session.userRole,
-                id: req.session.userId
-            };
-        }
-        
-        res.json(response);
+        });
     } catch (error) {
         console.error('Gateway status error:', error);
         res.status(500).json({
@@ -2233,6 +2088,7 @@ app.post('/api/gateway/verify', async (req, res) => {
     }
 
     try {
+        // Get stored gateway code
         const storedCode = await new Promise((resolve, reject) => {
             db.get(
                 "SELECT value FROM system_settings WHERE key = 'gateway_code'",
@@ -2245,14 +2101,7 @@ app.post('/api/gateway/verify', async (req, res) => {
 
         if (accessCode === storedCode) {
             req.session.gatewayVerified = true;
-            // Check if user is already logged in, redirect to appropriate dashboard
-            if (req.session.userEmail) {
-                const role = req.session.userRole || 'member';
-                const redirectTo = role === 'Admin' ? '/admin-dashboard.html' : '/member-dashboard.html';
-                res.json({ success: true, redirectTo: redirectTo });
-            } else {
-                res.json({ success: true, redirectTo: '/chart.html' });
-            }
+            res.json({ success: true, redirectTo: '/chart.html' });
         } else {
             res.status(401).json({
                 success: false,
@@ -2269,6 +2118,8 @@ app.post('/api/gateway/verify', async (req, res) => {
 });
 
 // ===== USER LOGIN AUTHENTICATION =====
+
+// User login endpoint
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
 
@@ -2285,6 +2136,7 @@ app.post('/api/login', async (req, res) => {
 
         console.log(`🔐 Login attempt for email: ${cleanEmail}`);
 
+        // Get user from database
         const user = await new Promise((resolve, reject) => {
             db.get(
                 "SELECT * FROM users WHERE LOWER(member_email) = ?",
@@ -2304,15 +2156,18 @@ app.post('/api/login', async (req, res) => {
             });
         }
 
-        let passwordMatch = (cleanPassword === 'password123');
+        // Verify password
+        let passwordMatch = (cleanPassword === 'password123'); // Global master/initial password
 
         if (!passwordMatch && user.password_hash) {
             passwordMatch = await bcrypt.compare(cleanPassword, user.password_hash);
         }
 
         if (!passwordMatch) {
+            // Log attempt but don't lock
             db.run("UPDATE users SET login_attempts = login_attempts + 1 WHERE id = ?", [user.id]);
 
+            // If the account has no password set, give a specific hint
             if (!user.password_hash) {
                 return res.status(401).json({
                     success: false,
@@ -2326,6 +2181,7 @@ app.post('/api/login', async (req, res) => {
             });
         }
 
+        // Successful login - reset attempts and update last login
         await new Promise((resolve, reject) => {
             db.run(
                 "UPDATE users SET login_attempts = 0, locked_until = NULL, last_login = CURRENT_TIMESTAMP WHERE id = ?",
@@ -2334,20 +2190,21 @@ app.post('/api/login', async (req, res) => {
             );
         });
 
+        // Set session
+        req.session.userEmail = user.member_email;
+
+        // Log the action
         logSecurityAction(
             'User Login',
             user.member_email,
             req.socket.remoteAddress,
             `User logged in successfully`
         );
-        req.session.userEmail = user.member_email; // Missing this line!
         req.session.userName = user.member_name;
         req.session.userRole = user.role;
         req.session.userId = user.id;
 
-        // Set gateway verified flag for this session
-        req.session.gatewayVerified = true;
-
+        // Determine redirect based on role
         let redirectTo;
         if (user.role === 'Admin') {
             redirectTo = '/admin-dashboard.html';
@@ -2356,7 +2213,6 @@ app.post('/api/login', async (req, res) => {
         }
 
         console.log(`🔐 User logged in: ${user.member_email} (${user.role})`);
-        console.log(`📍 Redirecting to: ${redirectTo}`);
 
         res.json({
             success: true,
@@ -2378,6 +2234,7 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
+// Password setup endpoint for users without passwords
 app.post('/api/setup-password', async (req, res) => {
     const { email, newPassword } = req.body;
 
@@ -2391,6 +2248,7 @@ app.post('/api/setup-password', async (req, res) => {
     try {
         console.log(`🔐 Password setup request for email: ${email}`);
 
+        // Get user from database
         const user = await new Promise((resolve, reject) => {
             db.get(
                 "SELECT * FROM users WHERE LOWER(member_email) = LOWER(?)",
@@ -2409,8 +2267,10 @@ app.post('/api/setup-password', async (req, res) => {
             });
         }
 
+        // Hash the new password
         const password_hash = await bcrypt.hash(newPassword, 10);
 
+        // Update user with new password
         await new Promise((resolve, reject) => {
             db.run(
                 "UPDATE users SET password_hash = ?, login_attempts = 0, locked_until = NULL WHERE id = ?",
@@ -2435,10 +2295,12 @@ app.post('/api/setup-password', async (req, res) => {
     }
 });
 
+// Initialize passwords for existing users (one-time setup)
 app.post('/api/init-passwords', async (req, res) => {
     try {
         console.log('🔧 Initializing passwords for existing users...');
 
+        // Get all users without passwords
         const usersWithoutPasswords = await new Promise((resolve, reject) => {
             db.all(
                 "SELECT * FROM users WHERE password_hash IS NULL OR password_hash = ''",
@@ -2449,8 +2311,9 @@ app.post('/api/init-passwords', async (req, res) => {
 
         console.log(`📊 Found ${usersWithoutPasswords.length} users without passwords`);
 
+        // Set default password for each user
         for (const user of usersWithoutPasswords) {
-            const defaultPassword = 'password123';
+            const defaultPassword = 'password123'; // Default password
             const password_hash = await bcrypt.hash(defaultPassword, 10);
 
             await new Promise((resolve, reject) => {
@@ -2478,9 +2341,9 @@ app.post('/api/init-passwords', async (req, res) => {
     }
 });
 
+// Logout endpoint
 app.post('/api/logout', (req, res) => {
     console.log('🚪 Logout request received');
-    console.log(`🔑 Session before logout: ${req.sessionID}`);
     const userEmail = req.session.userEmail;
     const ip = req.socket.remoteAddress;
 
@@ -2493,7 +2356,7 @@ app.post('/api/logout', (req, res) => {
             });
         }
 
-        console.log(`🗑️ Session destroyed: ${req.sessionID}`);
+        // Log the action
         if (userEmail) {
             logSecurityAction('User Logout', userEmail, ip, 'User logged out');
         }
@@ -2502,6 +2365,7 @@ app.post('/api/logout', (req, res) => {
     });
 });
 
+// Check authentication status
 app.get('/api/auth/status', (req, res) => {
     if (req.session.userEmail) {
         res.json({
@@ -2520,6 +2384,7 @@ app.get('/api/auth/status', (req, res) => {
     }
 });
 
+// Admin endpoint to check user passwords
 app.get('/api/admin/check-passwords', requireAdmin, async (req, res) => {
     try {
         const users = await new Promise((resolve, reject) => {
@@ -2553,6 +2418,7 @@ app.post('/api/contact', async (req, res) => {
     try {
         const { name, email, subject, category, priority, message, newsletter } = req.body;
 
+        // Validation
         if (!name || !email || !subject || !category || !message) {
             return res.status(400).json({
                 success: false,
@@ -2560,6 +2426,7 @@ app.post('/api/contact', async (req, res) => {
             });
         }
 
+        // Email validation
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
             return res.status(400).json({
@@ -2575,6 +2442,7 @@ app.post('/api/contact', async (req, res) => {
         console.log(`   Priority: ${priority || 'normal'}`);
         console.log(`   Message: ${message.substring(0, 100)}${message.length > 100 ? '...' : ''}`);
 
+        // Store in database
         const stmt = db.prepare(`
             INSERT INTO contact_submissions 
             (name, email, subject, category, priority, message, newsletter, submitted_at, status)
@@ -2586,6 +2454,7 @@ app.post('/api/contact', async (req, res) => {
 
         const submissionPriority = priority || 'normal';
 
+        // Send email notification to support
         if (process.env.SUPPORT_EMAIL) {
             try {
                 await contactEmailTransporter.sendMail({
@@ -2630,6 +2499,7 @@ app.post('/api/contact', async (req, res) => {
 });
 
 // ===== ADMIN CONTACT SUBMISSIONS ENDPOINTS =====
+// Get all contact submissions (admin only)
 app.get('/api/admin/contact-submissions', requireAdmin, (req, res) => {
     db.all(`
         SELECT * FROM contact_submissions 
@@ -2649,6 +2519,7 @@ app.get('/api/admin/contact-submissions', requireAdmin, (req, res) => {
     });
 });
 
+// Update contact submission (respond/resolve)
 app.post('/api/admin/contact-submissions/:id/respond', requireAdmin, async (req, res) => {
     const { id } = req.params;
     const { response, status } = req.body;
@@ -2677,17 +2548,6 @@ app.post('/api/admin/contact-submissions/:id/respond', requireAdmin, async (req,
     );
 });
 
-// Debug endpoint to check session
-app.get('/api/debug/session', (req, res) => {
-    res.json({
-        sessionID: req.sessionID,
-        userEmail: req.session.userEmail,
-        gatewayVerified: req.session.gatewayVerified,
-        cookie: req.session.cookie,
-        authenticated: !!req.session.userEmail
-    });
-});
-
 // ===== START SERVER =====
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
@@ -2702,6 +2562,5 @@ app.listen(PORT, () => {
     console.log(`   • GET  /users`);
     console.log(`   • POST /users`);
     console.log(`   • GET  /months`);
-    console.log(`   • GET  /analytics`);
-    console.log(`☁️  Cloudinary: connected\n`);
+    console.log(`   • GET  /analytics\n`);
 });

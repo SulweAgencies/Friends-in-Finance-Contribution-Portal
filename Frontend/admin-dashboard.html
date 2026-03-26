@@ -1317,9 +1317,6 @@
             <button class="nav-btn" data-tab="contributions">
                 <i class="fas fa-table"></i> Contributions
             </button>
-            <button class="nav-btn" data-tab="resources">
-                <i class="fas fa-folder-open"></i> Resources
-            </button>
             <button class="nav-btn" data-tab="dbexplorer">
                 <i class="fas fa-database"></i> DB Explorer
             </button>
@@ -1534,6 +1531,43 @@
                     </div>
                 </div>
 
+                <!-- Member Photo Management -->
+                <div class="admin-section">
+                    <div class="section-header">
+                        <h3><i class="fas fa-camera"></i> Member Photo Management</h3>
+                        <button class="btn btn-small btn-primary" id="refreshPhotos">
+                            <i class="fas fa-sync"></i> Refresh
+                        </button>
+                    </div>
+
+                    <div
+                        style="margin-top: 20px; padding: 20px; background: #f8fafc; border-radius: 8px; border: 1px dashed var(--border-color);">
+                        <h4 style="margin-bottom: 15px; color: var(--secondary-color);">
+                            <i class="fas fa-camera"></i> Update Member Photo URL
+                        </h4>
+                        <div class="form-row">
+                            <select id="photoMemberNameSelect" class="form-control" style="flex: 1;">
+                                <option value="">Select Member Name</option>
+                            </select>
+                            <select id="photoMemberEmailSelect" class="form-control" style="flex: 1;">
+                                <option value="">Select Member Email</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-top: 15px;">
+                            <label for="photoFileUrl">Photo URL (Google Drive/Cloud Storage)</label>
+                            <input type="url" id="photoFileUrl" class="form-control" placeholder="https://drive.google.com/file/d/..." />
+                        </div>
+                        <div class="form-row" style="margin-top: 15px;">
+                            <button class="btn btn-success" id="uploadPhotoBtn">
+                                <i class="fas fa-camera"></i> Update Photo
+                            </button>
+                            <button class="btn btn-warning" id="clearPhotoBtn">
+                                <i class="fas fa-trash"></i> Clear Photo
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- MOU/MOA Documents Management Consolidated Here -->
                 <div class="admin-section">
                     <div class="section-header">
@@ -1584,8 +1618,8 @@
                                 style="flex: 1; margin-left:8px;" />
                         </div>
                         <div class="form-group" style="margin-top: 15px;">
-                            <label for="mouFileUpload">Upload Document (PDF/DOC)</label>
-                            <input type="file" id="mouFileUpload" class="form-control" accept=".pdf,.doc,.docx">
+                            <label for="mouFileUrl">Document URL (Google Drive/Cloud Storage)</label>
+                            <input type="url" id="mouFileUrl" class="form-control" placeholder="https://drive.google.com/file/d/..." />
                         </div>
                         <div class="form-row" style="margin-top: 15px;">
                             <button class="btn btn-success" id="uploadMOUBtn">
@@ -1691,9 +1725,9 @@
 
                             <div class="input-group" style="flex: 2; min-width: 200px;">
                                 <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #4b5563;">📎
-                                    Receipt File (PDF/Image)</label>
-                                <input type="file" id="receiptFileInput" class="form-control"
-                                    accept=".pdf,.jpg,.jpeg,.png,.gif"
+                                    Receipt URL (Google Drive/Cloud Storage)</label>
+                                <input type="url" id="receiptUrlInput" class="form-control"
+                                    placeholder="https://drive.google.com/file/d/..."
                                     style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #d1d5db;">
                             </div>
 
@@ -1731,7 +1765,7 @@
                                         <th>Total Invested</th>
                                         <th>Mansa-X %</th>
                                         <th>I&M %</th>
-                                        <th>Last Updated</th>
+                                        <th>Receipt URL</th>
                                     </tr>
                                 </thead>
                                 <tbody id="investmentTrackingTable">
@@ -1742,46 +1776,6 @@
                                     </tr>
                                 </tbody>
                             </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Resources Tab -->
-            <div id="resources-tab" class="tab-content">
-                <h2><i class="fas fa-folder-open"></i> Resources</h2>
-
-                <div class="admin-section">
-                    <div class="section-header">
-                        <h3>Member Photos Gallery</h3>
-                        <div style="display:flex;gap:10px;align-items:center;">
-                            <button class="btn btn-small btn-primary" id="refreshResources">
-                                <i class="fas fa-sync"></i> Refresh
-                            </button>
-                            <button class="btn btn-small btn-primary" id="openPhotoMgmt">
-                                <i class="fas fa-camera"></i> Manage Photos
-                            </button>
-                        </div>
-                    </div>
-
-                    <div style="margin-top:12px;">
-                        <div id="galleryGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="admin-section" style="margin-top:18px;">
-                    <div class="section-header">
-                        <h3>MOU Documents</h3>
-                        <div>
-                            <button class="btn btn-small btn-primary" id="refreshMOUList">
-                                <i class="fas fa-sync"></i> Refresh MOU
-                            </button>
-                        </div>
-                    </div>
-                    <div style="margin-top:12px;">
-                        <div id="mouList"
-                            style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;">
                         </div>
                     </div>
                 </div>
@@ -2054,7 +2048,7 @@
 
     <script>
         // Configuration
-        const API_BASE = 'https://friends-in-finance-contribution-portal.onrender.com';
+        const API_BASE = 'http://localhost:3000';
 
         // State
         let adminData = {
@@ -2097,35 +2091,18 @@
 
         // Initialize dashboard
         document.addEventListener('DOMContentLoaded', function () {
-            // Check if user is authenticated and is admin
-            fetch('/api/auth/status', {
-                credentials: 'include' // Add this
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('🔐 Admin auth check response:', data);
-                    if (!data.authenticated || data.user.role !== 'Admin') {
-                        // Not authenticated or not admin, redirect to chart page
-                        console.log('❌ Admin auth check failed:', data);
-                        console.log('Not authenticated as admin, redirecting to chart');
-                        window.location.href = 'chart.html'; // Redirect to chart, NOT index.html
-                        return;
-                    }
+            // Skip authentication check - allow direct access to admin dashboard
+            console.log('Admin dashboard initializing...');
+            
+            // Set default admin name
+            document.getElementById('adminName').textContent = 'System Administrator';
 
-                    // User is authenticated admin, proceed
-                    document.getElementById('adminName').textContent = data.user.name || 'Admin';
-
-                    // Hide loading screen, show dashboard
-                    setTimeout(() => {
-                        document.getElementById('adminLoading').style.display = 'none';
-                        document.getElementById('adminDashboard').style.display = 'block';
-                        initializeDashboard();
-                    }, 500);
-                })
-                .catch(error => {
-                    console.error('Auth check failed:', error);
-                    window.location.href = 'chart.html'; // Redirect to chart, NOT index.html
-                });
+            // Hide loading screen, show dashboard
+            setTimeout(() => {
+                document.getElementById('adminLoading').style.display = 'none';
+                document.getElementById('adminDashboard').style.display = 'block';
+                initializeDashboard();
+            }, 500);
 
             // Navigation
             setupNavigation();
@@ -2140,8 +2117,7 @@
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                            },
-                            credentials: 'include'
+                            }
                         });
 
                         const data = await response.json();
@@ -2149,7 +2125,7 @@
                         if (data.success) {
                             // Successful logout - redirect to chart.html
                             setTimeout(() => {
-                                window.location.href = 'chart.html'; // Redirect to chart, NOT index.html
+                                window.location.href = 'chart.html';
                             }, 1000);
                         } else {
                             showNotification('Logout failed: ' + data.message, 'error');
@@ -2159,7 +2135,7 @@
                         showNotification('Network error during logout', 'error');
                         // Still redirect on error
                         setTimeout(() => {
-                            window.location.href = 'chart.html'; // Redirect to chart, NOT index.html
+                            window.location.href = 'chart.html';
                         }, 1000);
                     }
                 }
@@ -2207,31 +2183,12 @@
 
         async function initializeDashboard() {
             try {
-                console.log('🚀 Initializing admin dashboard...');
-                
-                // Fetch all necessary data with individual error handling
-                const results = await Promise.allSettled([
+                // Fetch all necessary data
+                await Promise.all([
                     fetchAnalytics(),
                     fetchUsers(),
                     fetchContributions()
                 ]);
-
-                // Log results of each fetch
-                results.forEach((result, index) => {
-                    const names = ['Analytics', 'Users', 'Contributions'];
-                    if (result.status === 'fulfilled') {
-                        console.log(`✅ ${names[index]} loaded successfully`);
-                    } else {
-                        console.error(`❌ ${names[index]} failed:`, result.reason);
-                        showNotification(`Failed to load ${names[index].toLowerCase()}: ${result.reason.message}`, 'error');
-                    }
-                });
-
-                // Check if we have at least some data to work with
-                if (!adminData.analytics && !adminData.members && !adminData.contributions) {
-                    showNotification('No data could be loaded. Please check server connection.', 'error');
-                    return;
-                }
 
                 // Update UI
                 updateStats();
@@ -2244,6 +2201,9 @@
                 // Populate MOU member selects (ensure they're filled on load)
                 populateMOUMemberDropdown();
                 loadMOUTable();
+
+                // Populate Photo member selects
+                loadPhotoMemberOptions();
 
                 // Populate resources (gallery + MOU list)
                 if (typeof loadResources === 'function') loadResources();
@@ -2262,18 +2222,9 @@
 
         async function fetchAnalytics() {
             try {
-                console.log('📊 Fetching analytics...');
-                const response = await fetch(`${API_BASE}/analytics`, {
-                    credentials: 'include'
-                });
-                console.log('📊 Analytics response status:', response.status);
-                
-                if (!response.ok) {
-                    throw new Error(`Analytics fetch failed: ${response.status} ${response.statusText}`);
-                }
-                
+                const response = await fetch(`${API_BASE}/analytics`);
+                if (!response.ok) throw new Error('Failed to fetch analytics');
                 adminData.analytics = await response.json();
-                console.log('📊 Analytics data loaded:', adminData.analytics);
 
                 // Update local stats from analytics
                 if (adminData.analytics.totalStats) {
@@ -2284,47 +2235,29 @@
                     adminData.stats.activeMonths = Object.keys(adminData.analytics.monthlyContributions || {}).length;
                 }
             } catch (error) {
-                console.error('❌ fetchAnalytics error:', error);
+                console.error('fetchAnalytics error', error);
                 throw error;
             }
         }
 
         async function fetchUsers() {
             try {
-                console.log('👥 Fetching users...');
-                const response = await fetch(`${API_BASE}/users`, {
-                    credentials: 'include'
-                });
-                console.log('👥 Users response status:', response.status);
-                
-                if (!response.ok) {
-                    throw new Error(`Users fetch failed: ${response.status} ${response.statusText}`);
-                }
-                
+                const response = await fetch(`${API_BASE}/users`);
+                if (!response.ok) throw new Error('Failed to fetch users');
                 adminData.members = await response.json();
-                console.log('👥 Users data loaded:', adminData.members?.length || 0, 'members');
             } catch (error) {
-                console.error('❌ fetchUsers error:', error);
+                console.error('fetchUsers error', error);
                 throw error;
             }
         }
 
         async function fetchContributions() {
             try {
-                console.log('💰 Fetching contributions...');
-                const response = await fetch(`${API_BASE}/contributions`, {
-                    credentials: 'include'
-                });
-                console.log('💰 Contributions response status:', response.status);
-                
-                if (!response.ok) {
-                    throw new Error(`Contributions fetch failed: ${response.status} ${response.statusText}`);
-                }
-                
+                const response = await fetch(`${API_BASE}/contributions`);
+                if (!response.ok) throw new Error('Failed to fetch contributions');
                 adminData.contributions = await response.json();
-                console.log('💰 Contributions data loaded:', adminData.contributions?.length || 0, 'contributions');
             } catch (error) {
-                console.error('❌ fetchContributions error:', error);
+                console.error('fetchContributions error', error);
                 throw error;
             }
         }
@@ -2405,12 +2338,10 @@
         }
 
         function loadMembersTable() {
-            console.log('📋 Loading members table with', adminData.members?.length || 0, 'members');
             const tableBody = document.getElementById('membersTable');
             tableBody.innerHTML = '';
 
-            if (!adminData.members || adminData.members.length === 0) {
-                console.log('❌ No members data available');
+            if (adminData.members.length === 0) {
                 tableBody.innerHTML = '<tr><td colspan="7" class="text-center">No members found. Sync data first.</td></tr>';
                 return;
             }
@@ -2454,12 +2385,10 @@
         }
 
         function loadContributionsTable() {
-            console.log('💰 Loading contributions table with', adminData.contributions?.length || 0, 'contributions');
             const tableBody = document.getElementById('contributionsTable');
             tableBody.innerHTML = '';
 
-            if (!adminData.contributions || adminData.contributions.length === 0) {
-                console.log('❌ No contributions data available');
+            if (adminData.contributions.length === 0) {
                 tableBody.innerHTML = '<tr><td colspan="8" class="text-center">No contributions found.</td></tr>';
                 return;
             }
@@ -2997,7 +2926,7 @@
             const emailSelect = document.getElementById('mouMemberEmailSelect');
             const title = document.getElementById('mouTitle').value;
             const expiryDate = document.getElementById('mouExpiryDate').value;
-            const fileInput = document.getElementById('mouFileUpload');
+            const fileUrl = document.getElementById('mouFileUrl').value;
 
             const selectedNameId = nameSelect ? nameSelect.value : '';
             const selectedEmail = emailSelect ? emailSelect.value : '';
@@ -3012,24 +2941,36 @@
                 return;
             }
 
-            if (!fileInput.files || fileInput.files.length === 0) {
-                showNotification('Please select a file to upload', 'warning');
+            if (!fileUrl) {
+                showNotification('Please enter a document URL', 'warning');
                 return;
             }
 
-            const formData = new FormData();
-            formData.append('mouFile', fileInput.files[0]);
-            formData.append('member_email', selectedEmail);
-            formData.append('document_title', title);
-            formData.append('expiry_date', expiryDate);
-            formData.append('uploaded_by', 'admin');
+            // Validate URL format
+            try {
+                new URL(fileUrl);
+            } catch (e) {
+                showNotification('Please enter a valid URL', 'warning');
+                return;
+            }
+
+            const requestBody = {
+                file_url: fileUrl,
+                member_email: selectedEmail,
+                document_title: title,
+                expiry_date: expiryDate,
+                uploaded_by: 'admin'
+            };
 
             try {
                 showNotification('Uploading MOU document...', 'info');
 
                 const response = await fetch(`${API_BASE}/mou/upload`, {
                     method: 'POST',
-                    body: formData
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
                 });
 
                 const result = await response.json();
@@ -3043,7 +2984,7 @@
                 // Clear form
                 document.getElementById('mouTitle').value = '';
                 document.getElementById('mouExpiryDate').value = '';
-                fileInput.value = '';
+                document.getElementById('mouFileUrl').value = '';
 
                 // Reload table
                 loadMOUTable();
@@ -3052,6 +2993,153 @@
                 console.error('Error uploading MOU:', error);
                 showNotification(`Upload failed: ${error.message}`, 'error');
             }
+        }
+
+        // Photo Management Functions
+        async function uploadPhoto() {
+            const nameSelect = document.getElementById('photoMemberNameSelect');
+            const emailSelect = document.getElementById('photoMemberEmailSelect');
+            const fileUrl = document.getElementById('photoFileUrl').value;
+
+            const selectedNameId = nameSelect ? nameSelect.value : '';
+            const selectedEmail = emailSelect ? emailSelect.value : '';
+
+            if (!selectedNameId || !selectedEmail) {
+                showNotification('Please select both member name and email', 'warning');
+                return;
+            }
+
+            if (!fileUrl) {
+                showNotification('Please enter a photo URL', 'warning');
+                return;
+            }
+
+            // Validate URL format
+            try {
+                new URL(fileUrl);
+            } catch (e) {
+                showNotification('Please enter a valid URL', 'warning');
+                return;
+            }
+
+            const requestBody = {
+                file_url: fileUrl,
+                uploaded_by: 'admin'
+            };
+
+            try {
+                showNotification('Updating member photo...', 'info');
+
+                const response = await fetch(`${API_BASE}/users/${selectedNameId}/photo`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || 'Upload failed');
+                }
+
+                showNotification('Member photo updated successfully', 'success');
+
+                // Clear form
+                document.getElementById('photoFileUrl').value = '';
+
+                // Reload members table to show updated photo
+                loadMembersTable();
+
+            } catch (error) {
+                console.error('Error updating photo:', error);
+                showNotification(`Update failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function clearPhoto() {
+            const nameSelect = document.getElementById('photoMemberNameSelect');
+            const emailSelect = document.getElementById('photoMemberEmailSelect');
+
+            const selectedNameId = nameSelect ? nameSelect.value : '';
+            const selectedEmail = emailSelect ? emailSelect.value : '';
+
+            if (!selectedNameId || !selectedEmail) {
+                showNotification('Please select both member name and email', 'warning');
+                return;
+            }
+
+            if (!confirm('Are you sure you want to clear this member\'s photo?')) {
+                return;
+            }
+
+            try {
+                showNotification('Clearing member photo...', 'info');
+
+                const response = await fetch(`${API_BASE}/users/${selectedNameId}/photo`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || 'Delete failed');
+                }
+
+                showNotification('Member photo cleared successfully', 'success');
+
+                // Clear form
+                document.getElementById('photoFileUrl').value = '';
+
+                // Reload members table to show cleared photo
+                loadMembersTable();
+
+            } catch (error) {
+                console.error('Error clearing photo:', error);
+                showNotification(`Clear failed: ${error.message}`, 'error');
+            }
+        }
+
+        function loadPhotoMemberOptions() {
+            const nameSelect = document.getElementById('photoMemberNameSelect');
+            const emailSelect = document.getElementById('photoMemberEmailSelect');
+
+            if (!nameSelect || !emailSelect) return;
+
+            // Clear existing options
+            nameSelect.innerHTML = '<option value="">Select Member Name</option>';
+            emailSelect.innerHTML = '<option value="">Select Member Email</option>';
+
+            if (!adminData || !adminData.members) return;
+
+            // Populate member options
+            adminData.members.forEach(member => {
+                const nameOption = document.createElement('option');
+                nameOption.value = member.id;
+                nameOption.textContent = member.member_name;
+                nameSelect.appendChild(nameOption);
+
+                const emailOption = document.createElement('option');
+                emailOption.value = member.member_email;
+                emailOption.textContent = member.member_email;
+                emailSelect.appendChild(emailOption);
+            });
+
+            // Add sync functionality
+            nameSelect.addEventListener('change', () => {
+                const selectedMember = adminData.members.find(m => m.id == nameSelect.value);
+                if (selectedMember) {
+                    emailSelect.value = selectedMember.member_email;
+                }
+            });
+
+            emailSelect.addEventListener('change', () => {
+                const selectedMember = adminData.members.find(m => m.member_email == emailSelect.value);
+                if (selectedMember) {
+                    nameSelect.value = selectedMember.id;
+                }
+            });
         }
 
         async function viewMOU(id) {
@@ -3289,15 +3377,20 @@
             document.getElementById('generateMOUBtn')?.addEventListener('click', generateMOUTemplate);
             document.getElementById('closeMOUModal')?.addEventListener('click', closeMOUPreview);
 
+            // Photo management buttons
+            document.getElementById('uploadPhotoBtn')?.addEventListener('click', uploadPhoto);
+            document.getElementById('clearPhotoBtn')?.addEventListener('click', clearPhoto);
+            document.getElementById('refreshPhotos')?.addEventListener('click', loadPhotoMemberOptions);
+
             // System operations - removed section, remove listeners
 
             // Analytics and Live Data buttons
             document.getElementById('analyticsBtn')?.addEventListener('click', () => {
-                window.location.href = 'index.html';
+                window.location.href = 'chart.html';
             });
 
             document.getElementById('liveDataBtn')?.addEventListener('click', () => {
-                window.location.href = 'live_data.html';
+                window.location.href = 'index.html';
             });
 
             // Add Member button
@@ -3463,7 +3556,7 @@
         // Upload receipt
         async function uploadReceipt() {
             const month = document.getElementById('receiptMonthSelect').value;
-            const fileInput = document.getElementById('receiptFileInput');
+            const receiptUrl = document.getElementById('receiptUrlInput').value;
             const messageEl = document.getElementById('receiptMessage');
 
             if (!month) {
@@ -3472,21 +3565,34 @@
                 return;
             }
 
-            if (!fileInput.files || fileInput.files.length === 0) {
-                showNotification('Please select a receipt file', 'warning');
-                messageEl.innerHTML = '<div style="color: #ef4444;">❌ Please select a receipt file</div>';
+            if (!receiptUrl) {
+                showNotification('Please enter a receipt URL', 'warning');
+                messageEl.innerHTML = '<div style="color: #ef4444;">❌ Please enter a receipt URL</div>';
                 return;
             }
 
-            const formData = new FormData();
-            formData.append('receipt', fileInput.files[0]);
+            // Validate URL format
+            try {
+                new URL(receiptUrl);
+            } catch (e) {
+                showNotification('Please enter a valid URL', 'warning');
+                messageEl.innerHTML = '<div style="color: #ef4444;">❌ Please enter a valid URL</div>';
+                return;
+            }
+
+            const requestBody = {
+                receipt_url: receiptUrl
+            };
 
             try {
                 messageEl.innerHTML = '<div style="color: #2563eb;"><i class="fas fa-spinner fa-spin"></i> Uploading...</div>';
 
                 const response = await fetch(`${API_BASE}/investments/${encodeURIComponent(month)}/receipt`, {
                     method: 'POST',
-                    body: formData
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
                 });
 
                 const result = await response.json();
@@ -3497,7 +3603,7 @@
                 messageEl.innerHTML = '<div style="color: #10b981;">✅ Receipt uploaded successfully!</div>';
 
                 // Clear form
-                fileInput.value = '';
+                document.getElementById('receiptUrlInput').value = '';
 
                 // Refresh investment table to show receipt status
                 setTimeout(() => {
@@ -3557,14 +3663,28 @@
             if (!tableBody) return;
 
             try {
-                tableBody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 20px; color: #6b7280;"><i class="fas fa-spinner fa-spin"></i> Loading investment data...</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 20px; color: #6b7280;"><i class="fas fa-spinner fa-spin"></i> Loading investment data...</td></tr>';
 
                 const response = await fetch(`${API_BASE}/api/investment-tracking`);
                 if (!response.ok) throw new Error('Failed to fetch investment tracking data');
                 const investments = await response.json();
+                
+                // Debug: Log the first investment record to see field names
+                console.log('Investment API response:', investments);
+                if (investments && investments.length > 0) {
+                    console.log('First investment record fields:', Object.keys(investments[0]));
+                    console.log('First investment record:', investments[0]);
+                    console.log('Receipt URL field check:', {
+                        receipt_url: investments[0].receipt_url,
+                        receipt: investments[0].receipt,
+                        receiptPath: investments[0].receipt_path,
+                        receiptFile: investments[0].receipt_file,
+                        allFields: Object.keys(investments[0]).filter(key => key.toLowerCase().includes('receipt'))
+                    });
+                }
 
                 if (!investments || investments.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 20px; color: #6b7280;">No investment data available</td></tr>';
+                    tableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 20px; color: #6b7280;">No investment data available</td></tr>';
                     return;
                 }
 
@@ -3581,7 +3701,20 @@
 
                     const mansaXPct = inv.mansa_x_percentage || 0;
                     const iandmPct = inv.i_and_m_percentage || 0;
-                    const hasReceipt = inv.receipt_path ? true : false;
+
+                    // Debug: Check all possible receipt URL fields for this record
+                    console.log(`Receipt fields for ${inv.month}:`, {
+                        receipt_url: inv.receipt_url,
+                        receipt: inv.receipt,
+                        receipt_path: inv.receipt_path,
+                        receipt_file: inv.receipt_file,
+                        file_url: inv.file_url,
+                        document_url: inv.document_url,
+                        allFields: Object.keys(inv).filter(key => key.toLowerCase().includes('receipt') || key.toLowerCase().includes('url'))
+                    });
+
+                    // Try multiple possible field names for receipt URL
+                    const receiptUrl = inv.receipt_url || inv.receipt || inv.receipt_path || inv.receipt_file || inv.file_url || inv.document_url;
 
                     row.innerHTML = `
                         <td><strong>${inv.month || 'N/A'}</strong></td>
@@ -3593,12 +3726,13 @@
                         <td><span style="color: #10b981; font-weight: 600;">${mansaXPct}%</span></td>
                         <td><span style="color: #2563eb; font-weight: 600;">${iandmPct}%</span></td>
                         <td>
-                            <span style="display: inline-block; padding: 4px 8px; border-radius: 4px; background: ${hasReceipt ? '#10b981' : '#f59e0b'}; color: white; font-weight: 600;">
-                                <i class="fas fa-${hasReceipt ? 'check-circle' : 'exclamation-circle'}"></i>
-                                ${hasReceipt ? 'Uploaded' : 'Missing'}
-                            </span>
+                            ${receiptUrl && receiptUrl !== null && receiptUrl.trim() !== '' ? 
+                                `<a href="${receiptUrl}" target="_blank" style="color: #10b981; text-decoration: none; font-size: 12px; word-break: break-all; max-width: 200px; display: inline-block;">
+                                    ${receiptUrl.length > 30 ? receiptUrl.substring(0, 30) + '...' : receiptUrl}
+                                </a>` : 
+                                '<span style="color: #f59e0b; font-weight: 600;">No URL</span>'
+                            }
                         </td>
-                        <td>${inv.updated_at ? new Date(inv.updated_at).toLocaleDateString() : 'N/A'}</td>
                     `;
                     tableBody.appendChild(row);
                 });
@@ -3608,7 +3742,7 @@
 
             } catch (error) {
                 console.error('Error loading investment tracking table:', error);
-                tableBody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 20px; color: #ef4444;">Error loading investment data</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 20px; color: #ef4444;">Error loading investment data</td></tr>';
             }
         }
 
@@ -3799,6 +3933,9 @@
                 const member = adminData.members.find(m => String(m.id) === String(memberId));
                 if (member) document.getElementById('simplePhotoMemberLabel').textContent = `${member.member_name} (${member.member_email})`;
             }
+
+            // Clear the URL input when opening the modal
+            document.getElementById('simplePhotoUrl').value = '';
         }
 
         function createSimplePhotoUploadModal() {
@@ -3814,7 +3951,7 @@
                     <div class="modal-body">
                         <div id="simplePhotoMemberLabel" style="margin-bottom:8px;color:#333;">Select member</div>
                         <input type="hidden" id="simplePhotoMemberId" />
-                        <input type="file" id="simplePhotoFile" accept="image/*" />
+                        <input type="url" id="simplePhotoUrl" placeholder="https://drive.google.com/file/d/..." style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;" />
                         <div style="margin-top:12px;display:flex;gap:8px;">
                             <button id="simplePhotoUploadBtn" class="btn btn-primary">Upload</button>
                             <button id="simplePhotoCancel" class="btn btn-secondary">Cancel</button>
@@ -3828,20 +3965,43 @@
             document.getElementById('simplePhotoCancel').addEventListener('click', () => modal.style.display = 'none');
             document.getElementById('simplePhotoUploadBtn').addEventListener('click', async () => {
                 const memberId = document.getElementById('simplePhotoMemberId').value;
-                const input = document.getElementById('simplePhotoFile');
+                const photoUrl = document.getElementById('simplePhotoUrl').value;
                 if (!memberId) return showNotification('Member not selected', 'warning');
-                if (!input.files || input.files.length === 0) return showNotification('Please select a file', 'warning');
+                if (!photoUrl) return showNotification('Please enter a photo URL', 'warning');
 
-                const file = input.files[0];
-                if (file.size > 5 * 1024 * 1024) return showNotification('File must be <5MB', 'error');
+                // Validate URL format
+                try {
+                    new URL(photoUrl);
+                } catch (e) {
+                    showNotification('Please enter a valid URL', 'warning');
+                    return;
+                }
 
-                const form = new FormData();
-                form.append('photo', file);
-                form.append('uploaded_by', currentAdmin.id || 'admin');
+                const requestBody = {
+                    file_url: photoUrl,
+                    uploaded_by: currentAdmin.id || 'admin'
+                };
 
                 try {
-                    const res = await uploadFile(`${API_ENDPOINTS.members}/${memberId}/photo`, form);
+                    const res = await fetch(`${API_BASE}/users/${memberId}/photo`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(requestBody)
+                    });
+                    
+                    const result = await res.json();
+                    
+                    if (!res.ok) {
+                        throw new Error(result.error || 'Upload failed');
+                    }
+                    
                     showNotification('Photo uploaded', 'success');
+                    
+                    // Clear the URL input
+                    document.getElementById('simplePhotoUrl').value = '';
+                    
                     modal.style.display = 'none';
                     // refresh members
                     await initializeDashboard();

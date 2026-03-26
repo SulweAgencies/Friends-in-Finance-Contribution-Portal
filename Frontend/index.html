@@ -1,797 +1,1416 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <!-- Site Identity - Custom Icon -->
-    <link rel="icon" type="image/svg+xml" href="/assets/hand-holding-usd-colored.svg">
-    <link rel="apple-touch-icon" href="/assets/hand-holding-usd-colored.svg">
-    <link rel="manifest" href="/assets/site.webmanifest">
-    <meta name="theme-color" content="#2563eb">
-    <meta name="apple-mobile-web-app-title" content="Friends in Finance">
-    <meta name="application-name" content="Friends in Finance">
-    
-    <!-- Site Identity - Hand Holding USD Icon -->
-    
-    
-    
-    
-    <meta name="apple-mobile-web-app-title" content="Friends in Finance">
-    <meta name="application-name" content="Friends in Finance">
-    
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Access Gateway | Friends in Finance</title>
-    
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
 
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Data Dashboard</title>
+    <style>
         :root {
-            --primary: #1e3a5f;
-            --primary-dark: #0f2b4b;
-            --primary-light: #2b4c7c;
-            --secondary: #2d3748;
-            --accent: #3182ce;
-            --accent-light: #63b3ed;
-            --success: #38a169;
-            --warning: #d69e2e;
-            --danger: #e53e3e;
-            --light: #f7fafc;
-            --dark: #1a202c;
-            --gray: #718096;
-            --border: #e2e8f0;
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --text-color: #1f2937;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --row-hover: #f9fafb;
+            --header-bg: #f8fafc;
+            --danger-color: #ef4444;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            min-height: 100vh;
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 40px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 24px;
+            overflow: hidden;
+        }
+
+        /* Dashboard-style header (matches admin dashboard) */
+        .admin-header {
+            background: linear-gradient(135deg, #2C3E50 0%, #1a2530 100%);
+            color: white;
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo-section {
             display: flex;
             align-items: center;
-            justify-content: center;
-            padding: 20px;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-section i {
+            font-size: 24px;
+            color: #2563eb;
+        }
+
+        .logo-section h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+            color: white;
+        }
+
+        .logo-section span {
+            color: #2563eb;
+        }
+
+        .main-nav {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .main-nav a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        .main-nav a:hover {
+            color: white;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        button:hover {
+            background-color: var(--bg-color);
+            border-color: #d1d5db;
+        }
+
+        button.primary {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        button.primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.925rem;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        th {
+            background-color: var(--header-bg);
+            font-weight: 600;
+            color: #4b5563;
+            cursor: pointer;
+            user-select: none;
+            position: sticky;
+            top: 0;
+            transition: background 0.2s;
+        }
+
+        th:hover {
+            background-color: #e2e8f0;
+        }
+
+        th span.sort-icon {
+            margin-left: 8px;
+            font-size: 0.75rem;
+            color: #9ca3af;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: var(--row-hover);
+        }
+
+        td[contenteditable="true"] {
+            outline: none;
+            transition: background 0.2s;
+            cursor: text;
+        }
+
+        td[contenteditable="true"]:hover {
+            background-color: #eff6ff;
+            box-shadow: inset 0 0 0 1px #bfdbfe;
+        }
+
+        td[contenteditable="true"]:focus {
+            background-color: #eff6ff;
+            box-shadow: inset 0 0 0 2px var(--primary-color);
+        }
+
+        /* Dropdown Menu */
+        .dropdown {
             position: relative;
         }
 
-        /* Animated background effect */
-        body::before {
-            content: '';
+        .dropdown-content {
+            display: none;
             position: absolute;
+            right: 0;
+            top: 100%;
+            margin-top: 8px;
+            background-color: white;
+            min-width: 250px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            z-index: 10;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 8px;
+        }
+
+        .dropdown.active .dropdown-content {
+            display: block;
+        }
+
+        .column-toggle {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .column-toggle:hover {
+            background-color: var(--bg-color);
+        }
+
+        .column-toggle input {
+            margin-right: 10px;
+            accent-color: var(--primary-color);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+
+        /* Modal styles */
+        .modal {
+            position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.05"><path d="M10 50 L30 30 L50 50 L70 30 L90 50" stroke="white" fill="none" stroke-width="2"/><circle cx="30" cy="70" r="5" fill="white"/><circle cx="70" cy="70" r="5" fill="white"/></svg>');
-            background-size: 200px 200px;
-            animation: moveBackground 60s linear infinite;
-            pointer-events: none;
-        }
-
-        @keyframes moveBackground {
-            from { background-position: 0 0; }
-            to { background-position: 200px 200px; }
-        }
-
-        .gateway-container {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(10px);
-            border-radius: 24px;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-            overflow: hidden;
-            max-width: 440px;
             width: 100%;
-            position: relative;
-            z-index: 10;
-            transform: translateY(0);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .gateway-container:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.4);
-        }
-
-        .gateway-header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            color: white;
-            padding: 40px 30px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .gateway-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            animation: rotate 20s linear infinite;
-        }
-
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        .gateway-header .icon-wrapper {
-            width: 80px;
-            height: 80px;
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(5px);
-            border-radius: 50%;
-            display: flex;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 20px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            z-index: 10001;
         }
 
-        .gateway-header .icon-wrapper i {
-            font-size: 40px;
-            color: white;
-        }
-
-        .gateway-header h1 {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            letter-spacing: -0.5px;
-        }
-
-        .gateway-header p {
-            opacity: 0.9;
-            font-size: 14px;
-            font-weight: 400;
-        }
-
-        .gateway-body {
-            padding: 35px 30px;
-            background: white;
-        }
-
-        .security-notice {
-            background: linear-gradient(135deg, #fffaf0, #fff5e6);
-            border-left: 4px solid var(--warning);
-            padding: 18px;
-            margin-bottom: 25px;
-            border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(214, 158, 46, 0.1);
-        }
-
-        .security-notice h3 {
-            color: #744210;
-            margin-bottom: 8px;
-            font-size: 15px;
-            font-weight: 600;
+        .modal.active {
             display: flex;
-            align-items: center;
-            gap: 8px;
         }
 
-        .security-notice p {
-            color: #744210;
-            font-size: 13px;
-            line-height: 1.6;
+        .modal-content {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            width: 800px;
+            max-height: 90vh;
+            overflow: auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
             margin: 0;
         }
 
-        .access-code-form .form-group {
-            margin-bottom: 25px;
-        }
-
-        .access-code-form label {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-bottom: 10px;
-            color: var(--dark);
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .access-code-form label i {
-            color: var(--accent);
-        }
-
-        .access-code-input {
-            position: relative;
-        }
-
-        .password-toggle-btn {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
+        .modal-close {
             background: none;
             border: none;
-            color: var(--gray);
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 6px;
-            transition: all 0.2s ease;
-            font-size: 16px;
-        }
-
-        .password-toggle-btn:hover {
-            color: var(--accent);
-            background: rgba(49, 130, 206, 0.1);
-        }
-
-        .password-toggle-btn:focus {
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(49, 130, 206, 0.3);
-        }
-
-        .access-code-input input {
-            width: 100%;
-            padding: 16px 20px;
-            border: 2px solid var(--border);
-            border-radius: 14px;
             font-size: 24px;
-            letter-spacing: 12px;
-            text-align: center;
-            font-weight: 700;
-            font-family: 'Courier New', monospace;
-            transition: all 0.3s;
-            background: var(--light);
-        }
-
-        .access-code-input input:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 4px rgba(49, 130, 206, 0.15);
-            background: white;
-        }
-
-        .access-code-input input::placeholder {
-            letter-spacing: normal;
-            font-size: 14px;
-            color: var(--gray);
-        }
-
-        .input-hint {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 8px;
-            font-size: 12px;
-            color: var(--gray);
-            padding: 0 5px;
-        }
-
-        .attempts-badge {
-            background: var(--light);
-            padding: 4px 10px;
-            border-radius: 30px;
-            font-weight: 600;
-        }
-
-        .attempts-warning {
-            background: #fed7d7;
-            color: #742a2a;
-            padding: 14px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            display: none;
-            align-items: center;
-            gap: 10px;
-            border-left: 4px solid var(--danger);
-        }
-
-        .attempts-warning i {
-            font-size: 18px;
-        }
-
-        .timer {
-            color: var(--danger);
-            font-weight: 700;
-            font-size: 16px;
-            margin-left: 4px;
-        }
-
-        .submit-btn {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            color: white;
-            border: none;
-            border-radius: 14px;
-            font-size: 16px;
-            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            color: #666;
+        }
+
+        .modal-body {
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .modal-footer {
+            margin-top: 20px;
             display: flex;
-            align-items: center;
-            justify-content: center;
             gap: 10px;
-            position: relative;
-            overflow: hidden;
+            justify-content: flex-end;
         }
 
-        .submit-btn::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-
-        .submit-btn:hover::before {
-            width: 300px;
-            height: 300px;
-        }
-
-        .submit-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(30, 58, 95, 0.3);
-        }
-
-        .submit-btn:disabled {
-            background: #cbd5e0;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .error-message {
-            background: #fed7d7;
-            color: #742a2a;
-            padding: 14px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            display: none;
-            align-items: center;
-            gap: 10px;
-            border-left: 4px solid var(--danger);
-            font-size: 14px;
-        }
-
-        .error-message i {
-            font-size: 18px;
-        }
-
-        .gateway-footer {
-            text-align: center;
-            padding: 25px;
-            border-top: 1px solid var(--border);
-            color: var(--gray);
+        .code-block {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: monospace;
             font-size: 13px;
-            background: #fafbfc;
+            line-height: 1.5;
+            white-space: pre-wrap;
         }
 
-        .gateway-footer p {
-            margin-bottom: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            background: var(--success-color);
+            color: white;
+            border-radius: 8px;
+            z-index: 10002;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
-        .gateway-footer i {
-            color: var(--accent);
+        .notification.error {
+            background: var(--danger-color);
         }
 
-        /* Loading spinner */
-        .fa-spinner {
-            animation: spin 1s linear infinite;
+        .notification.warning {
+            background: var(--warning-color);
         }
 
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+        .notification.info {
+            background: var(--primary-color);
         }
 
-        /* Responsive */
-        @keyframes checkmark {
-            0% { transform: scale(0); }
-            100% { transform: scale(1); }
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
         }
     /* Responsive Design */
         @media (max-width: 768px) {
-            .gateway-container {
+            body {
                 padding: 20px;
             }
 
-            .gateway-header {
-                padding: 1.5rem 5%;
+            .container {
+                padding: 16px;
             }
 
-            .gateway-header h1 {
-                font-size: 2rem;
+            header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
             }
 
-            .gateway-header p {
-                font-size: 1rem;
+            h2 {
+                font-size: 1.3rem;
             }
 
-            .gateway-grid {
-                grid-template-columns: 1fr;
-                gap: 1.5rem;
+            .controls {
+                flex-direction: column;
+                width: 100%;
+                gap: 10px;
             }
 
-            .gateway-card {
-                padding: 1.5rem;
+            button {
+                width: 100%;
+                justify-content: center;
             }
 
-            .gateway-icon {
-                font-size: 2rem;
+            .table-wrapper {
+                border-radius: 6px;
             }
 
-            .gateway-card h3 {
-                font-size: 1.1rem;
+            th,
+            td {
+                padding: 8px 12px;
+                font-size: 13px;
             }
 
-            .gateway-card p {
-                font-size: 0.9rem;
-            }
-
-            .btn {
-                padding: 0.8rem 1.5rem;
-                font-size: 0.9rem;
+            .modal-content {
+                width: 95%;
+                padding: 20px;
             }
         }
 
         @media (max-width: 480px) {
-            .gateway-container {
-                padding: 15px;
+            body {
+                padding: 10px;
             }
 
-            .gateway-header {
-                padding: 1rem 3%;
+            .container {
+                padding: 12px;
             }
 
-            .gateway-header h1 {
-                font-size: 1.5rem;
+            h2 {
+                font-size: 1.2rem;
             }
 
-            .gateway-header p {
-                font-size: 0.9rem;
+            th,
+            td {
+                padding: 6px 8px;
+                font-size: 12px;
             }
 
-            .gateway-card {
-                padding: 1rem;
-            }
-
-            .gateway-icon {
-                font-size: 1.5rem;
-            }
-
-            .gateway-card h3 {
-                font-size: 1rem;
-            }
-
-            .btn {
-                padding: 0.7rem 1.2rem;
-                font-size: 0.85rem;
+            .dropdown-content {
+                min-width: 200px;
+                right: -10px;
             }
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
-    <div class="gateway-container">
-        <div class="gateway-header">
-            <div class="icon-wrapper">
-                <i class="fas fa-shield-halved"></i>
+
+    <!-- EDIT CONTRIBUTION MODAL -->
+    <div id="editModal" style="
+      display:none;
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.5);
+      align-items:center;
+      justify-content:center;
+      z-index:9999;
+    ">
+        <div style="
+        background:#ffffff;
+        padding:20px;
+        border-radius:10px;
+        width:340px;
+        box-shadow:0 10px 25px rgba(0,0,0,0.2);
+      ">
+            <h3 style="margin-top:0">Edit Monthly Contribution</h3>
+
+            <label>Member Name</label>
+            <input id="memberName" readonly style="width:100%;margin-bottom:10px" />
+
+            <label>Member Email</label>
+            <select id="memberEmail" style="width:100%;margin-bottom:10px">
+                <option value="anneawuor20@gmail.com">anneawuor20@gmail.com</option>
+                <option value="arnnebelle2@yahoo.com">arnnebelle2@yahoo.com</option>
+                <option value="robertelmussy@gmail.com">robertelmussy@gmail.com</option>
+                <option value="ckithikii@gmail.com">ckithikii@gmail.com</option>
+                <option value="wakeshocharlotte@gmail.com">wakeshocharlotte@gmail.com</option>
+                <option value="ndongaelsie@gmail.com">ndongaelsie@gmail.com</option>
+                <option value="Njenga573@gmail.com">Njenga573@gmail.com</option>
+                <option value="njengastellah@gmail.com">njengastellah@gmail.com</option>
+                <option value="priscillahmlumbasyo@gmail.com">priscillahmlumbasyo@gmail.com</option>
+                <option value="owinovictor91@gmail.com">owinovictor91@gmail.com</option>
+                <option value="virginia.wmwaniki@gmail.com">virginia.wmwaniki@gmail.com</option>
+            </select>
+
+            <label>Month</label>
+            <select id="month" style="width:100%;margin-bottom:10px">
+                <option>Nov-2025</option>
+                <option>Dec-2025</option>
+                <option>Jan-2026</option>
+                <option>Feb-2026</option>
+                <option>Mar-2026</option>
+                <option>Apr-2026</option>
+                <option>May-2026</option>
+                <option>Jun-2026</option>
+                <option>Jul-2026</option>
+                <option>Aug-2026</option>
+                <option>Sep-2026</option>
+                <option>Oct-2026</option>
+                <option>Nov-2026</option>
+                <option>Dec-2026</option>
+                <option>Jan-2027</option>
+            </select>
+
+            <label>Contribution Amount</label>
+            <input id="contribution" type="number" min="0" style="width:100%;margin-bottom:12px" />
+
+            <div style="display:flex;justify-content:flex-end;gap:10px">
+                <button onclick="closeEditModal()">Cancel</button>
+                <button class="primary" onclick="submitEdit()">Save</button>
             </div>
-            <h1>Secure Gateway</h1>
-            <p>Friends in Finance Contribution System</p>
-        </div>
-        
-        <div class="gateway-body">
-            <div class="security-notice">
-                <h3>
-                    <i class="fas fa-exclamation-triangle"></i>
-                    Restricted Access
-                </h3>
-                <p>This system contains sensitive financial information. Access is strictly limited to authorized members only. All attempts are logged and monitored.</p>
-            </div>
-            
-            <div class="error-message" id="errorMessage">
-                <i class="fas fa-circle-exclamation"></i>
-                <span id="errorText">Invalid access code. Please try again.</span>
-            </div>
-            
-            <div class="attempts-warning" id="attemptsWarning">
-                <i class="fas fa-lock"></i>
-                <span>
-                    Too many failed attempts. System locked for 
-                    <span class="timer" id="lockTimer">30</span> seconds.
-                </span>
-            </div>
-            
-            <form class="access-code-form" id="gatewayForm">
-                <div class="form-group">
-                    <label for="accessCode">
-                        <i class="fas fa-key"></i>
-                        Enter System Access Code
-                    </label>
-                    <div class="access-code-input">
-                        <input 
-                            type="password" 
-                            id="accessCode" 
-                            maxlength="8"
-                            placeholder="••••••••"
-                            autocomplete="off"
-                            inputmode="numeric"
-                            pattern="[0-9]*"
-                            required
-                        >
-                        <button type="button" class="password-toggle-btn" onclick="togglePassword('accessCode')" title="Toggle password visibility">
-                            <i class="far fa-eye" id="accessCode-toggle-icon"></i>
-                        </button>
-                    </div>
-                    <div class="input-hint">
-                        <span>
-                            <i class="far fa-clock"></i> 8-digit code required
-                        </span>
-                        <span class="attempts-badge">
-                            <i class="fas fa-shield-alt"></i>
-                            Attempts: <span id="attempts">0</span>/5
-                        </span>
-                    </div>
-                </div>
-                
-                <button type="submit" class="submit-btn" id="submitBtn">
-                    <span>Enter Secure Portal</span>
-                    <i class="fas fa-arrow-right"></i>
-                </button>
-            </form>
-        </div>
-        
-        <div class="gateway-footer">
-            <p>
-                <i class="fas fa-fingerprint"></i>
-                For access issues, contact system administrator
-            </p>
-            <p>
-                <i class="far fa-copyright"></i>
-                2026 Sulwe Digitals. All rights reserved.
-            </p>
+
+            <div id="editStatus" style="margin-top:10px;font-size:0.9em;color:#374151"></div>
         </div>
     </div>
 
+    <!-- DATA EXPORT MODAL -->
+    <div id="dataModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Data Export</h3>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <pre id="modalContent" class="code-block"></pre>
+            </div>
+            <div class="modal-footer">
+                <button id="copyBtn" onclick="copyModalContent()">Copy to Clipboard</button>
+                <button class="primary" onclick="downloadModalContent()">Download</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard-style header (matches admin dashboard) -->
+    <header class="admin-header">
+        <div class="header-content">
+            <a href="index.html" class="logo-section">
+                <i class="fas fa-hand-holding-usd"></i>
+                <h1>Friends in Finance <span>Live Data</span></h1>
+            </a>
+            <div class="main-nav">
+                <a href="chart.html">Analytics</a>
+                <a href="admin-dashboard.html">Admin</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+                <!-- Existing buttons -->
+                <button id="toggleColumnsBtn" onclick="app.toggleEmptyColumns()">
+                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    <span id="toggleText">Show All Columns</span>
+                </button>
+
+                <div class="dropdown" id="colDropdown">
+                    <button onclick="toggleDropdown()">
+                        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                        Manage Columns
+                    </button>
+                    <div class="dropdown-content" id="columnList">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- NEW ETL BUTTONS -->
+                <button id="analyzeBtn" onclick="analyzeTableData()">
+                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    Analyze
+                </button>
+
+                <button id="viewContribBtn" class="primary" onclick="loadContributions()">
+                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V7" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M16 3v4M8 3v4m-6 4h20" />
+                    </svg>
+                    View Contributions (DB)
+                </button>
+
+                <button onclick="window.open('chart.html', '_blank')" class="primary">
+                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    View Analytics Charts
+                </button>
+
+                <button onclick="loadUsers()">
+                    View Users (DB)
+                </button>
+                <button onclick="syncToDatabase()" id="manualSyncBtn">
+                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Update Database
+                </button>
+            </div>
+        </header>
+
+        <div id="tableContainer" class="table-wrapper">
+            <div class="loading">Loading data...</div>
+        </div>
+        <div id="dbOutput" style="margin-top:16px"></div>
+    </div>
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // DOM elements
-            const form = document.getElementById('gatewayForm');
-            const accessCodeInput = document.getElementById('accessCode');
-            const submitBtn = document.getElementById('submitBtn');
-            const errorMessage = document.getElementById('errorMessage');
-            const errorText = document.getElementById('errorText');
-            const attemptsSpan = document.getElementById('attempts');
-            const attemptsWarning = document.getElementById('attemptsWarning');
-            const lockTimer = document.getElementById('lockTimer');
-            
-            // State management
-            let failedAttempts = 0;
-            let isLocked = false;
-            let lockTimeout = null;
-            
-            // Check for existing gateway session on load
-            checkGatewayStatus();
-            
-            // Restrict input to digits only and auto-format
-            accessCodeInput.addEventListener('input', function(e) {
-                let value = e.target.value.replace(/[^0-9]/g, '');
-                e.target.value = value;
-                
-                // Auto-submit when 8 digits entered
-                if (value.length === 8 && !isLocked) {
-                    validateAccessCode(value);
-                }
-            });
-            
-            // Handle form submission
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                if (!isLocked) {
-                    validateAccessCode(accessCodeInput.value);
-                }
-            });
-            
-            // Prevent paste for security
-            accessCodeInput.addEventListener('paste', function(e) {
-                e.preventDefault();
-                showError('Pasting is disabled for security reasons');
-            });
-            
-            // Prevent copy/cut
-            accessCodeInput.addEventListener('copy', (e) => e.preventDefault());
-            accessCodeInput.addEventListener('cut', (e) => e.preventDefault());
-            
-            // Check gateway status from server
-            async function checkGatewayStatus() {
-                try {
-                    const response = await fetch('/api/gateway/status', {
-                    credentials: 'include'
+        const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRcnUfmRu11DOdc6hJPGcYRf4hc8AK7JaZ3vXM1QEzhj18nZykL7lthCrFgLgrE8c2m3AU-Dk-O10f5/pub?output=csv";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyXz7tY1TWkHo4PW0LihZOW1D8dVw20SdvkJVR4nhDH_H7yckc8qHm-S6om3A-zS8HyhQ/exec";
+        // If the dashboard is opened via file:// (developer preview), point to localhost:3000
+        // Otherwise use same-origin so the app works when served by the backend server.
+        const API_BASE = (location.protocol === 'file:') ? 'http://localhost:3000' : '';
+
+        // 🔧 MODAL CONTROL
+        function openEditModal(memberName, memberEmail, month, value) {
+            document.getElementById("memberName").value = memberName;
+            document.getElementById("memberEmail").value = memberEmail;
+            document.getElementById("month").value = month;
+            document.getElementById("contribution").value = value || "";
+            document.getElementById("editStatus").textContent = "";
+            document.getElementById("editModal").style.display = "flex";
+        }
+
+        function closeEditModal() {
+            document.getElementById("editModal").style.display = "none";
+        }
+
+        // 🔧 SUBMIT TO APPS SCRIPT
+        async function submitEdit() {
+            const payload = {
+                member_name: document.getElementById("memberName").value,
+                member_email: document.getElementById("memberEmail").value,
+                month: document.getElementById("month").value,
+                contribution: document.getElementById("contribution").value
+            };
+
+            const status = document.getElementById("editStatus");
+            status.textContent = "Saving…";
+
+            try {
+                const res = await fetch(SCRIPT_URL, {
+                    method: "POST",
+                    body: JSON.stringify(payload)
                 });
-                    const data = await response.json();
-                    
-                    if (data.authenticated) {
-                        // Already authenticated, redirect to appropriate dashboard
-                        const role = data.user?.role || 'member';
-                        const redirectTo = role === 'Admin' ? '/admin-dashboard.html' : '/member-dashboard.html';
-                        window.location.href = redirectTo;
-                        return;
-                    }
-                    
-                    if (data.attempts > 0) {
-                        failedAttempts = data.attempts;
-                        attemptsSpan.textContent = failedAttempts;
-                    }
-                    
-                    if (data.isLocked) {
-                        showLockWarning(data.lockRemaining);
-                    }
-                    
-                    // Focus input
-                    accessCodeInput.focus();
-                    
-                } catch (error) {
-                    console.log('Gateway status check failed, proceeding in offline mode');
-                    // Continue in offline mode - focus input
-                    accessCodeInput.focus();
+
+                const result = await res.json();
+
+                if (result.success) {
+                    status.textContent = "Saved. Recalculating…";
+                    setTimeout(() => {
+                        closeEditModal();
+                        app.init(); // Refresh the table
+                    }, 1200);
+                } else {
+                    status.textContent = "Error: " + result.error;
+                }
+            } catch (err) {
+                status.textContent = "Network error";
+            }
+        }
+
+        class App {
+            constructor() {
+                this.headers = [];
+                this.rawData = [];
+                this.data = []; // working copy with potential sorts
+                this.hiddenColumns = new Set();
+                this.showingAll = false; // Track state
+                this.sortState = { colIndex: null, direction: 'asc' };
+                this.container = document.getElementById('tableContainer');
+                this.columnList = document.getElementById('columnList');
+                this.syncInProgress = false; // Prevent multiple syncs
+
+                this.init();
+                this.startAutoRefresh();
+            }
+
+            startAutoRefresh() {
+                // Initial load
+                this.init();
+
+                // Setup auto-sync scheduler
+                this.scheduleNextSync();
+            }
+
+            scheduleNextSync() {
+                const now = new Date();
+                const night = new Date(
+                    now.getFullYear(),
+                    now.getMonth(),
+                    now.getDate() + 1, // tomorrow
+                    0, 0, 0 // 00:00:00 midnight
+                );
+
+                // Calculate time until next midnight
+                const msToMidnight = night.getTime() - now.getTime();
+                console.log(`Next sync check scheduled in ${Math.round(msToMidnight / 1000 / 60)} minutes (at midnight)`);
+
+                setTimeout(() => {
+                    // It is now midnight.
+                    this.checkAndSync();
+
+                    // Schedule next check for 24 hours from now
+                    // Check every day, but only act if 1 day has passed since last sync
+                    setInterval(() => {
+                        this.checkAndSync();
+                    }, 24 * 60 * 60 * 1000); // Check every 24 hours
+                }, msToMidnight);
+            }
+
+            checkAndSync() {
+                const lastSyncTime = localStorage.getItem('lastDbSync');
+                const now = new Date().getTime();
+                const ONE_DAY_MS = 24 * 60 * 60 * 1000; // Changed from 5 days to 1 day
+
+                if (!lastSyncTime || (now - parseInt(lastSyncTime) >= ONE_DAY_MS)) {
+                    console.log("1 day has passed or no previous sync. Syncing now...");
+                    this.performDatabaseSync(true);
+                } else {
+                    const hoursUntilNextSync = Math.round((ONE_DAY_MS - (now - parseInt(lastSyncTime))) / (1000 * 60 * 60));
+                    console.log(`Not yet time to sync. Next sync in ${hoursUntilNextSync} hours`);
                 }
             }
-            
-            // Validate access code
-            async function validateAccessCode(code) {
-                if (code.length !== 8) {
-                    showError('Access code must be exactly 8 digits');
-                    accessCodeInput.focus();
+
+            async performDatabaseSync(isAuto = false) {
+                if (this.syncInProgress) {
+                    console.log("Sync already in progress, skipping...");
                     return;
                 }
-                
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
-                
+
+                this.syncInProgress = true;
+
                 try {
-                    const response = await fetch('/api/gateway/verify', {
+                    if (!isAuto) {
+                        showNotification('Preparing to sync data...', 'info');
+                    } else {
+                        console.log("Auto-syncing data to database...");
+                    }
+
+                    // Transform Google Sheet data to database format
+                    const contributions = [];
+                    const users = [];
+
+                    // Extract unique members
+                    const memberSet = new Set();
+
+                    // Find key column indices (case-insensitive)
+                    const interestIdx = this.headers.findIndex(h => h && h.toLowerCase().trim() === "interest per member");
+                    const payoutIdx = this.headers.findIndex(h => h && (h.toLowerCase().trim() === "final payout" || h.toLowerCase().trim() === "total payout"));
+                    const totalIdx = this.headers.findIndex(h => h && (h.toLowerCase().trim() === "total contributions" || h.toLowerCase().trim() === "total contribution"));
+
+                    this.rawData.forEach((row, rowIndex) => {
+                        const nameIdx = this.headers.indexOf("Member Name");
+                        const emailIdx = this.headers.indexOf("Member Email");
+
+                        const memberName = row[nameIdx];
+                        const memberEmail = row[emailIdx];
+
+                        if (memberName && memberEmail) {
+                            memberSet.add(JSON.stringify({ member_name: memberName, member_email: memberEmail }));
+
+                            // Create contribution object
+                            const contribution = {
+                                member_name: memberName,
+                                member_email: memberEmail,
+                                total_contributions: 0,
+                                interest_per_member: (interestIdx !== -1 ? (parseFloat(row[interestIdx]) || 0) : 0),
+                                final_payout: (payoutIdx !== -1 ? (parseFloat(row[payoutIdx]) || 0) : 0)
+                            };
+
+                            // Add month columns
+                            const EDITABLE_MONTHS = [
+                                "Nov-2025", "Dec-2025", "Jan-2026", "Feb-2026", "Mar-2026", "Apr-2026",
+                                "May-2026", "Jun-2026", "Jul-2026", "Aug-2026", "Sep-2026", "Oct-2026",
+                                "Nov-2026", "Dec-2026", "Jan-2027"
+                            ];
+
+                            let computedTotal = 0;
+                            EDITABLE_MONTHS.forEach(month => {
+                                const monthIndex = this.headers.indexOf(month);
+                                if (monthIndex !== -1) {
+                                    const amount = parseFloat(row[monthIndex]) || 0;
+                                    contribution[month] = amount;
+                                    computedTotal += amount;
+                                }
+                            });
+
+                            // Prefer Total column if available, otherwise use computed sum
+                            if (totalIdx !== -1) {
+                                contribution.total_contributions = parseFloat(row[totalIdx]) || computedTotal;
+                            } else {
+                                contribution.total_contributions = computedTotal;
+                            }
+
+                            contributions.push(contribution);
+                        }
+                    });
+
+                    // Create user objects
+                    Array.from(memberSet).forEach(memberStr => {
+                        const member = JSON.parse(memberStr);
+                        users.push({
+                            member_name: member.member_name,
+                            member_email: member.member_email,
+                            role: 'member'
+                        });
+                    });
+
+                    // Send to server
+                    const response = await fetch(`${API_BASE}/sync`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({ accessCode: code }),
-                        credentials: 'include'
+                        body: JSON.stringify({
+                            contributions: contributions,
+                            users: users
+                        })
                     });
-                    
+
                     const data = await response.json();
-                    
-                    if (data.success) {
-                        showSuccessAndRedirect(data.redirectTo || '/index.html');
+
+                    if (!isAuto) {
+                        showNotification(`Sync successful: ${data.message}`, 'success');
                     } else {
-                        handleFailedAttempt(data);
+                        console.log(`Auto-sync successful: ${data.message}`);
+                        localStorage.setItem('lastDbSync', new Date().getTime().toString());
                     }
-                } catch (error) {
-                    showError('Network error. Please check your connection.');
-                    resetSubmitButton();
+
+                    return true;
+                } catch (err) {
+                    if (!isAuto) {
+                        showNotification('Sync failed: ' + err.message, 'error');
+                    } else {
+                        console.error('Auto-sync failed:', err);
+                    }
+                    return false;
+                } finally {
+                    this.syncInProgress = false;
                 }
             }
-            
-            // Handle failed authentication attempt
-            function handleFailedAttempt(data) {
-                failedAttempts++;
-                attemptsSpan.textContent = failedAttempts;
-                
-                // Clear input
-                accessCodeInput.value = '';
-                
-                // Show error message
-                showError(data.message || 'Invalid access code');
-                
-                // Handle lock if needed
-                if (data.retryAfter) {
-                    showLockWarning(data.retryAfter);
+
+            async init() {
+                try {
+                    const res = await fetch(SHEET_URL);
+                    if (!res.ok) {
+                        throw new Error(`Sheet responded with status ${res.status}`);
+                    }
+                    const text = await res.text();
+                    // Cache latest successful sheet in localStorage for offline fallback
+                    try {
+                        localStorage.setItem('lastSheetCSV', text);
+                    } catch (e) {
+                        console.warn('Unable to cache sheet data in localStorage', e);
+                    }
+                    this.parseCSV(text);
+                    this.renderControls();
+                    this.hideEmptyColumns();
+                    this.renderTable();
+
+                    // Auto-sync to database after loading data
+                    // This ensures the database is updated whenever the dashboard loads
+                    setTimeout(() => {
+                        this.performDatabaseSync(true).then(success => {
+                            if (success) {
+                                console.log("Database synchronized successfully");
+                            }
+                        });
+                    }, 500); // Small delay to ensure UI renders first
+                } catch (err) {
+                    console.error('Failed to load live sheet data:', err);
+
+                    // Fallback: try to use last cached CSV from a previous successful load
+                    try {
+                        const cached = localStorage.getItem('lastSheetCSV');
+                        if (cached) {
+                            console.warn('Using cached sheet data from previous session');
+                            this.parseCSV(cached);
+                            this.renderControls();
+                            this.hideEmptyColumns();
+                            this.renderTable();
+                            this.container.insertAdjacentHTML(
+                                'beforeend',
+                                '<div class="loading" style="color:#f59e0b">Showing cached data. Live fetch failed: ' +
+                                err.message +
+                                '</div>'
+                            );
+                            return;
+                        }
+                    } catch (e) {
+                        console.warn('No cached sheet data available', e);
+                    }
+
+                    // If no cache available, show clear guidance
+                    this.container.innerHTML =
+                        `<div class="loading" style="color:red">
+                            Failed to load data: ${err.message}<br>
+                            <span style="font-size:0.9rem;color:#4b5563">
+                                Please check your internet connection and that the Google Sheet is published and accessible.
+                            </span>
+                        </div>`;
+                }
+            }
+
+            parseCSV(csv) {
+                // Handle both CRLF and LF
+                const lines = csv.trim().split(/\r?\n/);
+                const originalHeaders = lines[0].split(",").map(h => h.trim());
+                const originalData = lines.slice(1).map(line => line.split(",").map(cell => cell.trim()));
+
+                // Columns to remove (blacklisted keywords)
+                // Removed "total contribution" from blacklist to display the column
+                const blacklist = [
+                    "time weighted",
+                    "weighted interest @8%",
+                    "weighted contribution"
+                ];
+
+                // Identify indices to keep
+                const indicesToKeep = [];
+                originalHeaders.forEach((h, i) => {
+                    const headerLower = h.toLowerCase();
+                    // Check if header contains any blacklisted phrase
+                    const shouldRemove = blacklist.some(phrase => headerLower.includes(phrase));
+                    if (!shouldRemove) {
+                        indicesToKeep.push(i);
+                    }
+                });
+
+                // Filter Headers
+                this.headers = indicesToKeep.map(i => originalHeaders[i]);
+
+                // Filter Data
+                this.rawData = originalData
+                    .filter(row => {
+                        // Row filtering logic: Remove rows where the first cell contains restricted keywords
+                        const firstCell = (row[0] || "").toLowerCase();
+                        const rowBlacklist = ["total contribution", "total interest", "time weight (years)", "weighted"];
+                        return !rowBlacklist.some(term => firstCell.includes(term));
+                    })
+                    .map(row => {
+                        // Apply column filter to the row
+                        return indicesToKeep.map(i => row[i]);
+                    });
+
+                this.data = [...this.rawData];
+            }
+
+            renderControls() {
+                this.columnList.innerHTML = '';
+                this.headers.forEach((header, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'column-toggle';
+
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.checked = !this.hiddenColumns.has(index);
+                    checkbox.onchange = (e) => this.toggleColumn(index, e.target.checked);
+
+                    const label = document.createElement('span');
+                    label.textContent = header || `Column ${index + 1}`;
+
+                    div.appendChild(checkbox);
+                    div.appendChild(label);
+                    this.columnList.appendChild(div);
+                });
+            }
+
+            toggleColumn(index, isVisible) {
+                if (isVisible) {
+                    this.hiddenColumns.delete(index);
                 } else {
-                    resetSubmitButton();
-                    accessCodeInput.focus();
+                    this.hiddenColumns.add(index);
                 }
-                
-                // Shake animation for invalid code
-                accessCodeInput.style.animation = 'shake 0.5s ease';
-                setTimeout(() => {
-                    accessCodeInput.style.animation = '';
-                }, 500);
+                this.renderTable();
             }
-            
-            // Show lock warning with countdown
-            function showLockWarning(seconds) {
-                isLocked = true;
-                lockTimer.textContent = seconds;
-                attemptsWarning.style.display = 'flex';
-                submitBtn.disabled = true;
-                
-                // Update countdown every second
-                let remaining = seconds;
-                const countdown = setInterval(() => {
-                    remaining--;
-                    lockTimer.textContent = remaining;
-                    
-                    if (remaining <= 0) {
-                        clearInterval(countdown);
-                        isLocked = false;
-                        attemptsWarning.style.display = 'none';
-                        resetSubmitButton();
-                        accessCodeInput.focus();
+
+            toggleEmptyColumns() {
+                this.showingAll = !this.showingAll;
+                const btnText = document.getElementById('toggleText');
+
+                if (this.showingAll) {
+                    // Show All: Clear hidden columns list
+                    this.hiddenColumns.clear();
+                    btnText.textContent = "Hide Empty Columns";
+                } else {
+                    // Hide Empty: Re-apply empty column logic
+                    btnText.textContent = "Show All Columns";
+                    this.hideEmptyColumns();
+                }
+
+                // Update UI checkboxes
+                const checkboxes = this.columnList.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach((cb, idx) => {
+                    cb.checked = !this.hiddenColumns.has(idx);
+                });
+
+                this.renderTable();
+            }
+
+            hideEmptyColumns() {
+                this.hiddenColumns.clear();
+
+                this.headers.forEach((_, colIndex) => {
+                    let hasData = false;
+                    for (let row of this.data) {
+                        const cellVal = row[colIndex];
+                        if (cellVal && cellVal.trim() !== "") {
+                            hasData = true;
+                            break;
+                        }
                     }
-                }, 1000);
-            }
-            
-            // Show error message
-            function showError(message) {
-                errorText.textContent = message;
-                errorMessage.style.display = 'flex';
-                
-                // Auto-hide after 5 seconds
-                setTimeout(() => {
-                    errorMessage.style.display = 'none';
-                }, 5000);
-            }
-            
-            // Reset submit button to normal state
-            function resetSubmitButton() {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<span>Enter Secure Portal</span> <i class="fas fa-arrow-right"></i>';
-            }
-            
-            // Show success and redirect
-            function showSuccessAndRedirect(redirectUrl) {
-                // Show success state
-                submitBtn.innerHTML = '<i class="fas fa-check"></i> Access Granted!';
-                submitBtn.style.background = 'linear-gradient(135deg, #38a169, #2f855a)';
-                
-                // Brief delay for visual feedback
-                setTimeout(() => {
-                    window.location.href = redirectUrl;
-                }, 500);
-            }
-            
-            // Add shake animation
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes shake {
-                    0%, 100% { transform: translateX(0); }
-                    20% { transform: translateX(-10px); }
-                    40% { transform: translateX(10px); }
-                    60% { transform: translateX(-5px); }
-                    80% { transform: translateX(5px); }
+                    if (!hasData) {
+                        this.hiddenColumns.add(colIndex);
+                    }
+                });
+
+                // Update UI checkboxes will be handled by init or manual toggle usually, 
+                // but if called directly we should sync UI
+                if (this.columnList) {
+                    const checkboxes = this.columnList.querySelectorAll('input[type="checkbox"]');
+                    checkboxes.forEach((cb, idx) => {
+                        cb.checked = !this.hiddenColumns.has(idx);
+                    });
                 }
+
+                this.renderTable();
+            }
+
+            sort(colIndex) {
+                // Toggle direction if clicking same column
+                if (this.sortState.colIndex === colIndex) {
+                    this.sortState.direction = this.sortState.direction === 'asc' ? 'desc' : 'asc';
+                } else {
+                    this.sortState.colIndex = colIndex;
+                    this.sortState.direction = 'asc';
+                }
+
+                const dir = this.sortState.direction === 'asc' ? 1 : -1;
+
+                this.data.sort((a, b) => {
+                    let valA = a[colIndex] || "";
+                    let valB = b[colIndex] || "";
+
+                    // Try numeric sort
+                    const numA = parseFloat(valA);
+                    const numB = parseFloat(valB);
+
+                    if (!isNaN(numA) && !isNaN(numB)) {
+                        return (numA - numB) * dir;
+                    }
+
+                    // String sort
+                    return valA.localeCompare(valB) * dir;
+                });
+
+                this.renderTable();
+            }
+
+            updateCell(rowIndex, colIndex, value) {
+                // Update the current sorted view
+                this.data[rowIndex][colIndex] = value;
+                // Note: Updating the original unsorted rawData would require tracking original IDs 
+                // For this request scope, updating the view is sufficient as verification asked for sorting edits
+            }
+
+            renderTable() {
+                if (this.data.length === 0) {
+                    this.container.innerHTML = '<div class="loading">No data available</div>';
+                    return;
+                }
+
+                const table = document.createElement('table');
+
+                // Head
+                const thead = document.createElement('thead');
+                const trHead = document.createElement('tr');
+                this.headers.forEach((header, index) => {
+                    if (this.hiddenColumns.has(index)) return;
+
+                    const th = document.createElement('th');
+                    th.onclick = () => this.sort(index);
+
+                    let sortIcon = '';
+                    if (this.sortState.colIndex === index) {
+                        sortIcon = this.sortState.direction === 'asc' ? ' ▲' : ' ▼';
+                    } else {
+                        sortIcon = ' <span style="opacity:0.3">⇅</span>';
+                    }
+
+                    th.innerHTML = `${header} <span class="sort-icon">${sortIcon}</span>`;
+                    trHead.appendChild(th);
+                });
+                thead.appendChild(trHead);
+                table.appendChild(thead);
+
+                // Body
+                const tbody = document.createElement('tbody');
+                this.data.forEach((row, rIndex) => {
+                    const tr = document.createElement('tr');
+
+                    // We need to iterate headers to map columns correctly even if row length differs
+                    this.headers.forEach((_, cIndex) => {
+                        if (this.hiddenColumns.has(cIndex)) return;
+
+                        const td = document.createElement('td');
+                        td.textContent = row[cIndex] || "";
+
+                        // Editable ONLY if header matches allowed months
+                        const EDITABLE_MONTHS = [
+                            "Nov-2025", "Dec-2025", "Jan-2026", "Feb-2026", "Mar-2026", "Apr-2026",
+                            "May-2026", "Jun-2026", "Jul-2026", "Aug-2026", "Sep-2026", "Oct-2026",
+                            "Nov-2026", "Dec-2026", "Jan-2027"
+                        ];
+
+                        if (EDITABLE_MONTHS.includes(this.headers[cIndex])) {
+                            td.style.cursor = "pointer";
+                            td.style.color = "#2563eb";
+                            td.title = "Click to edit";
+
+                            td.onclick = () => {
+                                const memberName = row[this.headers.indexOf("Member Name")];
+                                const memberEmail = row[this.headers.indexOf("Member Email")];
+
+                                openEditModal(
+                                    memberName,
+                                    memberEmail,
+                                    this.headers[cIndex],
+                                    row[cIndex]
+                                );
+                            };
+                        }
+
+                        tr.appendChild(td);
+                    });
+                    tbody.appendChild(tr);
+                });
+                table.appendChild(tbody);
+
+                this.container.innerHTML = '';
+                this.container.appendChild(table);
+            }
+        }
+
+        const app = new App();
+
+        // Dropdown toggle helper
+        function toggleDropdown() {
+            document.getElementById('colDropdown').classList.toggle('active');
+        }
+
+        // Close dropdown when clicking outside
+        window.onclick = function (event) {
+            if (!event.target.closest('.dropdown')) {
+                const dropdowns = document.getElementsByClassName("dropdown");
+                for (let i = 0; i < dropdowns.length; i++) {
+                    dropdowns[i].classList.remove('active');
+                }
+            }
+        }
+
+        // DATABASE FUNCTIONS
+        function syncToDatabase(isAuto = false) {
+            app.performDatabaseSync(isAuto).then(() => {
+                if (!isAuto) {
+                    loadContributions(); // Show the updated data
+                }
+            });
+        }
+
+        function analyzeTableData() {
+            // Simple analysis of the current table
+            const stats = {
+                totalMembers: new Set(),
+                totalMonths: 0,
+                totalContributions: 0,
+                maxContribution: 0,
+                minContribution: Infinity
+            };
+
+            const EDITABLE_MONTHS = [
+                "Nov-2025", "Dec-2025", "Jan-2026", "Feb-2026", "Mar-2026", "Apr-2026",
+                "May-2026", "Jun-2026", "Jul-2026", "Aug-2026", "Sep-2026", "Oct-2026",
+                "Nov-2026", "Dec-2026", "Jan-2027"
+            ];
+
+            app.rawData.forEach(row => {
+                const memberEmail = row[app.headers.indexOf("Member Email")];
+                if (memberEmail) {
+                    stats.totalMembers.add(memberEmail);
+                }
+
+                EDITABLE_MONTHS.forEach(month => {
+                    const monthIndex = app.headers.indexOf(month);
+                    if (monthIndex !== -1) {
+                        const amount = parseFloat(row[monthIndex]) || 0;
+                        if (amount > 0) {
+                            stats.totalMonths++;
+                            stats.totalContributions += amount;
+                            stats.maxContribution = Math.max(stats.maxContribution, amount);
+                            stats.minContribution = Math.min(stats.minContribution, amount);
+                        }
+                    }
+                });
+            });
+
+            const analysis = `
+Analysis Results:
+• Total Members: ${stats.totalMembers.size}
+• Total Contribution Months: ${stats.totalMonths}
+• Total Contributions: $${stats.totalContributions.toLocaleString()}
+• Average per Member: $${(stats.totalContributions / stats.totalMembers.size).toLocaleString()}
+• Max Contribution: $${stats.maxContribution.toLocaleString()}
+• Min Contribution: $${stats.minContribution === Infinity ? 0 : stats.minContribution.toLocaleString()}
             `;
-            document.head.appendChild(style);
-            
-            // Password toggle function
-            function togglePassword(inputId) {
-                const input = document.getElementById(inputId);
-                const icon = document.getElementById(inputId + '-toggle-icon');
-                
-                if (input.type === 'password') {
-                    input.type = 'text';
-                    icon.classList.remove('far', 'fa-eye');
-                    icon.classList.add('far', 'fa-eye-slash');
-                } else {
-                    input.type = 'password';
-                    icon.classList.remove('far', 'fa-eye-slash');
-                    icon.classList.add('far', 'fa-eye');
-                }
-            }
+
+            showModal('Data Analysis', analysis.trim(), 'text');
+        }
+
+        function loadUsers() {
+            fetch(`${API_BASE}/users`)
+                .then(res => {
+                    const ct = res.headers.get('content-type') || '';
+                    if (!res.ok) return res.text().then(t => { throw new Error(`HTTP ${res.status}: ${t}`); });
+                    if (!ct.includes('application/json')) return res.text().then(t => { throw new Error(`Expected JSON but received HTML/text: ${t}`); });
+                    return res.json();
+                })
+                .then(data => {
+                    let html = `
+                        <h3 style="margin-top:20px">Database Users</h3>
+                        <table border="1" cellpadding="6" style="border-collapse:collapse;width:100%">
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Last Synced</th>
+                            </tr>
+                    `;
+
+                    data.forEach(r => {
+                        html += `
+                            <tr>
+                                <td>${r.id || ''}</td>
+                                <td>${r.member_name || ''}</td>
+                                <td>${r.member_email || ''}</td>
+                                <td>${r.role || ''}</td>
+                                <td>${r.synced_at || ''}</td>
+                            </tr>
+                        `;
+                    });
+
+                    html += "</table>";
+                    document.getElementById("dbOutput").innerHTML = html;
+                })
+                .catch(err => {
+                    const msg = 'Failed to load users: ' + (err.message || err);
+                    showNotification(msg, 'error');
+                    document.getElementById("dbOutput").innerHTML = `<pre style="color:red;white-space:pre-wrap">${msg}</pre>`;
+                });
+        }
+
+        function loadContributions() {
+            fetch(`${API_BASE}/contributions`)
+                .then(res => {
+                    const ct = res.headers.get('content-type') || '';
+                    if (!res.ok) return res.text().then(t => { throw new Error(`HTTP ${res.status}: ${t}`); });
+                    if (!ct.includes('application/json')) return res.text().then(t => { throw new Error(`Expected JSON but received HTML/text: ${t}`); });
+                    return res.json();
+                })
+                .then(data => {
+                    if (data.length === 0) {
+                        document.getElementById("dbOutput").innerHTML = '<p style="color:#666">No contributions data in database yet.</p>';
+                        return;
+                    }
+
+                    // Get month columns
+                    fetch(`${API_BASE}/months`)
+                        .then(res => res.json())
+                        .then(months => {
+                            let html = `
+                                <h3 style="margin-top:20px">Database Contributions (Wide Format)</h3>
+                                <div style="overflow-x:auto">
+                                    <table border="1" cellpadding="6" style="border-collapse:collapse;width:100%;min-width:800px">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                            `;
+
+                            // Add month columns
+                            months.forEach(month => {
+                                html += `<th>${month}</th>`;
+                            });
+
+                            // Add summary columns
+                            html += `
+                                            <th>Total</th>
+                                            <th>Interest</th>
+                                            <th>Payout</th>
+                                            <th>Last Synced</th>
+                                        </tr>
+                            `;
+
+                            // Add data rows
+                            data.forEach(r => {
+                                html += `
+                                    <tr>
+                                        <td>${r.id || ''}</td>
+                                        <td>${r.member_name || ''}</td>
+                                        <td>${r.member_email || ''}</td>
+                                `;
+
+                                // Add month values
+                                months.forEach(month => {
+                                    const value = r[month] || 0;
+                                    html += `<td>${value}</td>`;
+                                });
+
+                                // Add summary values
+                                html += `
+                                        <td><strong>${r.total_contributions || 0}</strong></td>
+                                        <td>${r.interest_per_member || 0}</td>
+                                        <td><strong>${r.final_payout || 0}</strong></td>
+                                        <td>${r.synced_at || ''}</td>
+                                    </tr>
+                                `;
+                            });
+
+                            html += "</table></div>";
+                            document.getElementById("dbOutput").innerHTML = html;
+                        })
+                        .catch(err => {
+                            document.getElementById("dbOutput").innerHTML = `<p style="color:red">Error loading month columns: ${err.message}</p>`;
+                        });
+                })
+                .catch(err => {
+                    const msg = 'Failed to load contributions: ' + (err.message || err);
+                    showNotification(msg, 'error');
+                    document.getElementById("dbOutput").innerHTML = `<pre style="color:red;white-space:pre-wrap">${msg}</pre>`;
+                });
+        }
+
+        // Modal functions
+        function showModal(title, content, type = 'text') {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalContent').textContent = content;
+            document.getElementById('modalContent').style.fontFamily = type === 'sql' ? 'monospace' : 'inherit';
+            document.getElementById('modalContent').style.fontSize = type === 'sql' ? '13px' : '14px';
+            document.getElementById('dataModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('dataModal').classList.remove('active');
+        }
+
+        function copyModalContent() {
+            const content = document.getElementById('modalContent').textContent;
+            navigator.clipboard.writeText(content).then(() => {
+                const btn = document.getElementById('copyBtn');
+                const original = btn.textContent;
+                btn.textContent = 'Copied!';
+                setTimeout(() => btn.textContent = original, 2000);
+            });
+        }
+
+        function downloadModalContent() {
+            const content = document.getElementById('modalContent').textContent;
+            const title = document.getElementById('modalTitle').textContent;
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${title.toLowerCase().replace(/ /g, '_')}_${Date.now()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Notification function
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('Dashboard initialized');
         });
     </script>
 </body>
+
 </html>

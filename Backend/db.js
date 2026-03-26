@@ -70,6 +70,7 @@ function initializeDatabase() {
       member_name TEXT,             -- added column
       document_type TEXT NOT NULL, -- 'photo' or 'mou'
       document_title TEXT,         -- filename or title
+      file_path TEXT NOT NULL,    -- path to the file on disk
       file_name TEXT NOT NULL,    -- original filename
       file_size INTEGER,          -- file size in bytes
       mime_type TEXT,            -- image/png, application/pdf, etc.
@@ -81,8 +82,6 @@ function initializeDatabase() {
       download_count INTEGER DEFAULT 0, -- for MOU: track downloads
       last_downloaded DATETIME,  -- for MOU: last download timestamp
       metadata TEXT,            -- JSON field for any additional data
-      cloudinary_url TEXT,      -- Cloudinary URL
-      public_id TEXT,           -- Cloudinary public ID
       FOREIGN KEY (member_email) REFERENCES users(member_email) ON DELETE CASCADE
     );
   `, (err) => {
@@ -974,7 +973,7 @@ async function updateMansaX(month, amount, changedBy = 'admin', reason = '') {
 // Get all investment records with percentage columns
 function getAllInvestmentRecords() {
   return new Promise((resolve, reject) => {
-    db.all(`SELECT month, total_contributions, mansa_x, i_and_m, cumulative_mansa_x, total_invested, running_total_contributions, mansa_x_percentage, i_and_m_percentage, receipt_path, updated_at FROM investment_tracking`, (err, rows) => {
+    db.all(`SELECT month, total_contributions, mansa_x, i_and_m, cumulative_mansa_x, total_invested, running_total_contributions, mansa_x_percentage, i_and_m_percentage, receipt_url, receipt_path, updated_at FROM investment_tracking`, (err, rows) => {
       if (err) return reject(err);
       // Sort by parsed month date ascending
       rows.sort((a, b) => {

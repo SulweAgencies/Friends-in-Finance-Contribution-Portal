@@ -46,6 +46,7 @@
             position: sticky;
             top: 0;
             z-index: 1000;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
         .header-content {
@@ -64,16 +65,11 @@
             align-items: center;
             gap: 12px;
             text-decoration: none;
-            border: none;
-            outline: none;
         }
 
         .logo-section i {
             font-size: 24px;
             color: #2563eb;
-            text-decoration: none;
-            border: none;
-            outline: none;
         }
 
         .logo-section h1 {
@@ -81,16 +77,10 @@
             font-weight: 700;
             margin: 0;
             color: white;
-            text-decoration: none;
-            border: none;
-            outline: none;
         }
 
         .logo-section span {
             color: #2563eb;
-            text-decoration: none;
-            border: none;
-            outline: none;
         }
 
         .main-nav {
@@ -468,35 +458,6 @@
             font-family: inherit;
         }
 
-        .password-input-container {
-            position: relative;
-        }
-
-        .password-toggle-btn {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: #64748b;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 6px;
-            transition: all 0.2s ease;
-            font-size: 16px;
-        }
-
-        .password-toggle-btn:hover {
-            color: #667eea;
-            background: rgba(102, 126, 234, 0.1);
-        }
-
-        .password-toggle-btn:focus {
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
-        }
-
         .btn {
             width: 100%;
             padding: 14px;
@@ -581,17 +542,11 @@
                 order: 1;
                 margin: 0;
                 padding: 0;
-                text-decoration: none;
-                border: none;
-                outline: none;
             }
             
             .landing-header .logo-section i {
                 color: #2563eb;
                 font-size: 24px;
-                text-decoration: none;
-                border: none;
-                outline: none;
             }
             
             .landing-header .logo-section h1 {
@@ -599,16 +554,10 @@
                 font-size: 1.5rem;
                 font-weight: 700;
                 margin: 0;
-                text-decoration: none;
-                border: none;
-                outline: none;
             }
             
             .landing-header .logo-section span {
                 color: #2563eb;
-                text-decoration: none;
-                border: none;
-                outline: none;
             }
             
             /* LAYER 2 - Navigation only, full width, even spacing */
@@ -781,7 +730,7 @@
             <!-- LAYER 1: Logo only -->
             <a href="chart.html" class="logo-section">
                 <i class="fas fa-hand-holding-usd"></i>
-                <h1>Friends in Finance <span>Analytics</span></h1>
+                <h1>Friends in Finance <span>Investment</span> Portal</h1>
             </a>
             
             <!-- LAYER 2: Navigation only -->
@@ -791,11 +740,6 @@
                 <a href="faq.html" class="active">FAQ</a>
                 <a href="contact.html">Contact</a>
             </nav>
-            
-            <!-- LAYER 3: Member Login button only -->
-            <button class="login-btn-top" id="openLoginModal">
-                <i class="fas fa-sign-in-alt"></i> Member Login
-            </button>
         </div>
     </header>
 
@@ -1085,7 +1029,7 @@
         <div class="footer-content">
             <a href="chart.html" class="footer-logo">
                 <i class="fas fa-hand-holding-usd"></i>
-                <h1>Friends in Finance <span>Analytics</span></h1>
+                <h1>Friends in Finance <span>Investment</span> Portal</h1>
             </a>
 
             <div class="footer-links">
@@ -1097,34 +1041,6 @@
             <p class="copyright">© 2026 Design by Sulwe Digitals. All rights reserved.</p>
         </div>
     </footer>
-
-    <!-- Login Modal -->
-    <div class="login-modal" id="loginModal">
-        <div class="login-box">
-            <button class="close-modal" id="closeLoginModal">&times;</button>
-            <div class="login-header">
-                <h3>Member Login</h3>
-                <p>Access your investment dashboard</p>
-            </div>
-            <form id="loginForm">
-                <div class="form-group">
-                    <label for="username">Email</label>
-                    <input type="email" id="username" class="form-control" placeholder="you@domain.com" required>
-                </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <div class="password-input-container">
-                        <input type="password" id="password" class="form-control" placeholder="Enter your password"
-                            required>
-                        <button type="button" class="password-toggle-btn" onclick="togglePassword('password')" title="Toggle password visibility">
-                            <i class="far fa-eye" id="password-toggle-icon"></i>
-                        </button>
-                    </div>
-                </div>
-                <button type="submit" class="btn">Login to Dashboard</button>
-            </form>
-        </div>
-    </div>
 
     <!-- JavaScript -->
     <script>
@@ -1143,125 +1059,14 @@
             }, 5000);
         }
 
-        // Check authentication status on page load
-        async function checkAuthStatus() {
-            try {
-                const response = await fetch('http://localhost:3000/api/auth/status');
-                const data = await response.json();
-
-                const loginBtn = document.getElementById('openLoginModal');
-                if (loginBtn) {
-                    // When authenticated, hide the button, otherwise show it
-                    loginBtn.style.display = data.authenticated ? 'none' : 'flex';
-                }
-            } catch (error) {
-                console.error('Auth status check failed:', error);
-            }
-        }
-
-        // Handle login form submission
-        async function handleLogin(e) {
-            e.preventDefault();
-
-            const email = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const submitBtn = e.target.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerHTML;
-
-            // Show loading state
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
-
-            try {
-                const response = await fetch('http://localhost:3000/api/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ email, password })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    // Save email to localStorage for next time
-                    localStorage.setItem('lastLoginEmail', email);
-
-                    showNotification('Login successful! Redirecting...', 'success');
-
-                    // Successful login - redirect to appropriate dashboard
-                    setTimeout(() => {
-                        window.location.href = data.redirectTo;
-                    }, 1000);
-                } else {
-                    // Failed login - show error
-                    showNotification(data.message || 'Login failed', 'error');
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalText;
-                }
-            } catch (error) {
-                console.error('Login error:', error);
-                showNotification('Network error. Please try again.', 'error');
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalText;
-            }
-        }
-
-        // Modal functionality
-        (function () {
-            const modal = document.getElementById('loginModal');
-            const openBtn = document.getElementById('openLoginModal');
-            const closeBtn = document.getElementById('closeLoginModal');
-
-            if (openBtn && modal) {
-                openBtn.addEventListener('click', () => {
-                    modal.classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                });
-
-                const closeModal = () => {
-                    modal.classList.remove('active');
-                    document.body.style.overflow = 'auto';
-                };
-
-                if (closeBtn) closeBtn.addEventListener('click', closeModal);
-                window.addEventListener('click', (e) => {
-                    if (e.target === modal) closeModal();
-                });
-            }
-        })();
-
         // Auto-fill last used email
         document.addEventListener('DOMContentLoaded', () => {
-            checkAuthStatus();
-            const lastEmail = localStorage.getItem('lastLoginEmail');
-            if (lastEmail) {
-                document.getElementById('username').value = lastEmail;
-            }
-
-            const loginForm = document.getElementById('loginForm');
-            if (loginForm) {
-                loginForm.addEventListener('submit', handleLogin);
-            }
+            // No login functionality needed
         });
+    </script>
 
-    // Password toggle function
-    function togglePassword(inputId) {
-        const input = document.getElementById(inputId);
-        const icon = document.getElementById(inputId + '-toggle-icon');
-        
-        if (input.type === 'password') {
-            input.type = 'text';
-            icon.classList.remove('far', 'fa-eye');
-            icon.classList.add('far', 'fa-eye-slash');
-        } else {
-            input.type = 'password';
-            icon.classList.remove('far', 'fa-eye-slash');
-            icon.classList.add('far', 'fa-eye');
-        }
-    }
-
-        // FAQ Search and Category functionality
+    <!-- FAQ Search and Category functionality -->
+    <script>
         document.addEventListener('DOMContentLoaded', function () {
             // Category filtering
             const categoryBtns = document.querySelectorAll('.category-btn');
