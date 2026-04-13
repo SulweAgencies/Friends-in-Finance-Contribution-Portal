@@ -1788,6 +1788,384 @@
                 width: 100px;
             }
         }
+
+        /* ===== MONTH.HTML SPECIFIC MOBILE FIXES - No Overlapping ===== */
+        @media (max-width: 768px) {
+            /* Main container - full width with proper padding */
+            .dashboard-container {
+                padding: 15px;
+                width: 100%;
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+            
+            /* Header card - full width, no margin issues */
+            .header-card {
+                padding: 20px;
+                margin-bottom: 20px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            
+            .header-card h1 {
+                font-size: 22px;
+                line-height: 1.3;
+                word-wrap: break-word;
+            }
+            
+            .subtitle {
+                font-size: 13px;
+                word-wrap: break-word;
+            }
+            
+            /* Month selector - stacked vertically, full width */
+            .month-selector {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+                padding: 15px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            
+            .month-selector label {
+                width: 100%;
+                text-align: left;
+                margin-left: 0 !important;
+                margin-top: 5px;
+            }
+            
+            .month-selector select {
+                width: 100%;
+                min-width: auto;
+                padding: 12px;
+                font-size: 14px;
+            }
+            
+            .compare-btn {
+                width: 100%;
+                margin-left: 0;
+                margin-top: 5px;
+                padding: 12px;
+                font-size: 14px;
+            }
+            
+            /* Summary cards - stacked, no overlap */
+            .summary-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                width: 100%;
+            }
+            
+            .summary-card {
+                padding: 18px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            
+            .card-value {
+                font-size: 28px;
+                word-wrap: break-word;
+            }
+            
+            .card-trend {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            
+            /* Charts grid - single column, full width */
+            .chart-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                width: 100%;
+            }
+            
+            .chart-card {
+                padding: 18px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            
+            .chart-container {
+                min-height: 250px;
+                height: auto;
+                width: 100%;
+            }
+            
+            .chart-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .chart-title {
+                font-size: 16px;
+            }
+            
+            .chart-question {
+                font-size: 11px;
+                padding: 4px 10px;
+            }
+            
+            /* Stats grid inside charts */
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+                margin-top: 15px;
+            }
+            
+            .stat-item {
+                padding: 12px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            
+            /* Member table - horizontal scroll, no overlap */
+            .member-table {
+                padding: 15px;
+                width: 100%;
+                box-sizing: border-box;
+                overflow-x: auto;
+            }
+            
+            .member-table table {
+                min-width: 650px;
+                width: 100%;
+            }
+            
+            .member-table th,
+            .member-table td {
+                padding: 10px 8px;
+                font-size: 12px;
+                white-space: nowrap;
+            }
+            
+            .table-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+                padding: 12px 15px;
+            }
+            
+            .table-title {
+                font-size: 16px;
+            }
+            
+            .data-badge {
+                font-size: 11px;
+                padding: 4px 10px;
+            }
+            
+            /* Status badges */
+            .status-badge {
+                font-size: 11px;
+                padding: 4px 8px;
+                white-space: nowrap;
+            }
+            
+            /* Comparison section */
+            .comparison-section {
+                padding: 18px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            
+            .comparison-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+                width: 100%;
+            }
+            
+            .comparison-header h2 {
+                font-size: 18px;
+                width: 100%;
+            }
+            
+            .comparison-header > div {
+                margin-left: 0 !important;
+                width: 100%;
+                justify-content: flex-start;
+                flex-wrap: wrap;
+            }
+            
+            .month-badge {
+                font-size: 14px;
+                padding: 6px 12px;
+            }
+            
+            .comparison-metrics {
+                grid-template-columns: 1fr;
+                gap: 12px;
+                width: 100%;
+            }
+            
+            .metric-card {
+                padding: 15px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            
+            .metric-value {
+                font-size: 24px;
+            }
+            
+            .metric-label {
+                font-size: 13px;
+            }
+            
+            /* Insights grid - single column */
+            .insights-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                width: 100%;
+            }
+            
+            .insight-card {
+                padding: 18px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            
+            .insight-question {
+                font-size: 15px;
+            }
+            
+            .insight-answer {
+                font-size: 13px;
+            }
+            
+            /* Top changes table */
+            .comparison-section table {
+                min-width: 550px;
+                width: 100%;
+                font-size: 12px;
+            }
+            
+            .comparison-section th,
+            .comparison-section td {
+                padding: 8px 6px;
+                white-space: nowrap;
+            }
+            
+            /* Key insights section */
+            #keyInsights {
+                padding: 18px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            
+            #keyInsights h2 {
+                font-size: 18px;
+                margin-bottom: 15px;
+            }
+            
+            /* Progress bar fix */
+            .progress-bar {
+                width: 100%;
+            }
+            
+            /* Fix any floating elements */
+            .dashboard-container > div,
+            .dashboard-container > section {
+                width: 100%;
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+        }
+
+        /* Small mobile devices (max-width: 480px) */
+        @media (max-width: 480px) {
+            .dashboard-container {
+                padding: 10px;
+            }
+            
+            .header-card {
+                padding: 15px;
+            }
+            
+            .header-card h1 {
+                font-size: 18px;
+            }
+            
+            .subtitle {
+                font-size: 12px;
+            }
+            
+            .summary-card {
+                padding: 15px;
+            }
+            
+            .card-value {
+                font-size: 24px;
+            }
+            
+            .chart-card {
+                padding: 15px;
+            }
+            
+            .chart-container {
+                min-height: 200px;
+            }
+            
+            .member-table {
+                padding: 10px;
+            }
+            
+            .member-table th,
+            .member-table td {
+                padding: 8px 6px;
+                font-size: 11px;
+            }
+            
+            .comparison-section {
+                padding: 15px;
+            }
+            
+            .insight-card {
+                padding: 15px;
+            }
+            
+            .insight-question {
+                font-size: 14px;
+            }
+            
+            .insight-answer {
+                font-size: 12px;
+            }
+            
+            .metric-value {
+                font-size: 20px;
+            }
+            
+            .month-badge {
+                font-size: 12px;
+                padding: 5px 10px;
+            }
+        }
+
+        /* Tablet landscape (769px - 1024px) */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .dashboard-container {
+                padding: 20px;
+            }
+            
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .chart-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .comparison-metrics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .insights-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
     </style>
 </head>
 
