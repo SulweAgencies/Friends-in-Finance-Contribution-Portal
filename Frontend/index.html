@@ -2,45 +2,64 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8">
+    <!-- Site Identity - Custom Icon -->
+    <link rel="icon" type="image/svg+xml" href="/assets/hand-holding-usd-colored.svg">
+    <link rel="apple-touch-icon" href="/assets/hand-holding-usd-colored.svg">
+    <link rel="manifest" href="/assets/site.webmanifest">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-title" content="Friends in Finance">
+    <meta name="application-name" content="Friends in Finance">
+    
+    <!-- Site Identity - Hand Holding USD Icon -->
+    
+    
+    
+    
+    <meta name="apple-mobile-web-app-title" content="Friends in Finance">
+    <meta name="application-name" content="Friends in Finance">
+    
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Data Dashboard</title>
+    <title>Contribution Analytics Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@2.5.0/dist/pptxgen.bundle.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary-color: #2563eb;
             --primary-hover: #1d4ed8;
             --text-color: #1f2937;
-            --bg-color: #f3f4f6;
+            --bg-color: #28394a;
             --card-bg: #ffffff;
             --border-color: #e5e7eb;
-            --row-hover: #f9fafb;
-            --header-bg: #f8fafc;
-            --danger-color: #ef4444;
             --success-color: #10b981;
             --warning-color: #f59e0b;
+            --danger-color: #ef4444;
             --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
             font-family: var(--font-family);
-            background-color: var(--bg-color);
+            background-color: #FFEAD7;
             color: var(--text-color);
-            margin: 0;
-            padding: 40px;
             line-height: 1.5;
         }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            background: var(--card-bg);
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            padding: 24px;
-            overflow: hidden;
+            padding: 20px;
         }
 
-        /* Dashboard-style header (matches admin dashboard) */
+        /* Dashboard-style header (matches member/admin dashboards) */
         .admin-header {
             background: linear-gradient(135deg, #2C3E50 0%, #1a2530 100%);
             color: white;
@@ -85,6 +104,48 @@
             color: #2563eb;
         }
 
+        /* Dashboard Navigation Menu */
+        .dashboard-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 6px;
+            border-radius: 40px;
+            backdrop-filter: blur(4px);
+        }
+
+        .dashboard-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 30px;
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+
+        .dashboard-nav-item i {
+            font-size: 1rem;
+        }
+
+        .dashboard-nav-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .dashboard-nav-item.active {
+            background: #2563eb;
+            color: white;
+            border-color: #3b82f6;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
         .main-nav {
             display: flex;
             align-items: center;
@@ -102,225 +163,628 @@
             color: white;
         }
 
-        .controls {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            flex-wrap: wrap;
+        .download-options {
+            position: relative;
+            display: inline-block;
         }
 
-        button {
-            background-color: white;
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
+        .download-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
             padding: 8px 16px;
             border-radius: 6px;
             font-size: 0.875rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        button:hover {
-            background-color: var(--bg-color);
-            border-color: #d1d5db;
-        }
-
-        button.primary {
-            background-color: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-        }
-
-        button.primary:hover {
-            background-color: var(--primary-hover);
-        }
-
-        .table-wrapper {
-            overflow-x: auto;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.925rem;
-        }
-
-        th,
-        td {
-            text-align: left;
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border-color);
-            white-space: nowrap;
-        }
-
-        th {
-            background-color: var(--header-bg);
             font-weight: 600;
-            color: #4b5563;
             cursor: pointer;
-            user-select: none;
-            position: sticky;
-            top: 0;
-            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
         }
 
-        th:hover {
-            background-color: #e2e8f0;
+        .download-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
         }
 
-        th span.sort-icon {
-            margin-left: 8px;
-            font-size: 0.75rem;
-            color: #9ca3af;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        tr:hover td {
-            background-color: var(--row-hover);
-        }
-
-        td[contenteditable="true"] {
-            outline: none;
-            transition: background 0.2s;
-            cursor: text;
-        }
-
-        td[contenteditable="true"]:hover {
-            background-color: #eff6ff;
-            box-shadow: inset 0 0 0 1px #bfdbfe;
-        }
-
-        td[contenteditable="true"]:focus {
-            background-color: #eff6ff;
-            box-shadow: inset 0 0 0 2px var(--primary-color);
-        }
-
-        /* Dropdown Menu */
-        .dropdown {
-            position: relative;
-        }
-
-        .dropdown-content {
+        .download-dropdown {
             display: none;
             position: absolute;
             right: 0;
-            top: 100%;
-            margin-top: 8px;
-            background-color: white;
-            min-width: 250px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            z-index: 10;
-            max-height: 400px;
-            overflow-y: auto;
-            padding: 8px;
+            top: 110%;
+            background: white;
+            min-width: 260px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
         }
 
-        .dropdown.active .dropdown-content {
+        .download-dropdown.show {
             display: block;
         }
 
-        .column-toggle {
+        .download-option {
             display: flex;
             align-items: center;
-            padding: 8px 12px;
+            gap: 12px;
+            padding: 14px 18px;
+            border-radius: 14px;
             cursor: pointer;
-            border-radius: 4px;
+            transition: all 0.2s;
+            color: #1e293b;
+            font-weight: 500;
         }
 
-        .column-toggle:hover {
-            background-color: var(--bg-color);
+        .download-option:hover {
+            background: #f1f5f9;
         }
 
-        .column-toggle input {
-            margin-right: 10px;
-            accent-color: var(--primary-color);
+        .download-option.pdf i {
+            color: #dc2626;
+        }
+
+        .download-option.png i {
+            color: #2563eb;
+        }
+
+        .download-option.csv i {
+            color: #059669;
+        }
+
+        .download-option.print i {
+            color: #7c3aed;
+        }
+
+        .download-option.pptx i {
+            color: #d24726;
+        }
+
+        /* Members Dropdown Styles */
+        .members-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .members-dropdown-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .members-dropdown-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .members-dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 110%;
+            background: white;
+            min-width: 280px;
+            max-width: 350px;
+            max-height: 400px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            overflow-y: auto;
+        }
+
+        .members-dropdown-content.show {
+            display: block;
+        }
+
+        .dropdown-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .member-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #1e293b;
+            font-weight: 500;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .member-item:hover {
+            background: #f8fafc;
+            transform: translateX(2px);
+        }
+
+        .member-item:last-child {
+            border-bottom: none;
+        }
+
+        .member-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .member-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .member-name {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .member-email {
+            font-size: 12px;
+            color: #64748b;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .member-arrow {
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-button {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 1024px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-card {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .chart-card.full-width {
+            grid-column: span 2;
+        }
+
+        @media (max-width: 1024px) {
+            .chart-card.full-width {
+                grid-column: span 1;
+            }
+        }
+
+        .chart-card h2 {
+            font-size: 1.25rem;
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
+
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+
+        .chart-container.full-height {
+            height: 400px;
+        }
+
+        .contributors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .contributor-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s;
+        }
+
+        .contributor-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .contributor-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            margin: 0 auto 15px;
+        }
+
+        .contributor-name {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .contributor-amount {
+            color: var(--success-color);
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .contributor-rank {
+            font-size: 0.8rem;
+            padding: 4px 12px;
+            border-radius: 20px;
+            color: white;
+            display: inline-block;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .refresh-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.2s;
+        }
+
+        .refresh-button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .refresh-button:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
         }
 
         .loading {
             text-align: center;
             padding: 40px;
             color: #6b7280;
+            font-size: 1.1rem;
         }
 
-        /* Modal styles */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 10001;
+        .error {
+            background-color: #fee2e2;
+            color: var(--danger-color);
+            padding: 12px 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--danger-color);
         }
 
-        .modal.active {
-            display: flex;
+        .info {
+            background-color: #dbeafe;
+            color: var(--primary-color);
+            padding: 12px 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary-color);
         }
 
-        .modal-content {
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            color: #6b7280;
+            font-size: 0.875rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: 50px;
+        }
+
+        /* Additional styles to match dashboard_chart layout for new sections */
+        .member-table {
             background: white;
-            padding: 24px;
-            border-radius: 12px;
-            width: 800px;
-            max-height: 90vh;
-            overflow: auto;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.03);
+            overflow-x: auto;
+            margin-bottom: 24px;
         }
 
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        table.member-table,
+        table.member-table th,
+        table.member-table td {
+            border-collapse: collapse;
+        }
+
+        .member-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .member-table th {
+            text-align: left;
+            padding: 12px 10px;
+            background: #f8fafc;
+            color: #1e293b;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .member-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #0f172a;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 12px;
+            display: inline-block
+        }
+
+        .status-active {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-warning {
+            background: #fef9c3;
+            color: #854d0e;
+        }
+
+        .status-late {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2563eb, #3b82f6);
+            border-radius: 10px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .qa-section {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 18px;
+        }
+
+        .qa-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 12px;
+        }
+
+        @media (max-width: 1200px) {
+            .qa-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .qa-item {
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 10px;
+            border-left: 6px solid #2563eb;
+        }
+
+        .qa-question {
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+
+        .qa-answer {
+            color: #334155;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .form-group {
             margin-bottom: 20px;
         }
 
-        .modal-header h3 {
-            margin: 0;
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #475569;
+            font-weight: 500;
         }
 
-        .modal-close {
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        .password-input-container {
+            position: relative;
+        }
+
+        .password-toggle-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
             background: none;
             border: none;
-            font-size: 24px;
+            color: #64748b;
             cursor: pointer;
-            color: #666;
+            padding: 8px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            font-size: 16px;
         }
 
-        .modal-body {
-            max-height: 60vh;
-            overflow-y: auto;
+        .password-toggle-btn:hover {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
         }
 
-        .modal-footer {
-            margin-top: 20px;
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
+        .password-toggle-btn:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
         }
 
-        .code-block {
-            background: #f8fafc;
-            padding: 20px;
-            border-radius: 8px;
-            overflow-x: auto;
-            font-family: monospace;
-            font-size: 13px;
-            line-height: 1.5;
-            white-space: pre-wrap;
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
         }
 
         /* Notification */
@@ -328,25 +792,27 @@
             position: fixed;
             top: 20px;
             right: 20px;
-            padding: 12px 24px;
-            background: var(--success-color);
+            padding: 1rem 1.5rem;
+            border-radius: 5px;
             color: white;
-            border-radius: 8px;
-            z-index: 10002;
+            font-weight: 500;
+            z-index: 9999;
             animation: slideIn 0.3s ease;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+        }
+
+        .notification.success {
+            background: #10b981;
         }
 
         .notification.error {
-            background: var(--danger-color);
+            background: #ef4444;
         }
 
         .notification.warning {
-            background: var(--warning-color);
-        }
-
-        .notification.info {
-            background: var(--primary-color);
+            background: #f59e0b;
+            color: #1f2937;
         }
 
         @keyframes slideIn {
@@ -372,1045 +838,1970 @@
                 opacity: 0;
             }
         }
-    /* Responsive Design */
-        @media (max-width: 768px) {
-            body {
-                padding: 20px;
+
+        .landing-footer {
+            background: linear-gradient(135deg, #2C3E50 0%, #1a2530 100%);
+            color: white;
+            padding: 40px 0 20px;
+            margin-top: 40px;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            text-align: center;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .footer-logo i {
+            font-size: 24px;
+            color: #2563eb;
+        }
+
+        .footer-logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .footer-logo span {
+            color: #2563eb;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .copyright {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            margin-top: 20px;
+        }
+
+
+
+
+
+        .download-progress {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+            z-index: 10000;
+            text-align: center;
+            min-width: 320px;
+        }
+
+        .download-progress.active {
+            display: block;
+        }
+
+        .progress-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid #f1f5f9;
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
             }
 
-            .container {
-                padding: 16px;
-            }
-
-            header {
-                flex-direction: column;
-                gap: 15px;
-                text-align: center;
-            }
-
-            h2 {
-                font-size: 1.3rem;
-            }
-
-            .controls {
-                flex-direction: column;
-                width: 100%;
-                gap: 10px;
-            }
-
-            button {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .table-wrapper {
-                border-radius: 6px;
-            }
-
-            th,
-            td {
-                padding: 8px 12px;
-                font-size: 13px;
-            }
-
-            .modal-content {
-                width: 95%;
-                padding: 20px;
+            100% {
+                transform: rotate(360deg);
             }
         }
 
-        @media (max-width: 480px) {
-            body {
-                padding: 10px;
-            }
-
-            .container {
-                padding: 12px;
-            }
-
-            h2 {
-                font-size: 1.2rem;
-            }
-
-            th,
-            td {
-                padding: 6px 8px;
-                font-size: 12px;
-            }
-
-            .dropdown-content {
-                min-width: 200px;
-                right: -10px;
-            }
+        .progress-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 10px;
         }
+
+        .progress-subtext {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .export-timestamp {
+            display: none;
+            text-align: right;
+            color: #64748b;
+            font-size: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+
+        .charts-content.downloading .export-timestamp {
+            display: block;
+        }
+
+        .download-watermark {
+            display: none;
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            color: rgba(102, 126, 234, 0.1);
+            font-size: 60px;
+            font-weight: 800;
+            transform: rotate(-15deg);
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .charts-content.downloading .download-watermark {
+            display: block;
+        }
+
+        .member-info-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            font-weight: 600;
+        }
+    /* index.html - Mobile & Tablet Responsive Fixes - UPDATED */
+@media (max-width: 768px) {
+    /* Header - Three row layout */
+    .admin-header .header-content {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 10px 15px;
+    }
+    
+    .admin-header .logo-section {
+        width: 100%;
+        justify-content: center;
+        order: 1;
+    }
+    
+    .admin-header .logo-section i {
+        color: #2563eb;
+        font-size: 24px;
+    }
+    
+    .admin-header .logo-section h1 {
+        color: white;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0;
+    }
+    
+    .admin-header .logo-section span {
+        color: #2563eb;
+    }
+    
+    /* Preserve menu style for General, Monthly, Investment */
+    .admin-header .dashboard-nav {
+        width: 100%;
+        justify-content: center;
+        order: 2;
+        margin: 0;
+        display: flex;
+        gap: 5px;
+        background: rgba(255, 255, 255, 0.15);
+        padding: 6px;
+        border-radius: 40px;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .admin-header .dashboard-nav-item {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+        white-space: nowrap;
+        display: inline-flex;
+        border-radius: 30px;
+        flex: 0 0 auto;
+    }
+    
+    .admin-header .dashboard-nav-item.active {
+        background: #2563eb;
+        color: white;
+        border-color: #3b82f6;
+    }
+    
+    /* Keep Export Report in ONE ROW */
+    .admin-header .main-nav {
+        width: 100%;
+        justify-content: space-between;
+        order: 3;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        gap: 5px;
+        padding: 5px 0;
+    }
+    
+    .admin-header .download-options {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .admin-header .download-btn {
+        width: 100%;
+        padding: 8px 5px;
+        font-size: 0.8rem;
+        justify-content: center;
+        white-space: nowrap;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 6px;
+    }
+    
+    /* Container - full width */
+    .container {
+        padding: 15px;
+        width: 100%;
+    }
+    
+    /* Stats grid - stacked */
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .stat-card {
+        padding: 20px;
+    }
+    
+    .stat-value {
+        font-size: 28px;
+    }
+    
+    /* Charts - each in its own row */
+    .charts-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .chart-card {
+        width: 100%;
+        padding: 20px;
+    }
+    
+    .chart-card.full-width {
+        grid-column: span 1;
+    }
+    
+    .chart-container {
+        min-height: 250px;
+        height: auto;
+        width: 100%;
+    }
+    
+    .chart-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .chart-question {
+        margin-top: 5px;
+    }
+    
+    /* Contributors grid */
+    .contributors-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+    
+    .contributor-card {
+        padding: 15px;
+    }
+    
+    .contributor-avatar {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+    }
+    
+    .contributor-name {
+        font-size: 13px;
+    }
+    
+    .contributor-amount {
+        font-size: 14px;
+    }
+    
+    /* Download dropdown */
+    .download-dropdown {
+        right: auto;
+        left: 0;
+        width: 280px;
+    }
+    
+    /* Member table if present */
+    .member-table {
+        padding: 15px;
+        overflow-x: auto;
+        width: 100%;
+    }
+    
+    .member-table table {
+        min-width: 600px;
+    }
+    
+    /* Dashboard grid */
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    /* QA section */
+    .qa-section {
+        padding: 15px;
+        width: 100%;
+    }
+    
+    .qa-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .qa-item {
+        padding: 15px;
+        width: 100%;
+    }
+    
+    /* Stats grid within charts */
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .stat-item {
+        width: 100%;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .admin-header .header-content {
+        flex-wrap: wrap;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .charts-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .contributors-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .qa-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Small mobile adjustments */
+@media (max-width: 480px) {
+    .admin-header .dashboard-nav-item {
+        padding: 6px 10px;
+        font-size: 0.85rem;
+    }
+    
+    .admin-header .main-nav {
+        gap: 3px;
+    }
+    
+    .admin-header .download-btn {
+        padding: 6px 3px;
+        font-size: 0.7rem;
+    }
+    
+    .container {
+        padding: 10px;
+    }
+    
+    .chart-container {
+        min-height: 200px;
+    }
+    
+    .contributors-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stat-card {
+        padding: 15px;
+    }
+    
+    .stat-value {
+        font-size: 24px;
+    }
+    
+    .chart-card h2 {
+        font-size: 16px;
+    }
+}
+
+/* Hero Section Styles - Refined */
+.hero-section {
+    background: linear-gradient(135deg, #2C3E50 0%, #1a2530 100%);
+    color: white;
+    padding: 60px 10%;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.05"><path d="M20 20 L80 20 L80 80 L20 80 Z" fill="none" stroke="white" stroke-width="2"/><circle cx="50" cy="50" r="20" fill="none" stroke="white" stroke-width="2"/></svg>') repeat;
+    pointer-events: none;
+}
+
+.hero-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+.hero-content h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.hero-content p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    max-width: 800px;
+    margin: 0 auto 2rem;
+    line-height: 1.6;
+}
+
+.stats-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.stat-item {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 25px 15px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.stat-number {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.stat-label {
+    font-size: 0.95rem;
+    opacity: 0.9;
+    letter-spacing: 0.5px;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .hero-section {
+        padding: 50px 5%;
+    }
+    
+    .hero-content h2 {
+        font-size: 2rem;
+    }
+    
+    .hero-content p {
+        font-size: 1.1rem;
+    }
+    
+    .stats-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+    
+    .stat-number {
+        font-size: 1.8rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-section {
+        padding: 40px 15px;
+    }
+    
+    .hero-content h2 {
+        font-size: 1.8rem;
+    }
+    
+    .hero-content p {
+        font-size: 1rem;
+    }
+    
+    .stats-container {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .stat-item {
+        padding: 20px 15px;
+    }
+    
+    .stat-number {
+        font-size: 1.6rem;
+    }
+}
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
-
-    <!-- EDIT CONTRIBUTION MODAL -->
-    <div id="editModal" style="
-      display:none;
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,0.5);
-      align-items:center;
-      justify-content:center;
-      z-index:9999;
-    ">
-        <div style="
-        background:#ffffff;
-        padding:20px;
-        border-radius:10px;
-        width:340px;
-        box-shadow:0 10px 25px rgba(0,0,0,0.2);
-      ">
-            <h3 style="margin-top:0">Edit Monthly Contribution</h3>
-
-            <label>Member Name</label>
-            <input id="memberName" readonly style="width:100%;margin-bottom:10px" />
-
-            <label>Member Email</label>
-            <select id="memberEmail" style="width:100%;margin-bottom:10px">
-                <option value="anneawuor20@gmail.com">anneawuor20@gmail.com</option>
-                <option value="arnnebelle2@yahoo.com">arnnebelle2@yahoo.com</option>
-                <option value="robertelmussy@gmail.com">robertelmussy@gmail.com</option>
-                <option value="ckithikii@gmail.com">ckithikii@gmail.com</option>
-                <option value="wakeshocharlotte@gmail.com">wakeshocharlotte@gmail.com</option>
-                <option value="ndongaelsie@gmail.com">ndongaelsie@gmail.com</option>
-                <option value="Njenga573@gmail.com">Njenga573@gmail.com</option>
-                <option value="njengastellah@gmail.com">njengastellah@gmail.com</option>
-                <option value="priscillahmlumbasyo@gmail.com">priscillahmlumbasyo@gmail.com</option>
-                <option value="owinovictor91@gmail.com">owinovictor91@gmail.com</option>
-                <option value="virginia.wmwaniki@gmail.com">virginia.wmwaniki@gmail.com</option>
-            </select>
-
-            <label>Month</label>
-            <select id="month" style="width:100%;margin-bottom:10px">
-                <option>Nov-2025</option>
-                <option>Dec-2025</option>
-                <option>Jan-2026</option>
-                <option>Feb-2026</option>
-                <option>Mar-2026</option>
-                <option>Apr-2026</option>
-                <option>May-2026</option>
-                <option>Jun-2026</option>
-                <option>Jul-2026</option>
-                <option>Aug-2026</option>
-                <option>Sep-2026</option>
-                <option>Oct-2026</option>
-                <option>Nov-2026</option>
-                <option>Dec-2026</option>
-                <option>Jan-2027</option>
-            </select>
-
-            <label>Contribution Amount</label>
-            <input id="contribution" type="number" min="0" style="width:100%;margin-bottom:12px" />
-
-            <div style="display:flex;justify-content:flex-end;gap:10px">
-                <button onclick="closeEditModal()">Cancel</button>
-                <button class="primary" onclick="submitEdit()">Save</button>
-            </div>
-
-            <div id="editStatus" style="margin-top:10px;font-size:0.9em;color:#374151"></div>
-        </div>
-    </div>
-
-    <!-- DATA EXPORT MODAL -->
-    <div id="dataModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modalTitle">Data Export</h3>
-                <button class="modal-close" onclick="closeModal()">×</button>
-            </div>
-            <div class="modal-body">
-                <pre id="modalContent" class="code-block"></pre>
-            </div>
-            <div class="modal-footer">
-                <button id="copyBtn" onclick="copyModalContent()">Copy to Clipboard</button>
-                <button class="primary" onclick="downloadModalContent()">Download</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Dashboard-style header (matches admin dashboard) -->
+    <!-- HEADER with Dashboard Menu -->
     <header class="admin-header">
         <div class="header-content">
             <a href="index.html" class="logo-section">
                 <i class="fas fa-hand-holding-usd"></i>
-                <h1>Friends in Finance <span>Live Data</span></h1>
+                <h1>Friends in Finance <span>Analytics</span></h1>
             </a>
-            <div class="main-nav">
-                <a href="chart.html">Analytics</a>
-                <a href="admin-dashboard.html">Admin</a>
-            </div>
+
+            <!-- Dashboard Navigation Menu (replaces dropdown) -->
+            <nav class="dashboard-nav">
+                <a href="index.html" class="dashboard-nav-item active" data-dashboard="chart">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>General</span>
+                </a>
+                <a href="month.html" class="dashboard-nav-item" data-dashboard="month">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Monthly</span>
+                </a>
+                <a href="invest.html" class="dashboard-nav-item" data-dashboard="invest">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Investment</span>
+                </a>
+            </nav>
+
+            <nav class="main-nav">
+                <!-- Download Button with Dropdown -->
+                <div class="download-options" id="downloadOptions">
+                    <button class="download-btn" onclick="toggleDownloadDropdown()">
+                        <i class="fas fa-download"></i> Export Report
+                    </button>
+                    <div class="download-dropdown" id="downloadDropdown">
+                        <div class="download-option pdf" onclick="exportDashboard('pdf')">
+                            <i class="fas fa-file-pdf"></i> Download as PDF
+                            <span style="margin-left: auto; font-size: 12px; color: #64748b;">Report</span>
+                        </div>
+                        <div class="download-option png" onclick="exportDashboard('png')">
+                            <i class="fas fa-file-image"></i> Download as PNG
+                            <span style="margin-left: auto; font-size: 12px; color: #64748b;">Image</span>
+                        </div>
+                        <div class="download-option print" onclick="exportDashboard('print')">
+                            <i class="fas fa-print"></i> Print Dashboard
+                            <span style="margin-left: auto; font-size: 12px; color: #64748b;">Paper</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Members Dropdown -->
+                <div class="members-dropdown" id="membersDropdown">
+                    <button class="members-dropdown-btn" onclick="toggleMembersDropdown()">
+                        <i class="fas fa-users"></i> Members
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="members-dropdown-content" id="membersDropdownContent">
+                        <div class="dropdown-loading">
+                            <i class="fas fa-spinner fa-spin"></i> Loading members...
+                        </div>
+                    </div>
+                </div>
+            </nav>
         </div>
     </header>
 
-    <div class="container">
-                <!-- Existing buttons -->
-                <button id="toggleColumnsBtn" onclick="app.toggleEmptyColumns()">
-                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                    <span id="toggleText">Show All Columns</span>
-                </button>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h2>Smart Contribution Management</h2>
+            <p>Track, manage, and optimize your group contributions with real-time interest calculations and visual analytics.</p>
+            
+            <div class="stats-container">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalMembers">11</div>
+                    <div class="stat-label">Active Members</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="totalContributions">Kshs. 2650 K</div>
+                    <div class="stat-label">Actual Contributions</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="totalInterest">Kshs. 210 K</div>
+                    <div class="stat-label">Minimum Targeted Interest</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="activeMonths">0/0</div>
+                    <div class="stat-label">Active Months</div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-                <div class="dropdown" id="colDropdown">
-                    <button onclick="toggleDropdown()">
-                        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                        </svg>
-                        Manage Columns
-                    </button>
-                    <div class="dropdown-content" id="columnList">
-                        <!-- Populated by JS -->
+    <div class="container">
+
+
+        <div id="errorContainer" style="display: none;"></div>
+        <div id="infoContainer" style="display: none;"></div>
+
+        <div id="loadingIndicator" class="loading">
+            Loading analytics data from database...
+        </div>
+
+        <div class="download-progress" id="downloadProgress">
+            <div class="progress-spinner"></div>
+            <div class="progress-text" id="progressText">Preparing your report...</div>
+            <div class="progress-subtext" id="progressSubtext">This will take just a moment</div>
+        </div>
+
+        <div id="chartsContent" class="charts-content" style="display: none;">
+            <div class="download-watermark">ANALYTICS REPORT</div>
+            <!-- Charts Grid -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h2>Monthly Contributions</h2>
+                    <div class="chart-container">
+                        <canvas id="monthlyChart"></canvas>
                     </div>
                 </div>
 
-                <!-- NEW ETL BUTTONS -->
-                <button id="analyzeBtn" onclick="analyzeTableData()">
-                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
-                    Analyze
-                </button>
+                <div class="chart-card">
+                    <h2>Contribution Share</h2>
+                    <div class="chart-container">
+                        <canvas id="contributionPieChart"></canvas>
+                    </div>
+                </div>
 
-                <button id="viewContribBtn" class="primary" onclick="loadContributions()">
-                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V7" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M16 3v4M8 3v4m-6 4h20" />
-                    </svg>
-                    View Contributions (DB)
-                </button>
+                <div class="chart-card">
+                    <h2>Monthly Payout (with Interest)</h2>
+                    <div class="chart-container">
+                        <canvas id="monthlyPayoutChart"></canvas>
+                    </div>
+                </div>
 
-                <button onclick="window.open('chart.html', '_blank')" class="primary">
-                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
-                    View Analytics Charts
-                </button>
+                <div class="chart-card">
+                    <h2>Interest Distribution</h2>
+                    <div class="chart-container">
+                        <canvas id="interestPieChart"></canvas>
+                    </div>
+                </div>
 
-                <button onclick="loadUsers()">
-                    View Users (DB)
-                </button>
-                <button onclick="syncToDatabase()" id="manualSyncBtn">
-                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                    Update Database
-                </button>
+                <div class="chart-card full-width">
+                    <h2>Leading Contributors</h2>
+                    <div class="chart-container full-height">
+                        <canvas id="leadingContributorsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Member Contribution Status & Payouts removed -->
+
+                <div class="chart-card full-width">
+                    <h2>Top Contributors</h2>
+                    <div id="contributorsList" class="contributors-grid">
+                        <!-- Contributors will be loaded here -->
+                    </div>
+                </div>
             </div>
-        </header>
-
-        <div id="tableContainer" class="table-wrapper">
-            <div class="loading">Loading data...</div>
         </div>
-        <div id="dbOutput" style="margin-top:16px"></div>
     </div>
 
-    <script>
-        const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRcnUfmRu11DOdc6hJPGcYRf4hc8AK7JaZ3vXM1QEzhj18nZykL7lthCrFgLgrE8c2m3AU-Dk-O10f5/pub?output=csv";
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyXz7tY1TWkHo4PW0LihZOW1D8dVw20SdvkJVR4nhDH_H7yckc8qHm-S6om3A-zS8HyhQ/exec";
-        // If the dashboard is opened via file:// (developer preview), point to localhost:3000
-        // Otherwise use same-origin so the app works when served by the backend server.
-        const API_BASE = (location.protocol === 'file:') ? 'http://localhost:3000' : '';
-
-        // 🔧 MODAL CONTROL
-        function openEditModal(memberName, memberEmail, month, value) {
-            document.getElementById("memberName").value = memberName;
-            document.getElementById("memberEmail").value = memberEmail;
-            document.getElementById("month").value = month;
-            document.getElementById("contribution").value = value || "";
-            document.getElementById("editStatus").textContent = "";
-            document.getElementById("editModal").style.display = "flex";
-        }
-
-        function closeEditModal() {
-            document.getElementById("editModal").style.display = "none";
-        }
-
-        // 🔧 SUBMIT TO APPS SCRIPT
-        async function submitEdit() {
-            const payload = {
-                member_name: document.getElementById("memberName").value,
-                member_email: document.getElementById("memberEmail").value,
-                month: document.getElementById("month").value,
-                contribution: document.getElementById("contribution").value
-            };
-
-            const status = document.getElementById("editStatus");
-            status.textContent = "Saving…";
-
-            try {
-                const res = await fetch(SCRIPT_URL, {
-                    method: "POST",
-                    body: JSON.stringify(payload)
-                });
-
-                const result = await res.json();
-
-                if (result.success) {
-                    status.textContent = "Saved. Recalculating…";
-                    setTimeout(() => {
-                        closeEditModal();
-                        app.init(); // Refresh the table
-                    }, 1200);
-                } else {
-                    status.textContent = "Error: " + result.error;
-                }
-            } catch (err) {
-                status.textContent = "Network error";
-            }
-        }
-
-        class App {
-            constructor() {
-                this.headers = [];
-                this.rawData = [];
-                this.data = []; // working copy with potential sorts
-                this.hiddenColumns = new Set();
-                this.showingAll = false; // Track state
-                this.sortState = { colIndex: null, direction: 'asc' };
-                this.container = document.getElementById('tableContainer');
-                this.columnList = document.getElementById('columnList');
-                this.syncInProgress = false; // Prevent multiple syncs
-
-                this.init();
-                this.startAutoRefresh();
-            }
-
-            startAutoRefresh() {
-                // Initial load
-                this.init();
-
-                // Setup auto-sync scheduler
-                this.scheduleNextSync();
-            }
-
-            scheduleNextSync() {
-                const now = new Date();
-                const night = new Date(
-                    now.getFullYear(),
-                    now.getMonth(),
-                    now.getDate() + 1, // tomorrow
-                    0, 0, 0 // 00:00:00 midnight
-                );
-
-                // Calculate time until next midnight
-                const msToMidnight = night.getTime() - now.getTime();
-                console.log(`Next sync check scheduled in ${Math.round(msToMidnight / 1000 / 60)} minutes (at midnight)`);
-
-                setTimeout(() => {
-                    // It is now midnight.
-                    this.checkAndSync();
-
-                    // Schedule next check for 24 hours from now
-                    // Check every day, but only act if 1 day has passed since last sync
-                    setInterval(() => {
-                        this.checkAndSync();
-                    }, 24 * 60 * 60 * 1000); // Check every 24 hours
-                }, msToMidnight);
-            }
-
-            checkAndSync() {
-                const lastSyncTime = localStorage.getItem('lastDbSync');
-                const now = new Date().getTime();
-                const ONE_DAY_MS = 24 * 60 * 60 * 1000; // Changed from 5 days to 1 day
-
-                if (!lastSyncTime || (now - parseInt(lastSyncTime) >= ONE_DAY_MS)) {
-                    console.log("1 day has passed or no previous sync. Syncing now...");
-                    this.performDatabaseSync(true);
-                } else {
-                    const hoursUntilNextSync = Math.round((ONE_DAY_MS - (now - parseInt(lastSyncTime))) / (1000 * 60 * 60));
-                    console.log(`Not yet time to sync. Next sync in ${hoursUntilNextSync} hours`);
-                }
-            }
-
-            async performDatabaseSync(isAuto = false) {
-                if (this.syncInProgress) {
-                    console.log("Sync already in progress, skipping...");
-                    return;
-                }
-
-                this.syncInProgress = true;
-
-                try {
-                    if (!isAuto) {
-                        showNotification('Preparing to sync data...', 'info');
-                    } else {
-                        console.log("Auto-syncing data to database...");
-                    }
-
-                    // Transform Google Sheet data to database format
-                    const contributions = [];
-                    const users = [];
-
-                    // Extract unique members
-                    const memberSet = new Set();
-
-                    // Find key column indices (case-insensitive)
-                    const interestIdx = this.headers.findIndex(h => h && h.toLowerCase().trim() === "interest per member");
-                    const payoutIdx = this.headers.findIndex(h => h && (h.toLowerCase().trim() === "final payout" || h.toLowerCase().trim() === "total payout"));
-                    const totalIdx = this.headers.findIndex(h => h && (h.toLowerCase().trim() === "total contributions" || h.toLowerCase().trim() === "total contribution"));
-
-                    this.rawData.forEach((row, rowIndex) => {
-                        const nameIdx = this.headers.indexOf("Member Name");
-                        const emailIdx = this.headers.indexOf("Member Email");
-
-                        const memberName = row[nameIdx];
-                        const memberEmail = row[emailIdx];
-
-                        if (memberName && memberEmail) {
-                            memberSet.add(JSON.stringify({ member_name: memberName, member_email: memberEmail }));
-
-                            // Create contribution object
-                            const contribution = {
-                                member_name: memberName,
-                                member_email: memberEmail,
-                                total_contributions: 0,
-                                interest_per_member: (interestIdx !== -1 ? (parseFloat(row[interestIdx]) || 0) : 0),
-                                final_payout: (payoutIdx !== -1 ? (parseFloat(row[payoutIdx]) || 0) : 0)
-                            };
-
-                            // Add month columns
-                            const EDITABLE_MONTHS = [
-                                "Nov-2025", "Dec-2025", "Jan-2026", "Feb-2026", "Mar-2026", "Apr-2026",
-                                "May-2026", "Jun-2026", "Jul-2026", "Aug-2026", "Sep-2026", "Oct-2026",
-                                "Nov-2026", "Dec-2026", "Jan-2027"
-                            ];
-
-                            let computedTotal = 0;
-                            EDITABLE_MONTHS.forEach(month => {
-                                const monthIndex = this.headers.indexOf(month);
-                                if (monthIndex !== -1) {
-                                    const amount = parseFloat(row[monthIndex]) || 0;
-                                    contribution[month] = amount;
-                                    computedTotal += amount;
-                                }
-                            });
-
-                            // Prefer Total column if available, otherwise use computed sum
-                            if (totalIdx !== -1) {
-                                contribution.total_contributions = parseFloat(row[totalIdx]) || computedTotal;
-                            } else {
-                                contribution.total_contributions = computedTotal;
-                            }
-
-                            contributions.push(contribution);
-                        }
-                    });
-
-                    // Create user objects
-                    Array.from(memberSet).forEach(memberStr => {
-                        const member = JSON.parse(memberStr);
-                        users.push({
-                            member_name: member.member_name,
-                            member_email: member.member_email,
-                            role: 'member'
-                        });
-                    });
-
-                    // Send to server
-                    const response = await fetch(`${API_BASE}/sync`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            contributions: contributions,
-                            users: users
-                        })
-                    });
-
-                    const data = await response.json();
-
-                    if (!isAuto) {
-                        showNotification(`Sync successful: ${data.message}`, 'success');
-                    } else {
-                        console.log(`Auto-sync successful: ${data.message}`);
-                        localStorage.setItem('lastDbSync', new Date().getTime().toString());
-                    }
-
-                    return true;
-                } catch (err) {
-                    if (!isAuto) {
-                        showNotification('Sync failed: ' + err.message, 'error');
-                    } else {
-                        console.error('Auto-sync failed:', err);
-                    }
-                    return false;
-                } finally {
-                    this.syncInProgress = false;
-                }
-            }
-
-            async init() {
-                try {
-                    const res = await fetch(SHEET_URL);
-                    if (!res.ok) {
-                        throw new Error(`Sheet responded with status ${res.status}`);
-                    }
-                    const text = await res.text();
-                    // Cache latest successful sheet in localStorage for offline fallback
-                    try {
-                        localStorage.setItem('lastSheetCSV', text);
-                    } catch (e) {
-                        console.warn('Unable to cache sheet data in localStorage', e);
-                    }
-                    this.parseCSV(text);
-                    this.renderControls();
-                    this.hideEmptyColumns();
-                    this.renderTable();
-
-                    // Auto-sync to database after loading data
-                    // This ensures the database is updated whenever the dashboard loads
-                    setTimeout(() => {
-                        this.performDatabaseSync(true).then(success => {
-                            if (success) {
-                                console.log("Database synchronized successfully");
-                            }
-                        });
-                    }, 500); // Small delay to ensure UI renders first
-                } catch (err) {
-                    console.error('Failed to load live sheet data:', err);
-
-                    // Fallback: try to use last cached CSV from a previous successful load
-                    try {
-                        const cached = localStorage.getItem('lastSheetCSV');
-                        if (cached) {
-                            console.warn('Using cached sheet data from previous session');
-                            this.parseCSV(cached);
-                            this.renderControls();
-                            this.hideEmptyColumns();
-                            this.renderTable();
-                            this.container.insertAdjacentHTML(
-                                'beforeend',
-                                '<div class="loading" style="color:#f59e0b">Showing cached data. Live fetch failed: ' +
-                                err.message +
-                                '</div>'
-                            );
-                            return;
-                        }
-                    } catch (e) {
-                        console.warn('No cached sheet data available', e);
-                    }
-
-                    // If no cache available, show clear guidance
-                    this.container.innerHTML =
-                        `<div class="loading" style="color:red">
-                            Failed to load data: ${err.message}<br>
-                            <span style="font-size:0.9rem;color:#4b5563">
-                                Please check your internet connection and that the Google Sheet is published and accessible.
-                            </span>
-                        </div>`;
-                }
-            }
-
-            parseCSV(csv) {
-                // Handle both CRLF and LF
-                const lines = csv.trim().split(/\r?\n/);
-                const originalHeaders = lines[0].split(",").map(h => h.trim());
-                const originalData = lines.slice(1).map(line => line.split(",").map(cell => cell.trim()));
-
-                // Columns to remove (blacklisted keywords)
-                // Removed "total contribution" from blacklist to display the column
-                const blacklist = [
-                    "time weighted",
-                    "weighted interest @8%",
-                    "weighted contribution"
-                ];
-
-                // Identify indices to keep
-                const indicesToKeep = [];
-                originalHeaders.forEach((h, i) => {
-                    const headerLower = h.toLowerCase();
-                    // Check if header contains any blacklisted phrase
-                    const shouldRemove = blacklist.some(phrase => headerLower.includes(phrase));
-                    if (!shouldRemove) {
-                        indicesToKeep.push(i);
-                    }
-                });
-
-                // Filter Headers
-                this.headers = indicesToKeep.map(i => originalHeaders[i]);
-
-                // Filter Data
-                this.rawData = originalData
-                    .filter(row => {
-                        // Row filtering logic: Remove rows where the first cell contains restricted keywords
-                        const firstCell = (row[0] || "").toLowerCase();
-                        const rowBlacklist = ["total contribution", "total interest", "time weight (years)", "weighted"];
-                        return !rowBlacklist.some(term => firstCell.includes(term));
-                    })
-                    .map(row => {
-                        // Apply column filter to the row
-                        return indicesToKeep.map(i => row[i]);
-                    });
-
-                this.data = [...this.rawData];
-            }
-
-            renderControls() {
-                this.columnList.innerHTML = '';
-                this.headers.forEach((header, index) => {
-                    const div = document.createElement('div');
-                    div.className = 'column-toggle';
-
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.checked = !this.hiddenColumns.has(index);
-                    checkbox.onchange = (e) => this.toggleColumn(index, e.target.checked);
-
-                    const label = document.createElement('span');
-                    label.textContent = header || `Column ${index + 1}`;
-
-                    div.appendChild(checkbox);
-                    div.appendChild(label);
-                    this.columnList.appendChild(div);
-                });
-            }
-
-            toggleColumn(index, isVisible) {
-                if (isVisible) {
-                    this.hiddenColumns.delete(index);
-                } else {
-                    this.hiddenColumns.add(index);
-                }
-                this.renderTable();
-            }
-
-            toggleEmptyColumns() {
-                this.showingAll = !this.showingAll;
-                const btnText = document.getElementById('toggleText');
-
-                if (this.showingAll) {
-                    // Show All: Clear hidden columns list
-                    this.hiddenColumns.clear();
-                    btnText.textContent = "Hide Empty Columns";
-                } else {
-                    // Hide Empty: Re-apply empty column logic
-                    btnText.textContent = "Show All Columns";
-                    this.hideEmptyColumns();
-                }
-
-                // Update UI checkboxes
-                const checkboxes = this.columnList.querySelectorAll('input[type="checkbox"]');
-                checkboxes.forEach((cb, idx) => {
-                    cb.checked = !this.hiddenColumns.has(idx);
-                });
-
-                this.renderTable();
-            }
-
-            hideEmptyColumns() {
-                this.hiddenColumns.clear();
-
-                this.headers.forEach((_, colIndex) => {
-                    let hasData = false;
-                    for (let row of this.data) {
-                        const cellVal = row[colIndex];
-                        if (cellVal && cellVal.trim() !== "") {
-                            hasData = true;
-                            break;
-                        }
-                    }
-                    if (!hasData) {
-                        this.hiddenColumns.add(colIndex);
-                    }
-                });
-
-                // Update UI checkboxes will be handled by init or manual toggle usually, 
-                // but if called directly we should sync UI
-                if (this.columnList) {
-                    const checkboxes = this.columnList.querySelectorAll('input[type="checkbox"]');
-                    checkboxes.forEach((cb, idx) => {
-                        cb.checked = !this.hiddenColumns.has(idx);
-                    });
-                }
-
-                this.renderTable();
-            }
-
-            sort(colIndex) {
-                // Toggle direction if clicking same column
-                if (this.sortState.colIndex === colIndex) {
-                    this.sortState.direction = this.sortState.direction === 'asc' ? 'desc' : 'asc';
-                } else {
-                    this.sortState.colIndex = colIndex;
-                    this.sortState.direction = 'asc';
-                }
-
-                const dir = this.sortState.direction === 'asc' ? 1 : -1;
-
-                this.data.sort((a, b) => {
-                    let valA = a[colIndex] || "";
-                    let valB = b[colIndex] || "";
-
-                    // Try numeric sort
-                    const numA = parseFloat(valA);
-                    const numB = parseFloat(valB);
-
-                    if (!isNaN(numA) && !isNaN(numB)) {
-                        return (numA - numB) * dir;
-                    }
-
-                    // String sort
-                    return valA.localeCompare(valB) * dir;
-                });
-
-                this.renderTable();
-            }
-
-            updateCell(rowIndex, colIndex, value) {
-                // Update the current sorted view
-                this.data[rowIndex][colIndex] = value;
-                // Note: Updating the original unsorted rawData would require tracking original IDs 
-                // For this request scope, updating the view is sufficient as verification asked for sorting edits
-            }
-
-            renderTable() {
-                if (this.data.length === 0) {
-                    this.container.innerHTML = '<div class="loading">No data available</div>';
-                    return;
-                }
-
-                const table = document.createElement('table');
-
-                // Head
-                const thead = document.createElement('thead');
-                const trHead = document.createElement('tr');
-                this.headers.forEach((header, index) => {
-                    if (this.hiddenColumns.has(index)) return;
-
-                    const th = document.createElement('th');
-                    th.onclick = () => this.sort(index);
-
-                    let sortIcon = '';
-                    if (this.sortState.colIndex === index) {
-                        sortIcon = this.sortState.direction === 'asc' ? ' ▲' : ' ▼';
-                    } else {
-                        sortIcon = ' <span style="opacity:0.3">⇅</span>';
-                    }
-
-                    th.innerHTML = `${header} <span class="sort-icon">${sortIcon}</span>`;
-                    trHead.appendChild(th);
-                });
-                thead.appendChild(trHead);
-                table.appendChild(thead);
-
-                // Body
-                const tbody = document.createElement('tbody');
-                this.data.forEach((row, rIndex) => {
-                    const tr = document.createElement('tr');
-
-                    // We need to iterate headers to map columns correctly even if row length differs
-                    this.headers.forEach((_, cIndex) => {
-                        if (this.hiddenColumns.has(cIndex)) return;
-
-                        const td = document.createElement('td');
-                        td.textContent = row[cIndex] || "";
-
-                        // Editable ONLY if header matches allowed months
-                        const EDITABLE_MONTHS = [
-                            "Nov-2025", "Dec-2025", "Jan-2026", "Feb-2026", "Mar-2026", "Apr-2026",
-                            "May-2026", "Jun-2026", "Jul-2026", "Aug-2026", "Sep-2026", "Oct-2026",
-                            "Nov-2026", "Dec-2026", "Jan-2027"
-                        ];
-
-                        if (EDITABLE_MONTHS.includes(this.headers[cIndex])) {
-                            td.style.cursor = "pointer";
-                            td.style.color = "#2563eb";
-                            td.title = "Click to edit";
-
-                            td.onclick = () => {
-                                const memberName = row[this.headers.indexOf("Member Name")];
-                                const memberEmail = row[this.headers.indexOf("Member Email")];
-
-                                openEditModal(
-                                    memberName,
-                                    memberEmail,
-                                    this.headers[cIndex],
-                                    row[cIndex]
-                                );
-                            };
-                        }
-
-                        tr.appendChild(td);
-                    });
-                    tbody.appendChild(tr);
-                });
-                table.appendChild(tbody);
-
-                this.container.innerHTML = '';
-                this.container.appendChild(table);
-            }
-        }
-
-        const app = new App();
-
-        // Dropdown toggle helper
-        function toggleDropdown() {
-            document.getElementById('colDropdown').classList.toggle('active');
-        }
-
-        // Close dropdown when clicking outside
-        window.onclick = function (event) {
-            if (!event.target.closest('.dropdown')) {
-                const dropdowns = document.getElementsByClassName("dropdown");
-                for (let i = 0; i < dropdowns.length; i++) {
-                    dropdowns[i].classList.remove('active');
-                }
-            }
-        }
-
-        // DATABASE FUNCTIONS
-        function syncToDatabase(isAuto = false) {
-            app.performDatabaseSync(isAuto).then(() => {
-                if (!isAuto) {
-                    loadContributions(); // Show the updated data
-                }
-            });
-        }
-
-        function analyzeTableData() {
-            // Simple analysis of the current table
-            const stats = {
-                totalMembers: new Set(),
-                totalMonths: 0,
-                totalContributions: 0,
-                maxContribution: 0,
-                minContribution: Infinity
-            };
-
-            const EDITABLE_MONTHS = [
-                "Nov-2025", "Dec-2025", "Jan-2026", "Feb-2026", "Mar-2026", "Apr-2026",
-                "May-2026", "Jun-2026", "Jul-2026", "Aug-2026", "Sep-2026", "Oct-2026",
-                "Nov-2026", "Dec-2026", "Jan-2027"
-            ];
-
-            app.rawData.forEach(row => {
-                const memberEmail = row[app.headers.indexOf("Member Email")];
-                if (memberEmail) {
-                    stats.totalMembers.add(memberEmail);
-                }
-
-                EDITABLE_MONTHS.forEach(month => {
-                    const monthIndex = app.headers.indexOf(month);
-                    if (monthIndex !== -1) {
-                        const amount = parseFloat(row[monthIndex]) || 0;
-                        if (amount > 0) {
-                            stats.totalMonths++;
-                            stats.totalContributions += amount;
-                            stats.maxContribution = Math.max(stats.maxContribution, amount);
-                            stats.minContribution = Math.min(stats.minContribution, amount);
-                        }
-                    }
-                });
-            });
-
-            const analysis = `
-Analysis Results:
-• Total Members: ${stats.totalMembers.size}
-• Total Contribution Months: ${stats.totalMonths}
-• Total Contributions: $${stats.totalContributions.toLocaleString()}
-• Average per Member: $${(stats.totalContributions / stats.totalMembers.size).toLocaleString()}
-• Max Contribution: $${stats.maxContribution.toLocaleString()}
-• Min Contribution: $${stats.minContribution === Infinity ? 0 : stats.minContribution.toLocaleString()}
-            `;
-
-            showModal('Data Analysis', analysis.trim(), 'text');
-        }
-
-        function loadUsers() {
-            fetch(`${API_BASE}/users`)
-                .then(res => {
-                    const ct = res.headers.get('content-type') || '';
-                    if (!res.ok) return res.text().then(t => { throw new Error(`HTTP ${res.status}: ${t}`); });
-                    if (!ct.includes('application/json')) return res.text().then(t => { throw new Error(`Expected JSON but received HTML/text: ${t}`); });
-                    return res.json();
-                })
-                .then(data => {
-                    let html = `
-                        <h3 style="margin-top:20px">Database Users</h3>
-                        <table border="1" cellpadding="6" style="border-collapse:collapse;width:100%">
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Role</th>
-                                <th>Last Synced</th>
-                            </tr>
-                    `;
-
-                    data.forEach(r => {
-                        html += `
-                            <tr>
-                                <td>${r.id || ''}</td>
-                                <td>${r.member_name || ''}</td>
-                                <td>${r.member_email || ''}</td>
-                                <td>${r.role || ''}</td>
-                                <td>${r.synced_at || ''}</td>
-                            </tr>
-                        `;
-                    });
-
-                    html += "</table>";
-                    document.getElementById("dbOutput").innerHTML = html;
-                })
-                .catch(err => {
-                    const msg = 'Failed to load users: ' + (err.message || err);
-                    showNotification(msg, 'error');
-                    document.getElementById("dbOutput").innerHTML = `<pre style="color:red;white-space:pre-wrap">${msg}</pre>`;
-                });
-        }
-
-        function loadContributions() {
-            fetch(`${API_BASE}/contributions`)
-                .then(res => {
-                    const ct = res.headers.get('content-type') || '';
-                    if (!res.ok) return res.text().then(t => { throw new Error(`HTTP ${res.status}: ${t}`); });
-                    if (!ct.includes('application/json')) return res.text().then(t => { throw new Error(`Expected JSON but received HTML/text: ${t}`); });
-                    return res.json();
-                })
-                .then(data => {
-                    if (data.length === 0) {
-                        document.getElementById("dbOutput").innerHTML = '<p style="color:#666">No contributions data in database yet.</p>';
-                        return;
-                    }
-
-                    // Get month columns
-                    fetch(`${API_BASE}/months`)
-                        .then(res => res.json())
-                        .then(months => {
-                            let html = `
-                                <h3 style="margin-top:20px">Database Contributions (Wide Format)</h3>
-                                <div style="overflow-x:auto">
-                                    <table border="1" cellpadding="6" style="border-collapse:collapse;width:100%;min-width:800px">
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Name</th>
-                                            <th>Email</th>
-                            `;
-
-                            // Add month columns
-                            months.forEach(month => {
-                                html += `<th>${month}</th>`;
-                            });
-
-                            // Add summary columns
-                            html += `
-                                            <th>Total</th>
-                                            <th>Interest</th>
-                                            <th>Payout</th>
-                                            <th>Last Synced</th>
-                                        </tr>
-                            `;
-
-                            // Add data rows
-                            data.forEach(r => {
-                                html += `
-                                    <tr>
-                                        <td>${r.id || ''}</td>
-                                        <td>${r.member_name || ''}</td>
-                                        <td>${r.member_email || ''}</td>
-                                `;
-
-                                // Add month values
-                                months.forEach(month => {
-                                    const value = r[month] || 0;
-                                    html += `<td>${value}</td>`;
-                                });
-
-                                // Add summary values
-                                html += `
-                                        <td><strong>${r.total_contributions || 0}</strong></td>
-                                        <td>${r.interest_per_member || 0}</td>
-                                        <td><strong>${r.final_payout || 0}</strong></td>
-                                        <td>${r.synced_at || ''}</td>
-                                    </tr>
-                                `;
-                            });
-
-                            html += "</table></div>";
-                            document.getElementById("dbOutput").innerHTML = html;
-                        })
-                        .catch(err => {
-                            document.getElementById("dbOutput").innerHTML = `<p style="color:red">Error loading month columns: ${err.message}</p>`;
-                        });
-                })
-                .catch(err => {
-                    const msg = 'Failed to load contributions: ' + (err.message || err);
-                    showNotification(msg, 'error');
-                    document.getElementById("dbOutput").innerHTML = `<pre style="color:red;white-space:pre-wrap">${msg}</pre>`;
-                });
-        }
-
-        // Modal functions
-        function showModal(title, content, type = 'text') {
-            document.getElementById('modalTitle').textContent = title;
-            document.getElementById('modalContent').textContent = content;
-            document.getElementById('modalContent').style.fontFamily = type === 'sql' ? 'monospace' : 'inherit';
-            document.getElementById('modalContent').style.fontSize = type === 'sql' ? '13px' : '14px';
-            document.getElementById('dataModal').classList.add('active');
-        }
-
-        function closeModal() {
-            document.getElementById('dataModal').classList.remove('active');
-        }
-
-        function copyModalContent() {
-            const content = document.getElementById('modalContent').textContent;
-            navigator.clipboard.writeText(content).then(() => {
-                const btn = document.getElementById('copyBtn');
-                const original = btn.textContent;
-                btn.textContent = 'Copied!';
-                setTimeout(() => btn.textContent = original, 2000);
-            });
-        }
-
-        function downloadModalContent() {
-            const content = document.getElementById('modalContent').textContent;
-            const title = document.getElementById('modalTitle').textContent;
-            const blob = new Blob([content], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${title.toLowerCase().replace(/ /g, '_')}_${Date.now()}.txt`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-
-        // Notification function
-        function showNotification(message, type = 'info') {
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.textContent = message;
-
-            document.body.appendChild(notification);
-            setTimeout(() => {
-                notification.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => notification.remove(), 300);
-            }, 3000);
-        }
-
-        // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', function () {
-            console.log('Dashboard initialized');
+    
+    <!-- FOOTER -->
+    <footer class="landing-footer">
+        <div class="footer-content">
+            <a href="index.html" class="logo-section footer-logo">
+                <i class="fas fa-hand-holding-usd"></i>
+                <h1>Friends in Finance <span>Analytics</span></h1>
+            </a>
+            <div class="footer-links">
+                <a href="about.html"><i class="fas fa-info-circle"></i> About</a>
+                <a href="faq.html"><i class="fas fa-question-circle"></i> FAQ</a>
+                <a href="contact.html"><i class="fas fa-envelope"></i> Contact</a>
+            </div>
+            <p class="copyright">&copy; 2026 Friends in Finance Group. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+
+<script>
+    const API_BASE = 'http://localhost:3000';
+
+    // Store chart instances globally
+    let charts = {};
+    let chartData = {
+        monthlyContributions: {},
+        monthlyInterest: {},
+        memberContributions: [],
+        leadingContributors: []
+    };
+
+    // Show error message
+    function showError(message) {
+        const container = document.getElementById('errorContainer');
+        container.innerHTML = `<div class="error">${message}</div>`;
+        container.style.display = 'block';
+        setTimeout(() => {
+            container.style.display = 'none';
+        }, 5000);
+    }
+
+    // Show info message
+    function showInfo(message) {
+        const container = document.getElementById('infoContainer');
+        container.innerHTML = `<div class="info">${message}</div>`;
+        container.style.display = 'block';
+        setTimeout(() => {
+            container.style.display = 'none';
+        }, 3000);
+    }
+
+    // Update last update time
+    function updateLastUpdateTime() {
+        const now = new Date();
+        const formattedTime = now.toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
         });
-    </script>
+        const el = document.getElementById('lastUpdate');
+        if (el) {
+            el.textContent = `Last updated: ${formattedTime}`;
+        }
+    }
+
+    // Load data from database
+    async function loadDataFromDatabase() {
+        try {
+            // Get contributions data from database
+            const response = await fetch(`${API_BASE}/contributions`);
+            if (!response.ok) {
+                throw new Error(`Database error: ${response.status}`);
+            }
+
+            const dbData = await response.json();
+
+            if (!Array.isArray(dbData) || dbData.length === 0) {
+                showInfo('No data found in database. Sync data first from the main dashboard.');
+                return null;
+            }
+
+            return dbData;
+
+        } catch (error) {
+            console.error('Error loading database data:', error);
+            showError('Failed to load data from database: ' + error.message);
+            return null;
+        }
+    }
+
+    function showNotification(message) {
+        const notification = document.createElement('div');
+        notification.style.cssText = 'position:fixed;top:20px;right:20px;background:#10b981;color:#fff;padding:12px 16px;border-radius:10px;font-weight:600;box-shadow:0 10px 25px rgba(16,185,129,0.3);z-index:10001;';
+        notification.textContent = `✅ ${message}`;
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 3000);
+    }
+
+    function toggleDownloadDropdown() {
+        const dropdown = document.getElementById('downloadDropdown');
+        if (!dropdown) return;
+        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        
+        // Close members dropdown if open
+        const membersDropdown = document.getElementById('membersDropdownContent');
+        if (membersDropdown) {
+            membersDropdown.classList.remove('show');
+        }
+    }
+
+    function showProgress(message, submessage) {
+        const progress = document.getElementById('downloadProgress');
+        const progressText = document.getElementById('progressText');
+        const progressSubtext = document.getElementById('progressSubtext');
+        if (!progress) return;
+        progressText.textContent = message || 'Preparing your report...';
+        progressSubtext.textContent = submessage || 'This will take just a moment';
+        progress.classList.add('active');
+    }
+
+    function hideProgress() {
+        const progress = document.getElementById('downloadProgress');
+        if (progress) progress.classList.remove('active');
+    }
+
+    async function exportDashboard(format) {
+        const dd = document.getElementById('downloadDropdown');
+        if (dd) dd.classList.remove('show');
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+        const filename = `Contribution_Analytics_${timestamp}`;
+        switch (format) {
+            case 'pdf': await exportAsPDF(filename); break;
+            case 'png': await exportAsPNG(filename); break;
+            case 'csv': exportAsCSV(filename); break;
+            case 'print': printDashboard(); break;
+            case 'pptx': await exportAsPPTX(filename); break;
+        }
+    }
+
+    async function exportAsPDF(filename) {
+        try {
+            showProgress('Generating PDF...', 'Creating analytics report');
+            const chartsContent = document.getElementById('chartsContent');
+            chartsContent.classList.add('downloading');
+            const ts = document.createElement('div');
+            ts.className = 'export-timestamp';
+            ts.innerHTML = `Report generated: ${new Date().toLocaleString()} • Contribution Analytics`;
+            chartsContent.insertBefore(ts, chartsContent.firstChild);
+            const canvas = await html2canvas(chartsContent, { scale: 2, backgroundColor: '#ffffff', logging: false, allowTaint: true, useCORS: true });
+            ts.remove();
+            chartsContent.classList.remove('downloading');
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'pt', 'a4');
+            const imgData = canvas.toDataURL('image/png');
+            const imgWidth = 595.28;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+            window.open(pdf.output('bloburl'), '_blank');
+            hideProgress();
+            showNotification('PDF preview opened in new tab!');
+        } catch (e) {
+            console.error(e);
+            hideProgress();
+            showError('Error generating PDF. Please try again.');
+        }
+    }
+
+    async function exportAsPNG(filename) {
+        try {
+            showProgress('Generating PNG...', 'Creating analytics image');
+            const chartsContent = document.getElementById('chartsContent');
+            chartsContent.classList.add('downloading');
+            const ts = document.createElement('div');
+            ts.className = 'export-timestamp';
+            ts.innerHTML = `Report generated: ${new Date().toLocaleString()} • Contribution Analytics`;
+            chartsContent.insertBefore(ts, chartsContent.firstChild);
+            const canvas = await html2canvas(chartsContent, { scale: 2, backgroundColor: '#ffffff', logging: false });
+            ts.remove();
+            chartsContent.classList.remove('downloading');
+            const imgData = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = `${filename}.png`;
+            link.href = imgData;
+            link.click();
+            hideProgress();
+            showNotification('PNG report downloaded successfully!');
+        } catch (e) {
+            console.error(e);
+            hideProgress();
+            showError('Error generating PNG. Please try again.');
+        }
+    }
+
+    function exportAsCSV(filename) {
+        if (!chartData || !chartData.memberContributions) {
+            showError('CSV export not available on this page.');
+            return;
+        }
+        showProgress('Generating CSV...', 'Exporting analytics data');
+        let csvContent = 'Contribution Analytics Report\n';
+        csvContent += `Generated: ${new Date().toLocaleString()}\n\n`;
+        const totalMembers = chartData.memberContributions.length;
+        const totalContributions = chartData.memberContributions.reduce((s, m) => s + m.amount, 0);
+        const totalInterest = chartData.memberContributions.reduce((s, m) => s + m.interest, 0);
+        csvContent += 'SUMMARY STATISTICS\n';
+        csvContent += `Total Members,${totalMembers}\n`;
+        csvContent += `Total Contributions,${totalContributions}\n`;
+        csvContent += `Total Interest,${totalInterest}\n`;
+        csvContent += `Final Payout,${totalContributions + totalInterest}\n\n`;
+        csvContent += 'MONTHLY SUMMARY\n';
+        csvContent += 'Month,Contributions,Interest,Total with Interest\n';
+        const months = Object.keys(chartData.monthlyContributions).sort();
+        months.forEach(month => {
+            const amount = chartData.monthlyContributions[month] || 0;
+            const interest = chartData.monthlyInterest[month] || 0;
+            csvContent += `${month},${amount},${interest},${amount + interest}\n`;
+        });
+        csvContent += '\nMEMBER CONTRIBUTIONS\n';
+        csvContent += 'Name,Total Contributions,Interest,Payout\n';
+        chartData.memberContributions.forEach(m => {
+            csvContent += `${m.fullName},${m.amount},${m.interest},${m.payout}\n`;
+        });
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        window.open(url, '_blank');
+        hideProgress();
+        showNotification('CSV preview opened in new tab!');
+    }
+
+    async function exportAsPPTX(filename) {
+        try {
+            if (!window.PptxGenJS) { showError('PowerPoint export library not loaded.'); return; }
+            showProgress('Generating PowerPoint...', 'Creating presentation slides');
+            const chartImages = {
+                monthlyChart: charts.monthly?.toBase64Image(),
+                contributionPieChart: charts.contribution?.toBase64Image(),
+                monthlyPayoutChart: charts.monthlyPayout?.toBase64Image(),
+                interestPieChart: charts.interest?.toBase64Image(),
+                leadingContributorsChart: charts.leading?.toBase64Image()
+            };
+            const pptx = new PptxGenJS();
+            pptx.layout = 'LAYOUT_WIDE';
+            const titleSlide = pptx.addSlide();
+            titleSlide.addText('Friends in Finance Contribution Analytics', { x: 0.5, y: 1.5, w: 9, h: 1, fontSize: 44, bold: true, color: '2563eb', align: 'center' });
+            titleSlide.addText(`Generated: ${new Date().toLocaleString()}`, { x: 0.5, y: 3, w: 9, h: 0.5, fontSize: 20, color: '4b5563', align: 'center' });
+            if (chartImages.monthlyChart) { const s = pptx.addSlide(); s.addText('Monthly Contributions', { x: 0.5, y: 0.3, w: 9, h: 0.8, fontSize: 32, bold: true, color: '2563eb' }); s.addImage({ data: chartImages.monthlyChart, x: 0.5, y: 1.2, w: 9, h: 3.5 }); }
+            if (chartImages.contributionPieChart && chartImages.interestPieChart) { const s = pptx.addSlide(); s.addText('Contribution & Interest Distribution', { x: 0.5, y: 0.3, w: 9, h: 0.8, fontSize: 32, bold: true, color: '2563eb' }); s.addImage({ data: chartImages.contributionPieChart, x: 0.5, y: 1.2, w: 4.2, h: 3.5 }); s.addImage({ data: chartImages.interestPieChart, x: 5.3, y: 1.2, w: 4.2, h: 3.5 }); }
+            if (chartImages.monthlyPayoutChart) { const s = pptx.addSlide(); s.addText('Monthly Payout with Interest', { x: 0.5, y: 0.3, w: 9, h: 0.8, fontSize: 32, bold: true, color: '2563eb' }); s.addImage({ data: chartImages.monthlyPayoutChart, x: 0.5, y: 1.2, w: 9, h: 3.5 }); }
+            if (chartImages.leadingContributorsChart) { const s = pptx.addSlide(); s.addText('Leading Contributors', { x: 0.5, y: 0.3, w: 9, h: 0.8, fontSize: 32, bold: true, color: '2563eb' }); s.addImage({ data: chartImages.leadingContributorsChart, x: 0.5, y: 1.2, w: 9, h: 3.5 }); }
+            pptx.writeFile({ fileName: `${filename}.pptx` });
+            hideProgress();
+            showNotification('PowerPoint presentation downloaded successfully!');
+        } catch (e) {
+            console.error(e);
+            hideProgress();
+            showError('Failed to generate PowerPoint. Please try again.');
+        }
+    }
+
+    function printDashboard() {
+        showProgress('Preparing Print...', 'Setting up dashboard for printing');
+        const chartsContent = document.getElementById('chartsContent');
+        chartsContent.classList.add('downloading');
+        const ts = document.createElement('div');
+        ts.className = 'export-timestamp';
+        ts.style.display = 'block';
+        ts.innerHTML = `Report generated: ${new Date().toLocaleString()} • Contribution Analytics`;
+        chartsContent.insertBefore(ts, chartsContent.firstChild);
+        setTimeout(() => {
+            hideProgress();
+            window.print();
+            ts.remove();
+            chartsContent.classList.remove('downloading');
+        }, 500);
+    }
+
+    // Members dropdown functions
+    function toggleMembersDropdown() {
+        const dropdown = document.getElementById('membersDropdownContent');
+        if (!dropdown) return;
+        
+        if (dropdown.classList.contains('show')) {
+            dropdown.classList.remove('show');
+        } else {
+            dropdown.classList.add('show');
+            loadMembersList();
+        }
+        
+        // Close download dropdown if open
+        const downloadDropdown = document.getElementById('downloadDropdown');
+        if (downloadDropdown) {
+            downloadDropdown.style.display = 'none';
+        }
+    }
+
+    async function loadMembersList() {
+        const dropdownContent = document.getElementById('membersDropdownContent');
+        if (!dropdownContent) return;
+        
+        try {
+            const response = await fetch(`${API_BASE}/contributions`);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch members: ${response.status}`);
+            }
+            
+            const members = await response.json();
+            
+            if (!Array.isArray(members) || members.length === 0) {
+                dropdownContent.innerHTML = '<div class="dropdown-loading">No members found</div>';
+                return;
+            }
+            
+            // Sort members by name
+            members.sort((a, b) => (a.member_name || '').localeCompare(b.member_name || ''));
+            
+            // Generate HTML for members list
+            let membersHTML = '';
+            members.forEach(member => {
+                const initials = getInitials(member.member_name || 'Unknown');
+                const email = member.member_email || 'No email';
+                
+                membersHTML += `
+                    <div class="member-item" onclick="openMemberDashboard('${email}', '${member.member_name || 'Member'}')">
+                        <div class="member-avatar">${initials}</div>
+                        <div class="member-info">
+                            <div class="member-name">${member.member_name || 'Unknown Member'}</div>
+                            <div class="member-email">${email}</div>
+                        </div>
+                        <div class="member-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            dropdownContent.innerHTML = membersHTML;
+            
+        } catch (error) {
+            console.error('Error loading members:', error);
+            dropdownContent.innerHTML = '<div class="dropdown-loading">Error loading members</div>';
+        }
+    }
+
+    function getInitials(name) {
+        if (!name) return '?';
+        return name.split(' ')
+            .map(word => word.charAt(0).toUpperCase())
+            .slice(0, 2)
+            .join('');
+    }
+
+    function openMemberDashboard(email, name) {
+        // Open member dashboard directly without authentication
+        const url = `member-dashboard.html?email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}&direct_access=true`;
+        window.location.href = url; // open in same tab
+        
+        // Close dropdown
+        const dropdown = document.getElementById('membersDropdownContent');
+        if (dropdown) {
+            dropdown.classList.remove('show');
+        }
+    }
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(event) {
+        const downloadOptions = document.getElementById('downloadOptions');
+        const membersDropdown = document.getElementById('membersDropdown');
+        const downloadDropdown = document.getElementById('downloadDropdown');
+        const membersDropdownContent = document.getElementById('membersDropdownContent');
+        
+        // Close download dropdown
+        if (downloadOptions && !downloadOptions.contains(event.target) && downloadDropdown) {
+            downloadDropdown.style.display = 'none';
+        }
+        
+        // Close members dropdown
+        if (membersDropdown && !membersDropdown.contains(event.target) && membersDropdownContent) {
+            membersDropdownContent.classList.remove('show');
+        }
+    });
+
+    // Function to update hero stats with dynamic data
+    async function updateHeroStats() {
+        try {
+            const response = await fetch(`${API_BASE}/contributions`);
+            if (!response.ok) throw new Error('Failed to fetch data');
+            
+            const contributions = await response.json();
+            
+            // Calculate totals
+            const totalMembers = contributions.length;
+            const totalContributions = contributions.reduce((sum, member) => sum + (member.total_contributions || 0), 0);
+            const totalInterest = contributions.reduce((sum, member) => sum + (member.interest_per_member || 0), 0);
+            
+            // Get active months (count of months with contributions)
+            const monthColumns = [];
+            if (contributions.length > 0) {
+                const standardColumns = ['id', 'member_name', 'member_email', 'total_contributions', 
+                                        'interest_per_member', 'final_payout', 'synced_at'];
+                
+                Object.keys(contributions[0]).forEach(key => {
+                    if (!standardColumns.includes(key) && !key.startsWith('_')) {
+                        monthColumns.push(key);
+                    }
+                });
+            }
+            
+            // Calculate active months (months with actual contributions > 0)
+            let activeMonthsCount = 0;
+            if (contributions.length > 0) {
+                monthColumns.forEach(month => {
+                    const monthTotal = contributions.reduce((sum, member) => sum + (parseFloat(member[month]) || 0), 0);
+                    if (monthTotal > 0) {
+                        activeMonthsCount++;
+                    }
+                });
+            }
+            
+            document.getElementById('totalMembers').textContent = totalMembers;
+            document.getElementById('totalContributions').textContent = `Kshs. ${Math.round(totalContributions / 1000)} K`;
+            document.getElementById('totalInterest').textContent = `Kshs. ${Math.round(totalInterest / 1000)} K`;
+            document.getElementById('activeMonths').textContent = `${activeMonthsCount}/${monthColumns.length}`;
+            
+        } catch (error) {
+            console.error('Error updating hero stats:', error);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('.download-options')) {
+                const dd = document.getElementById('downloadDropdown');
+                if (dd) dd.classList.remove('show');
+            }
+        });
+    });
+
+    // Process database data for charts
+    function processDatabaseData(dbData) {
+        // Reset chart data
+        chartData = {
+            monthlyContributions: {},
+            monthlyInterest: {},
+            memberContributions: [],
+            leadingContributors: []
+        };
+
+        // Get month columns dynamically
+        const months = [];
+        if (dbData.length > 0) {
+            // Find all month columns (exclude standard columns)
+            const standardColumns = ['id', 'member_name', 'member_email',
+                'total_contributions', 'interest_per_member',
+                'final_payout', 'synced_at'];
+
+            Object.keys(dbData[0]).forEach(key => {
+                if (!standardColumns.includes(key) && !key.startsWith('_')) {
+                    months.push(key);
+                }
+            });
+
+            // Sort months chronologically
+            months.sort((a, b) => {
+                const monthMap = {
+                    'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6,
+                    'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec': 12
+                };
+                const [monthA, yearA] = a.split('-');
+                const [monthB, yearB] = b.split('-');
+                const yearDiff = parseInt(yearA) - parseInt(yearB);
+                if (yearDiff !== 0) return yearDiff;
+                return (monthMap[monthA] || 0) - (monthMap[monthB] || 0);
+            });
+        }
+
+        // Calculate monthly contributions
+        const monthlyContributions = {};
+        months.forEach(month => {
+            monthlyContributions[month] = 0;
+        });
+
+        // Process each member
+        dbData.forEach(member => {
+            const memberName = member.member_name || '';
+            const memberEmail = member.member_email || '';
+
+            if (memberName && memberEmail) {
+                let memberTotal = 0;
+                let monthlyMemberContributions = {};
+
+                // Calculate member's contributions per month
+                months.forEach(month => {
+                    const amount = parseFloat(member[month]) || 0;
+                    monthlyMemberContributions[month] = amount;
+                    monthlyContributions[month] += amount;
+                    memberTotal += amount;
+                });
+
+                // Calculate interest (8% of total contributions)
+                const interest = member.interest_per_member || Math.round(memberTotal * 0.08);
+                const finalPayout = member.final_payout || (memberTotal + interest);
+
+                // Color palette
+                const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40',
+                    '#FF6384', '#C9CBCF', '#4BC0C0', '#9966FF', '#FF9F40'];
+                const colorIndex = chartData.memberContributions.length % colors.length;
+
+                chartData.memberContributions.push({
+                    name: memberName.split(' ')[0] || memberName,
+                    fullName: memberName,
+                    email: memberEmail,
+                    amount: memberTotal,
+                    interest: interest,
+                    payout: finalPayout,
+                    color: colors[colorIndex],
+                    monthlyData: monthlyMemberContributions
+                });
+            }
+        });
+
+        // Update monthly contributions data
+        chartData.monthlyContributions = monthlyContributions;
+
+        // Calculate monthly interest (8% of cumulative contributions)
+        const monthlyInterest = {};
+        let cumulativeTotal = 0;
+        months.forEach(month => {
+            cumulativeTotal += monthlyContributions[month] || 0;
+            monthlyInterest[month] = Math.round(cumulativeTotal * 0.08);
+        });
+        chartData.monthlyInterest = monthlyInterest;
+
+        // Create leading contributors (top 6)
+        const sortedContributors = [...chartData.memberContributions]
+            .sort((a, b) => b.amount - a.amount)
+            .slice(0, 6);
+
+        chartData.leadingContributors = sortedContributors.map((contributor, index) => ({
+            name: contributor.name,
+            fullName: contributor.fullName,
+            amount: contributor.amount,
+            rank: index + 1,
+            initial: contributor.name.charAt(0).toUpperCase(),
+            color: contributor.color
+        }));
+
+        return months;
+    }
+
+    // Update statistics
+    function updateStatistics() {
+        const totalMembers = chartData.memberContributions.length;
+        const totalContributions = chartData.memberContributions.reduce((sum, m) => sum + m.amount, 0);
+        const totalInterest = chartData.memberContributions.reduce((sum, m) => sum + m.interest, 0);
+        const totalPayout = chartData.memberContributions.reduce((sum, m) => sum + m.payout, 0);
+
+        // Count active months (months with contributions)
+        const activeMonths = Object.values(chartData.monthlyContributions).filter(v => v > 0).length;
+
+        // Update DOM with animation
+        animateCounter('totalMembers', totalMembers, '');
+        animateCounter('totalContributions', totalContributions, 'Kshs. ');
+        animateCounter('totalInterest', totalInterest, 'Kshs. ');
+        animateCounter('totalPayout', totalPayout, 'Kshs. ');
+    }
+
+    // Animate counter
+    function animateCounter(elementId, targetValue, prefix = '') {
+        const element = document.getElementById(elementId);
+        if (!element) return;
+
+        const currentValue = parseFloat(element.textContent.replace(prefix, '').replace(/,/g, '')) || 0;
+        const duration = 1000;
+        const startTime = Date.now();
+
+        const animate = () => {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+
+            // Easing function
+            const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+            const current = Math.floor(currentValue + (targetValue - currentValue) * easeOutQuart);
+
+            element.textContent = prefix + current.toLocaleString();
+
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            }
+        };
+
+        animate();
+    }
+
+    // Initialize all charts
+    function initializeCharts(months) {
+        console.log('Initializing charts...');
+
+        try {
+            // Destroy existing charts
+            Object.values(charts).forEach(chart => {
+                if (chart && chart.destroy) {
+                    chart.destroy();
+                }
+            });
+            charts = {};
+
+            // Initialize Monthly Contributions Chart
+            if (document.getElementById('monthlyChart')) {
+                charts.monthly = createMonthlyChart(months);
+            }
+
+            // Initialize Contribution Share Pie Chart
+            if (document.getElementById('contributionPieChart')) {
+                charts.contribution = createContributionPieChart();
+            }
+
+            // Initialize Monthly Contributions and Payout Stacked Bar Chart
+            if (document.getElementById('monthlyPayoutChart')) {
+                charts.monthlyPayout = createMonthlyPayoutChart(months);
+            }
+
+            // Initialize Active Contributions full-width horizontal bar chart
+            if (document.getElementById('activeContributionsChart')) {
+                charts.active = createActiveContributionsChart();
+            }
+
+            // Initialize Interest Share Pie Chart
+            if (document.getElementById('interestPieChart')) {
+                charts.interest = createInterestPieChart();
+            }
+
+            // Initialize Leading Contributors Bar Chart
+            if (document.getElementById('leadingContributorsChart')) {
+                charts.leading = createLeadingContributorsChart();
+            }
+
+            // Load contributors
+            loadContributors();
+
+            console.log('Charts initialized successfully');
+            showInfo('Charts updated successfully');
+
+        } catch (error) {
+            console.error('Error initializing charts:', error);
+            showError('Error creating charts: ' + error.message);
+        }
+    }
+
+    // Create Monthly Contributions Bar Chart
+    function createMonthlyChart(months) {
+        const ctx = document.getElementById('monthlyChart').getContext('2d');
+
+        const sortedValues = months.map(month => chartData.monthlyContributions[month] || 0);
+
+        return new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: months,
+                datasets: [{
+                    label: 'Total Contribution (Kshs.)',
+                    data: sortedValues,
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                return 'Kshs. ' + context.parsed.y.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function (value) {
+                                return 'Kshs. ' + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Create Contribution Share Pie Chart
+    function createContributionPieChart() {
+        const ctx = document.getElementById('contributionPieChart').getContext('2d');
+
+        return new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: chartData.memberContributions.map(m => m.name),
+                datasets: [{
+                    data: chartData.memberContributions.map(m => m.amount),
+                    backgroundColor: chartData.memberContributions.map(m => m.color),
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                const value = context.raw;
+                                const total = chartData.memberContributions.reduce((sum, m) => sum + m.amount, 0);
+                                const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                return `${context.label}: Kshs. ${value.toLocaleString()} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Create Monthly Contributions and Payout Stacked Bar Chart
+    function createMonthlyPayoutChart(months) {
+        const ctx = document.getElementById('monthlyPayoutChart').getContext('2d');
+
+        // Calculate contribution and payout data
+        const contributionData = months.map(month => chartData.monthlyContributions[month] || 0);
+        const payoutData = months.map(month => {
+            const contribution = chartData.monthlyContributions[month] || 0;
+            const interest = chartData.monthlyInterest[month] || 0;
+            return contribution + interest;
+        });
+
+        return new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: months,
+                datasets: [
+                    {
+                        label: 'Monthly Contributions',
+                        data: contributionData,
+                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'With Interest (8%)',
+                        data: payoutData,
+                        backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                return context.dataset.label + ': Kshs. ' + context.parsed.y.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: false,
+                    },
+                    y: {
+                        beginAtZero: true,
+                        stacked: false,
+                        ticks: {
+                            callback: function (value) {
+                                return 'Kshs. ' + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Create Interest Share Pie Chart
+    function createInterestPieChart() {
+        const ctx = document.getElementById('interestPieChart').getContext('2d');
+
+        return new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: chartData.memberContributions.map(m => m.name),
+                datasets: [{
+                    data: chartData.memberContributions.map(m => m.interest),
+                    backgroundColor: chartData.memberContributions.map(m => {
+                        // Use the same colors but with transparency for interest chart
+                        const color = m.color;
+                        if (color.startsWith('#')) {
+                            const r = parseInt(color.slice(1, 3), 16);
+                            const g = parseInt(color.slice(3, 5), 16);
+                            const b = parseInt(color.slice(5, 7), 16);
+                            return `rgba(${r}, ${g}, ${b}, 0.7)`;
+                        }
+                        return color;
+                    }),
+                    borderColor: chartData.memberContributions.map(m => m.color),
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                const value = context.raw;
+                                const total = chartData.memberContributions.reduce((sum, m) => sum + m.interest, 0);
+                                const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                return `${context.label}: Kshs. ${value.toLocaleString()} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Create Active Contributions horizontal bar chart (full-width)
+    function createActiveContributionsChart() {
+        const ctx = document.getElementById('activeContributionsChart').getContext('2d');
+        const data = chartData.memberContributions || [];
+        const labels = data.map(d => d.name);
+        const values = data.map(d => d.amount);
+        const colors = data.map(d => d.color);
+
+        return new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Active Contribution (Kshs.)',
+                    data: values,
+                    backgroundColor: colors,
+                    borderColor: colors,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                const v = context.parsed.x !== undefined ? context.parsed.x : context.parsed;
+                                return 'Kshs. ' + Number(v).toLocaleString();
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function (value) {
+                                return 'Kshs. ' + value.toLocaleString();
+                            }
+                        }
+                    },
+                    y: {
+                        ticks: { autoSkip: false }
+                    }
+                }
+            }
+        });
+    }
+
+    // Create Leading Contributors Bar Chart
+    function createLeadingContributorsChart() {
+        const ctx = document.getElementById('leadingContributorsChart').getContext('2d');
+        const data = chartData.memberContributions || [];
+        const labels = data.map(d => d.name);
+        const values = data.map(d => d.amount);
+        const colors = data.map(d => d.color);
+
+        return new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Total Contributions',
+                    data: values,
+                    backgroundColor: colors,
+                    borderColor: colors,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                return 'Kshs. ' + Number(context.parsed.y).toLocaleString();
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function (value) {
+                                return 'Kshs. ' + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Load top contributors into the DOM
+    function loadContributors() {
+        const container = document.getElementById('contributorsList');
+        if (!container) return;
+
+        container.innerHTML = '';
+
+        chartData.leadingContributors.forEach(contributor => {
+            const card = document.createElement('div');
+            card.className = 'contributor-card';
+
+            let rankColor = '#F39C12'; // Default gold
+            if (contributor.rank === 1) rankColor = '#FFD700'; // Gold
+            else if (contributor.rank === 2) rankColor = '#C0C0C0'; // Silver
+            else if (contributor.rank === 3) rankColor = '#CD7F32'; // Bronze
+            else rankColor = '#3498DB'; // Blue for others
+
+            card.innerHTML = `
+                    <div class="contributor-avatar" style="background: linear-gradient(135deg, ${rankColor}, ${contributor.color});">
+                        ${contributor.initial}
+                    </div>
+                    <div class="contributor-name" title="${contributor.fullName}">${contributor.name}</div>
+                    <div class="contributor-amount">Kshs. ${contributor.amount.toLocaleString()}</div>
+                    <span class="contributor-rank" style="background-color: ${rankColor}">
+                        #${contributor.rank} Contributor
+                    </span>
+                `;
+
+            container.appendChild(card);
+        });
+    }
+
+    // Main function to load all charts
+    async function loadAllCharts() {
+        const refreshBtn = document.getElementById('refreshBtn');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const chartsContent = document.getElementById('chartsContent');
+
+        try {
+            // Show loading, hide content, disable button
+            if (refreshBtn) refreshBtn.disabled = true;
+            loadingIndicator.style.display = 'block';
+            chartsContent.style.display = 'none';
+
+            // Load data from database
+            const dbData = await loadDataFromDatabase();
+
+            if (!dbData) {
+                loadingIndicator.style.display = 'none';
+                if (refreshBtn) refreshBtn.disabled = false;
+                return;
+            }
+
+            // Process data for charts
+            const months = processDatabaseData(dbData);
+
+            // Update statistics
+            updateStatistics();
+
+            // Initialize charts
+            initializeCharts(months);
+
+            // Update hero stats
+            updateHeroStats();
+
+            // Member/insights/FAQ sections removed per request
+
+            // Hide loading, show content
+            loadingIndicator.style.display = 'none';
+            chartsContent.style.display = 'block';
+
+            // Update timestamp
+            updateLastUpdateTime();
+
+            showInfo('Charts loaded successfully from database');
+
+        } catch (error) {
+            console.error('Error loading charts:', error);
+            showError('Failed to load charts: ' + error.message);
+            loadingIndicator.style.display = 'none';
+        } finally {
+            if (refreshBtn) refreshBtn.disabled = false;
+        }
+    }
+
+    // Auto-refresh every 5 minutes
+    function startAutoRefresh() {
+        setInterval(() => {
+            console.log('Auto-refreshing charts...');
+            loadAllCharts();
+        }, 5 * 60 * 1000); // 5 minutes
+    }
+
+    // ========== RENDER MEMBER & Q/A SECTIONS ==========
+    function renderMemberTable() {
+        const tbody = document.getElementById('memberTableBody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+
+        const members = chartData.memberContributions || [];
+        // Default expected monthly target
+        const expected = 25000;
+
+        members.sort((a, b) => b.amount - a.amount).forEach(m => {
+            const interest = m.interest || Math.round((m.amount || 0) * 0.08);
+            const payout = m.payout || ((m.amount || 0) + interest);
+            const roiPct = m.amount ? ((interest / m.amount) * 100).toFixed(1) : '0.0';
+            const projected18 = Math.round((m.amount || 0) * 0.18);
+            const progress = Math.min(100, Math.round(((Object.values(m.monthlyData || {}).reduce((a, b) => a + b, 0)) / (expected * (Object.keys(m.monthlyData || {}).length || 1))) * 100));
+
+            // status
+            let statusClass = 'status-late';
+            let statusText = 'No Payment';
+            const monthPaid = Object.values(m.monthlyData || {}).reduce((a, b) => a + b, 0);
+            if (monthPaid >= expected) { statusClass = 'status-active'; statusText = 'Paid'; }
+            else if (monthPaid > 0) { statusClass = 'status-warning'; statusText = 'Partial'; }
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                    <td>${m.fullName || m.name}</td>
+                    <td>Kshs. ${Number(m.amount || 0).toLocaleString()}</td>
+                    <td>Kshs. ${expected.toLocaleString()}</td>
+                    <td>
+                        <div class="progress-bar"><div class="progress-fill" style="width: ${progress}%;"></div></div>
+                        <div style="font-size:12px; margin-top:6px;">${progress}%</div>
+                    </td>
+                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                    <td>Kshs. ${Number(interest).toLocaleString()}</td>
+                    <td>Kshs. ${Number(payout).toLocaleString()}</td>
+                    <td>${roiPct}%</td>
+                    <td>Kshs. ${Number(projected18).toLocaleString()}</td>
+                `;
+            tbody.appendChild(row);
+        });
+    }
+
+    function renderInsightsAndAlerts() {
+        const insights = document.getElementById('insightsList');
+        const alerts = document.getElementById('alertsList');
+        if (!insights || !alerts) return;
+
+        // Simple computed insights
+        const totalPool = chartData.memberContributions.reduce((s, m) => s + (m.amount || 0), 0);
+        const totalInvested = chartData.monthlyContributions ? Object.values(chartData.monthlyContributions).reduce((a, b) => a + b, 0) : 0;
+        const top = chartData.memberContributions[0];
+
+        insights.innerHTML = '';
+        const ins1 = document.createElement('div');
+        ins1.innerHTML = `<div style="background:#f8fafc;padding:12px;border-radius:8px;"><strong>💰 Total Pool:</strong> Kshs. ${Number(totalPool).toLocaleString()}</div>`;
+        const ins2 = document.createElement('div');
+        ins2.innerHTML = `<div style="background:#f8fafc;padding:12px;border-radius:8px;"><strong>📈 Invested vs Cash:</strong> Invested Kshs. ${Number(totalInvested).toLocaleString()}</div>`;
+        const ins3 = document.createElement('div');
+        ins3.innerHTML = `<div style="background:#f8fafc;padding:12px;border-radius:8px;"><strong>🏆 Top Contributor:</strong> ${top ? (top.fullName || top.name) + ' - Kshs. ' + Number(top.amount).toLocaleString() : 'N/A'}</div>`;
+        insights.appendChild(ins1); insights.appendChild(ins2); insights.appendChild(ins3);
+
+        // Alerts: members with zero or partial payments
+        alerts.innerHTML = '';
+        const zero = chartData.memberContributions.filter(m => (m.amount || 0) === 0);
+        const partial = chartData.memberContributions.filter(m => (m.amount || 0) > 0 && (m.amount || 0) < 25000);
+
+        if (zero.length) {
+            const zdiv = document.createElement('div');
+            zdiv.className = 'alert-card';
+            zdiv.innerHTML = `<strong>${zero.length} members</strong> have not started contributions. Follow up required.`;
+            alerts.appendChild(zdiv);
+        }
+        if (partial.length) {
+            const pdiv = document.createElement('div');
+            pdiv.className = 'alert-card';
+            pdiv.style.background = '#fff7ed';
+            pdiv.innerHTML = `<strong>${partial.length} members</strong> have partial payments this period. Consider reminders.`;
+            alerts.appendChild(pdiv);
+        }
+        if (!zero.length && !partial.length) {
+            const ok = document.createElement('div');
+            ok.className = 'alert-card';
+            ok.style.background = '#ecfdf5';
+            ok.innerHTML = `<strong>All clear</strong> — no outstanding alerts.`;
+            alerts.appendChild(ok);
+        }
+    }
+
+    function renderQASection() {
+        const grid = document.getElementById('qaGrid');
+        if (!grid) return;
+        grid.innerHTML = '';
+
+        const questions = [
+            { q: 'How much money do we have?', a: `KES ${chartData.memberContributions.reduce((s, m) => s + (m.amount || 0), 0).toLocaleString()}` },
+            { q: 'Where is it invested?', a: 'Mansa-X / I&M / Cash (see allocation chart)' },
+            { q: 'Who gets paid what?', a: 'See Member Contribution Status & Payouts table' }
+        ];
+
+        questions.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'qa-item';
+            card.innerHTML = `<div class="qa-question">${item.q}</div><div class="qa-answer">${item.a}</div>`;
+            grid.appendChild(card);
+        });
+    }
+
+    // ============================================
+    // DASHBOARD FAQ (derived from chartData)
+    // ============================================
+
+    function calculateDashboardFaqData() {
+        const members = chartData.memberContributions || [];
+        const totalPool = members.reduce((s, m) => s + (m.amount || 0), 0);
+        const totalInterest = members.reduce((s, m) => s + (m.interest || 0), 0);
+        const totalPayout = members.reduce((s, m) => s + (m.payout || 0), 0);
+
+        // Top contributors
+        const sorted = [...members].sort((a, b) => b.amount - a.amount);
+        const top3 = sorted.slice(0, 3);
+        const top5 = sorted.slice(0, 5);
+
+        const nonContributors = members.filter(m => (m.amount || 0) === 0);
+        const behindTarget = members.filter(m => (m.amount || 0) > 0 && (m.amount || 0) < 50000);
+
+        // Estimate investments/cash from monthlyContributions if available
+        const monthlyTotals = Object.values(chartData.monthlyContributions || {});
+        const runningTotal = monthlyTotals.reduce((s, v) => s + v, 0);
+        const investedEstimate = 0; // not available here
+        const cashEstimate = totalPool - investedEstimate;
+
+        const avgRoi = totalPool > 0 ? ((totalInterest / totalPool) * 100).toFixed(1) : '0.0';
+
+        return {
+            totalPool,
+            totalInterest,
+            totalPayout,
+            topContributors: { top3, top5 },
+            nonContributors,
+            behindTarget,
+            avgRoi,
+            cashEstimate,
+            investedEstimate,
+            memberCount: members.length
+        };
+    }
+
+    function renderDashboardFaqSection() {
+        const data = calculateDashboardFaqData();
+        const formatKES = a => `Kshs. ${Math.round(a).toLocaleString()}`;
+
+        const topHTML = (data.topContributors.top3 || []).map((m, i) => {
+            return `<div style="display:flex;align-items:center;gap:12px;"><div style="width:36px;height:36px;border-radius:8px;background:#2563eb;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;">${i + 1}</div><div><div style="font-weight:700">${m.fullName || m.name}</div><div style="font-size:13px;color:#6b7280">${formatKES(m.amount || 0)}</div></div></div>`;
+        }).join('');
+
+        const faqItems = [
+            { q: 'How much money do we have total?', a: formatKES(data.totalPool) },
+            { q: 'Total interest accrued (8%)', a: formatKES(data.totalInterest) },
+            { q: 'Projected final payouts', a: formatKES(data.totalPayout) },
+            { q: 'Top contributors', custom: topHTML },
+            { q: 'Members with no contributions', a: `${data.nonContributors.length} member(s)` },
+            { q: 'Members below KES 50,000', a: `${data.behindTarget.length} member(s)` },
+            { q: 'Average ROI', a: `${data.avgRoi}%` }
+        ];
+
+        return faqItems.map(item => `
+                <div class="faq-item" style="background:#f8fafc;border-radius:12px;padding:18px;border:1px solid #e6eef9;">
+                    <div style="font-weight:700;margin-bottom:8px;">${item.q}</div>
+                    ${item.custom ? item.custom : `<div style="font-size:18px;font-weight:800;color:#0f172a">${item.a}</div>`}
+                </div>
+            `).join('');
+    }
+
+    function showComingSoon() {
+        alert('✨ This feature is coming soon! Check back later.');
+    }
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log('Charts dashboard initialized');
+
+        // Load charts immediately
+        loadAllCharts();
+
+        // Start auto-refresh
+        startAutoRefresh();
+    });
+</script>
 </body>
 
 </html>

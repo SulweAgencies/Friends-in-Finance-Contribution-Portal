@@ -1,0 +1,14 @@
+{
+  "name": "friends-in-finance-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for Friends in Finance Contribution Portal",
+  "private": true,
+  "scripts": {
+    "build": "if not exist dist mkdir dist && copy *.html dist && if exist css xcopy css dist\\css /E /I /Y && if exist js xcopy js dist\\js /E /I /Y && if exist assets xcopy assets dist\\assets /E /I /Y",
+    "start": "npx serve .",
+    "dev": "npx serve ."
+  },
+  "devDependencies": {
+    "serve": "^14.2.0"
+  }
+}

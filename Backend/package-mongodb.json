@@ -1,0 +1,32 @@
+{
+  "name": "contribution-sync-server",
+  "version": "1.0.0",
+  "description": "ETL sync service for live contribution data to MongoDB",
+  "main": "server-mongodb.js",
+  "scripts": {
+    "start": "node server-mongodb.js",
+    "start-sqlite": "node server.js",
+    "migrate": "node migrate-to-mongodb.js",
+    "dev": "nodemon server-mongodb.js",
+    "dev-sqlite": "nodemon server.js"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "archiver": "^7.0.1",
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^4.22.1",
+    "express-session": "^1.19.0",
+    "extract-zip": "^2.0.1",
+    "mongodb": "^6.3.0",
+    "mongoose": "^8.0.3",
+    "multer": "^2.0.2",
+    "nodemailer": "^8.0.1",
+    "sqlite3": "^5.1.7"
+  }
+}
