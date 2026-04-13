@@ -147,7 +147,7 @@ app.use(express.static(path.join(__dirname, '..', 'Frontend')));
 
 // ===== ROOT ROUTE - REDIRECT TO CHART =====
 app.get('/', (req, res) => {
-    res.redirect('/chart.html');
+    res.redirect('/index.html');
 });
 
 // ===== HEALTH CHECK =====
@@ -2101,7 +2101,7 @@ app.post('/api/gateway/verify', async (req, res) => {
 
         if (accessCode === storedCode) {
             req.session.gatewayVerified = true;
-            res.json({ success: true, redirectTo: '/chart.html' });
+            res.json({ success: true, redirectTo: '/index.html' });
         } else {
             res.status(401).json({
                 success: false,
