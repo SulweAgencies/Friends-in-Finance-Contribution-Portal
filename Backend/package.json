@@ -2,9 +2,9 @@
   "name": "contribution-sync-server",
   "version": "1.0.0",
   "description": "ETL sync service for live contribution data to SQLite",
-  "main": "server-mongodb.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node server-mongodb.js"
+    "start": "node server.js"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
