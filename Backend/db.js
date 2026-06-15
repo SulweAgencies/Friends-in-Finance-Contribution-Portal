@@ -1364,6 +1364,9 @@ function getInvestmentSummary() {
       } else {
         // Add calculated percentages
         if (summary) {
+          const totalInvestedFinal = Number(summary.total_invested_final) || 0;
+          const cumulativeMansaXFinal = Number(summary.cumulative_mansa_x_final) || 0;
+          summary.iandm_balance_final = Math.max(totalInvestedFinal - cumulativeMansaXFinal, 0);
           summary.mansa_x_percentage = summary.total_invested_final > 0
             ? (summary.cumulative_mansa_x_final / summary.total_invested_final * 100).toFixed(1)
             : 0;

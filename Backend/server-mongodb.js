@@ -854,10 +854,10 @@ app.get('/investments/summary', async (req, res) => {
             .sort({ month: 1 });
 
         // Calculate summary with field names frontend expects
-        // Match SQLite behavior: cumulative/iandm/total_invested should be the latest (MAX), not SUM across months
+        // `cumulative_mansa_x` and `total_invested` are cumulative, so their max values are the latest totals.
         const cumulative_mansa_x_final = investments.length ? Math.max(...investments.map(i => i.cumulative_mansa_x || 0)) : 0;
-        const iandm_balance_final = investments.length ? Math.max(...investments.map(i => i.i_and_m || 0)) : 0;
         const total_invested_final = investments.length ? Math.max(...investments.map(i => i.total_invested || 0)) : 0;
+        const iandm_balance_final = Math.max(total_invested_final - cumulative_mansa_x_final, 0);
 
         const total_contributions_all = investments.reduce((sum, inv) => sum + (inv.total_contributions || 0), 0);
         const total_mansa_x_monthly = investments.reduce((sum, inv) => sum + (inv.mansa_x || 0), 0);
