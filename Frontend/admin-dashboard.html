@@ -24,6 +24,8 @@
 
     <!-- Chart.js for visualizations -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -948,6 +950,257 @@
             margin-top: 20px;
         }
 
+        /* Payout tab */
+        .payout-overview-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(320px, 0.9fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .payout-card {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            padding: 22px;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+        }
+
+        .payout-card h3 {
+            margin: 0 0 18px;
+            color: #1f2937;
+        }
+
+        .payout-chart-wrap {
+            height: 320px;
+            position: relative;
+        }
+
+        .actual-interest-fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .actual-interest-fields label {
+            display: block;
+            margin-bottom: 7px;
+            color: #4b5563;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .actual-interest-fields input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 11px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font: inherit;
+        }
+
+        .actual-interest-total {
+            margin-top: 18px;
+            padding: 16px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #eff6ff, #ecfdf5);
+        }
+
+        .actual-interest-total label {
+            display: block;
+            margin-bottom: 7px;
+            color: #4b5563;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .actual-interest-total input {
+            width: 100%;
+            box-sizing: border-box;
+            border: 0;
+            background: transparent;
+            color: #047857;
+            font-size: 27px;
+            font-weight: 700;
+        }
+
+        .payout-help-text {
+            margin: 12px 0 0;
+            color: #6b7280;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .payout-table-wrap {
+            overflow-x: auto;
+        }
+
+        .payout-table {
+            width: 100%;
+            min-width: 620px;
+            border-collapse: collapse;
+        }
+
+        .payout-table th,
+        .payout-table td {
+            padding: 13px 15px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+        }
+
+        .payout-table th {
+            background: #f8fafc;
+            color: #4b5563;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .payout-table td:not(:first-child),
+        .payout-table th:not(:first-child) {
+            text-align: right;
+        }
+
+        .payout-table .payout-total-cell {
+            color: #047857;
+            font-weight: 700;
+        }
+
+        .payout-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .payout-header-row h2 {
+            margin: 0;
+        }
+
+        .payout-export {
+            position: relative;
+            flex: 0 0 auto;
+        }
+
+        .payout-export-button {
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            border-radius: 8px;
+            padding: 10px 15px;
+            background: #2563eb;
+            color: white;
+            font: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .payout-export-button:hover {
+            background: #1d4ed8;
+        }
+
+        .payout-export-menu {
+            display: none;
+            position: absolute;
+            z-index: 20;
+            top: calc(100% + 8px);
+            right: 0;
+            min-width: 220px;
+            padding: 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
+        }
+
+        .payout-export-menu.open {
+            display: block;
+        }
+
+        .payout-export-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 11px 12px;
+            border: 0;
+            border-radius: 8px;
+            background: transparent;
+            color: #1f2937;
+            font: inherit;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .payout-export-option:hover {
+            background: #f1f5f9;
+        }
+
+        .payout-export-option .fa-file-pdf {
+            color: #dc2626;
+        }
+
+        .payout-export-option .fa-file-image {
+            color: #2563eb;
+        }
+
+        .payout-export-option .fa-print {
+            color: #7c3aed;
+        }
+
+        .payout-export-timestamp {
+            margin-bottom: 16px;
+            color: #64748b;
+            font-size: 12px;
+            text-align: right;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden !important;
+            }
+
+            #payoutReportContent,
+            #payoutReportContent * {
+                visibility: visible !important;
+            }
+
+            #payoutReportContent {
+                position: absolute;
+                inset: 0;
+                width: 100%;
+                padding: 0;
+            }
+
+            #payoutReportContent .payout-card {
+                box-shadow: none;
+                break-inside: avoid;
+            }
+        }
+
+        @media (max-width: 800px) {
+            .payout-overview-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .payout-header-row {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .actual-interest-fields {
+                grid-template-columns: 1fr;
+            }
+
+            .payout-chart-wrap {
+                height: 270px;
+            }
+        }
+
         /* Contact Submissions Styles */
         .contact-submission-card {
             background: white;
@@ -1307,18 +1560,14 @@
             <button class="nav-btn active" data-tab="overview">
                 <i class="fas fa-tachometer-alt"></i> Overview
             </button>
-            <button class="nav-btn" data-tab="contacts">
-                <i class="fas fa-envelope"></i> Contact Submissions
-                <span class="notification-badge" id="contactBadge" style="display: none;">0</span>
+            <button class="nav-btn" data-tab="payout">
+                <i class="fas fa-money-check-alt"></i> Payout
             </button>
             <button class="nav-btn" data-tab="members">
                 <i class="fas fa-users"></i> Members
             </button>
             <button class="nav-btn" data-tab="contributions">
                 <i class="fas fa-table"></i> Contributions
-            </button>
-            <button class="nav-btn" data-tab="dbexplorer">
-                <i class="fas fa-database"></i> DB Explorer
             </button>
             <button class="nav-btn" data-tab="security">
                 <i class="fas fa-shield-alt"></i> Security
@@ -1367,9 +1616,83 @@
                 </div>
             </div>
 
-            <!-- Contact Submissions Tab -->
-            <div id="contacts-tab" class="tab-content">
-                <h2><i class="fas fa-envelope"></i> Member Inquiries & Contact Submissions</h2>
+            <!-- Payout Tab (replaces Contact Submissions) -->
+            <div id="payout-tab" class="tab-content">
+                <div class="payout-header-row">
+                    <h2><i class="fas fa-money-check-alt"></i> Actual Interest & Member Payouts</h2>
+                    <div class="payout-export" id="payoutExportOptions">
+                        <button class="payout-export-button" type="button" aria-expanded="false" aria-controls="payoutExportMenu" onclick="togglePayoutExportMenu()">
+                            <i class="fas fa-download"></i> Export Report <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="payout-export-menu" id="payoutExportMenu">
+                            <button class="payout-export-option" type="button" onclick="exportPayoutReport('pdf')">
+                                <i class="fas fa-file-pdf"></i> Download as PDF
+                            </button>
+                            <button class="payout-export-option" type="button" onclick="exportPayoutReport('png')">
+                                <i class="fas fa-file-image"></i> Download as PNG
+                            </button>
+                            <button class="payout-export-option" type="button" onclick="exportPayoutReport('print')">
+                                <i class="fas fa-print"></i> Print Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="payoutReportContent">
+                <div class="payout-overview-grid">
+                    <section class="payout-card">
+                        <h3><i class="fas fa-chart-pie"></i> Interest Sharing</h3>
+                        <div class="payout-chart-wrap">
+                            <canvas id="payoutInterestChart" aria-label="Actual interest allocated to active members"></canvas>
+                        </div>
+                    </section>
+
+                    <section class="payout-card">
+                        <h3><i class="fas fa-calculator"></i> Actual Interest Summary</h3>
+                        <div class="actual-interest-fields">
+                            <div>
+                                <label for="mansaXInterestInput">Mansa X Interest (Kshs.)</label>
+                                <input type="number" id="mansaXInterestInput" min="0" step="0.01" value="0" inputmode="decimal">
+                            </div>
+                            <div>
+                                <label for="imInterestInput">I&amp;M Interest (Kshs.)</label>
+                                <input type="number" id="imInterestInput" min="0" step="0.01" value="0" inputmode="decimal">
+                            </div>
+                        </div>
+                        <div class="actual-interest-total">
+                            <label for="totalActualInterest">Total Actual Interest (Kshs.)</label>
+                            <input type="text" id="totalActualInterest" value="0.00" readonly>
+                        </div>
+                        <p class="payout-help-text">Member shares match the Interest Distribution in analytics. Total actual interest is allocated using each member’s recorded interest share; values are saved in this browser.</p>
+                    </section>
+                </div>
+
+                <section class="payout-card">
+                    <div class="section-header">
+                        <h3><i class="fas fa-users"></i> Active Member Payouts</h3>
+                        <button class="btn btn-small btn-primary" type="button" onclick="renderPayoutTab()">
+                            <i class="fas fa-sync"></i> Recalculate
+                        </button>
+                    </div>
+                    <div class="payout-table-wrap">
+                        <table class="payout-table">
+                            <thead>
+                                <tr>
+                                    <th>Member Name</th>
+                                    <th>Member Contribution</th>
+                                    <th>Member Actual Interest</th>
+                                    <th>Total Payout</th>
+                                </tr>
+                            </thead>
+                            <tbody id="payoutMembersTable">
+                                <tr><td colspan="4" style="text-align:center;padding:24px;color:#6b7280;">Payout data will appear here after loading.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+                </div>
+
+                <div hidden aria-hidden="true">
 
                 <!-- Stats Cards -->
                 <div class="dashboard-stats" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 20px;">
@@ -1462,6 +1785,7 @@
                             <p style="margin-top: 15px;">Loading submissions...</p>
                         </div>
                     </div>
+                </div>
                 </div>
             </div>
 
@@ -1781,55 +2105,6 @@
                 </div>
             </div>
 
-            <!-- DB Explorer Tab -->
-            <div id="dbexplorer-tab" class="tab-content">
-                <h2><i class="fas fa-database"></i> Database Explorer</h2>
-
-                <div class="admin-section">
-                    <div class="section-header">
-                        <h3>Database Tables</h3>
-                        <button class="btn btn-small btn-primary" id="refreshTables">
-                            <i class="fas fa-sync"></i> Refresh Tables
-                        </button>
-                        <button class="btn btn-small btn-success" id="downloadSelectedTable">
-                            <i class="fas fa-download"></i> Download Table
-                        </button>
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: 250px 1fr; gap: 20px;">
-                        <!-- Table List -->
-                        <div
-                            style="background: #f8fafc; border-radius: 8px; padding: 15px; border: 1px solid var(--border-color);">
-                            <h4 style="margin-bottom: 15px; color: var(--secondary-color);">Tables</h4>
-                            <div id="tableList" style="max-height: 400px; overflow: auto;">
-                                <div style="padding: 10px; color: #6b7280; text-align: center;">
-                                    <i class="fas fa-spinner fa-spin"></i> Loading tables...
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Table Content -->
-                        <div
-                            style="background: white; border-radius: 8px; padding: 20px; border: 2px solid #2563eb; box-shadow: 0 4px 6px rgba(37, 99, 235, 0.1); overflow: hidden;">
-                            <h4 id="selectedTableName"
-                                style="margin-bottom: 15px; color: #2563eb; text-align: center; font-weight: 600; padding: 10px; background: #f0f7ff; border-radius: 6px; border: 1px dashed #2563eb;">
-                                Select a table to view data</h4>
-                            <div id="tableContent"
-                                style="max-height: 400px; overflow: auto; background: white; border-radius: 6px; border: 1px solid #e5e7eb; padding: 0;">
-                                <div style="padding: 30px; color: #6b7280; text-align: center;">
-                                    <i class="fas fa-database"
-                                        style="font-size: 48px; margin-bottom: 15px; opacity: 0.3;"></i>
-                                    <p style="font-size: 16px; margin-bottom: 10px;">Select a table from the left panel
-                                        to view its contents</p>
-                                    <small style="color: #9ca3af; font-size: 14px;">The selected table data will appear
-                                        here</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Security Tab -->
             <div id="security-tab" class="tab-content">
                 <h2><i class="fas fa-shield-alt"></i> Security & Audit</h2>
@@ -2066,6 +2341,7 @@
 
         // Chart instances
         let monthlyChart, contributorsChart;
+        let payoutInterestChart;
 
         // Helper: parse month labels like "Nov 2025" or "Nov-2025" into Date objects
         function parseMonthLabelToDate(label) {
@@ -2085,10 +2361,6 @@
             return null;
         }
 
-        // DB Explorer state
-        let currentTableData = null;
-        let currentTableName = '';
-
         // Initialize dashboard
         document.addEventListener('DOMContentLoaded', function () {
             // Skip authentication check - allow direct access to admin dashboard
@@ -2106,6 +2378,7 @@
 
             // Navigation
             setupNavigation();
+            initializePayoutControls();
 
             // Logout button
             document.getElementById('adminLogout').addEventListener('click', async function () {
@@ -2171,8 +2444,8 @@
                         monthlyChart.resize();
                         contributorsChart.resize();
                     }
-                    if (tabId === 'dbexplorer') {
-                        loadDatabaseTables();
+                    if (tabId === 'payout') {
+                        renderPayoutTab();
                     }
                     if (tabId === 'security') {
                         loadSecurityLogs();
@@ -2189,6 +2462,8 @@
                     fetchUsers(),
                     fetchContributions()
                 ]);
+
+                renderPayoutTab();
 
                 // Update UI
                 updateStats();
@@ -2259,6 +2534,278 @@
             } catch (error) {
                 console.error('fetchContributions error', error);
                 throw error;
+            }
+        }
+
+        function initializePayoutControls() {
+            const mansaInput = document.getElementById('mansaXInterestInput');
+            const imInput = document.getElementById('imInterestInput');
+            if (!mansaInput || !imInput) return;
+
+            try {
+                mansaInput.value = localStorage.getItem('payoutMansaXInterest') || '0';
+                imInput.value = localStorage.getItem('payoutIMInterest') || '0';
+                const savedTotal = localStorage.getItem('payoutTotalActualInterest');
+                if (savedTotal !== null) {
+                    document.getElementById('totalActualInterest').value = Number(savedTotal).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                }
+            } catch (error) {
+                console.warn('Could not restore saved payout interest inputs:', error);
+            }
+
+            [mansaInput, imInput].forEach(input => {
+                input.addEventListener('input', () => {
+                    const mansaInterest = Math.max(0, Number(mansaInput.value) || 0);
+                    const imInterest = Math.max(0, Number(imInput.value) || 0);
+                    try {
+                        localStorage.setItem('payoutMansaXInterest', String(mansaInterest));
+                        localStorage.setItem('payoutIMInterest', String(imInterest));
+                    } catch (error) {
+                        console.warn('Could not save payout interest inputs:', error);
+                    }
+                    renderPayoutTab();
+                });
+            });
+
+            const exportOptions = document.getElementById('payoutExportOptions');
+            document.addEventListener('click', event => {
+                if (exportOptions && !exportOptions.contains(event.target)) {
+                    document.getElementById('payoutExportMenu')?.classList.remove('open');
+                    exportOptions.querySelector('.payout-export-button')?.setAttribute('aria-expanded', 'false');
+                }
+            });
+        }
+
+        function getPayoutContributionTotal(contribution) {
+            const storedTotal = Number(contribution.total_contributions);
+            if (Number.isFinite(storedTotal) && storedTotal > 0) return storedTotal;
+
+            const monthly = contribution.monthly_contributions;
+            if (monthly && typeof monthly === 'object') {
+                return Object.values(monthly).reduce((sum, amount) => sum + (Number(amount) || 0), 0);
+            }
+
+            const ignoredKeys = new Set([
+                'id', '_id', 'member_name', 'member_email', 'total_contributions',
+                'interest_per_member', 'final_payout', 'synced_at', 'created_at',
+                'updated_at', 'createdAt', 'updatedAt'
+            ]);
+            return Object.entries(contribution).reduce((sum, [key, value]) => {
+                return ignoredKeys.has(key) || key.startsWith('_') ? sum : sum + (Number(value) || 0);
+            }, 0);
+        }
+
+        function formatPayoutAmount(amount) {
+            return `Kshs. ${Number(amount || 0).toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            })}`;
+        }
+
+        function togglePayoutExportMenu() {
+            const menu = document.getElementById('payoutExportMenu');
+            const button = document.querySelector('#payoutExportOptions .payout-export-button');
+            if (!menu || !button) return;
+
+            const isOpen = menu.classList.toggle('open');
+            button.setAttribute('aria-expanded', String(isOpen));
+        }
+
+        async function exportPayoutReport(format) {
+            const menu = document.getElementById('payoutExportMenu');
+            const button = document.querySelector('#payoutExportOptions .payout-export-button');
+            menu?.classList.remove('open');
+            button?.setAttribute('aria-expanded', 'false');
+
+            if (format === 'print') {
+                window.print();
+                return;
+            }
+
+            const report = document.getElementById('payoutReportContent');
+            if (!report) return;
+
+            const timestamp = document.createElement('div');
+            timestamp.className = 'payout-export-timestamp';
+            timestamp.textContent = `Friends in Finance — Actual Interest & Member Payouts | Generated ${new Date().toLocaleString()}`;
+            report.prepend(timestamp);
+
+            try {
+                if (typeof html2canvas !== 'function') throw new Error('The report image library is unavailable.');
+                const canvas = await html2canvas(report, {
+                    scale: 2,
+                    backgroundColor: '#ffffff',
+                    logging: false,
+                    useCORS: true
+                });
+                const image = canvas.toDataURL('image/png');
+                const filenameDate = new Date().toISOString().slice(0, 10);
+
+                if (format === 'png') {
+                    const link = document.createElement('a');
+                    link.download = `Payout_Report_${filenameDate}.png`;
+                    link.href = image;
+                    link.click();
+                    showNotification('Payout report downloaded as PNG', 'success');
+                    return;
+                }
+
+                if (format === 'pdf') {
+                    const jsPDF = window.jspdf?.jsPDF;
+                    if (!jsPDF) throw new Error('The PDF export library is unavailable.');
+                    const pdf = new jsPDF('p', 'pt', 'a4');
+                    const pageWidth = pdf.internal.pageSize.getWidth();
+                    const pageHeight = pdf.internal.pageSize.getHeight();
+                    const imageHeight = canvas.height * pageWidth / canvas.width;
+                    for (let offset = 0; offset < imageHeight; offset += pageHeight) {
+                        if (offset > 0) pdf.addPage();
+                        pdf.addImage(image, 'PNG', 0, -offset, pageWidth, imageHeight);
+                    }
+                    pdf.save(`Payout_Report_${filenameDate}.pdf`);
+                    showNotification('Payout report downloaded as PDF', 'success');
+                }
+            } catch (error) {
+                console.error('Payout report export failed:', error);
+                showNotification(error.message || 'Unable to export the payout report', 'error');
+            } finally {
+                timestamp.remove();
+            }
+        }
+
+        function renderPayoutTab() {
+            const mansaInterest = Math.max(0, Number(document.getElementById('mansaXInterestInput')?.value) || 0);
+            const imInterest = Math.max(0, Number(document.getElementById('imInterestInput')?.value) || 0);
+            const totalActualInterest = Math.round((mansaInterest + imInterest) * 100) / 100;
+            const totalInterestOutput = document.getElementById('totalActualInterest');
+            if (totalInterestOutput) {
+                totalInterestOutput.value = totalActualInterest.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+            }
+            try {
+                localStorage.setItem('payoutTotalActualInterest', String(totalActualInterest));
+            } catch (error) {
+                console.warn('Could not save total actual interest:', error);
+            }
+
+            const membersByEmail = new Map((adminData.members || []).map(member => [
+                String(member.member_email || '').toLowerCase(), member
+            ]));
+            const activeContributors = (adminData.contributions || [])
+                .map(contribution => ({
+                    ...contribution,
+                    payoutContribution: getPayoutContributionTotal(contribution),
+                    payoutInterestShare: Math.max(
+                        0,
+                        Number(contribution.interest_per_member) ||
+                        Math.round(getPayoutContributionTotal(contribution) * 0.08)
+                    )
+                }))
+                .filter(contribution => {
+                    const user = membersByEmail.get(String(contribution.member_email || '').toLowerCase());
+                    const status = String(user?.status || '').toLowerCase();
+                    const explicitlyInactive = user && (
+                        user.is_active === false || user.active === false ||
+                        ['inactive', 'disabled', 'deleted', 'terminated'].includes(status)
+                    );
+                    return !explicitlyInactive && contribution.payoutContribution > 0;
+                })
+                .sort((a, b) => String(a.member_name || '').localeCompare(String(b.member_name || '')));
+
+            const contributionTotal = activeContributors.reduce((sum, member) => sum + member.payoutContribution, 0);
+            const totalInterestShare = activeContributors.reduce((sum, member) => sum + member.payoutInterestShare, 0);
+            let allocatedInterest = 0;
+            const payoutRows = activeContributors.map((member, index) => {
+                const sharePercentage = totalInterestShare > 0
+                    ? (member.payoutInterestShare / totalInterestShare) * 100
+                    : (contributionTotal > 0 ? (member.payoutContribution / contributionTotal) * 100 : 0);
+                const actualInterest = index === activeContributors.length - 1
+                    ? Math.round((totalActualInterest - allocatedInterest) * 100) / 100
+                    : Math.round((totalActualInterest * sharePercentage / 100) * 100) / 100;
+                allocatedInterest += actualInterest;
+                return {
+                    name: member.member_name || 'Unnamed member',
+                    contribution: member.payoutContribution,
+                    interest: actualInterest,
+                    sharePercentage,
+                    payout: member.payoutContribution + actualInterest
+                };
+            });
+
+            const tableBody = document.getElementById('payoutMembersTable');
+            if (tableBody) {
+                tableBody.replaceChildren();
+                if (payoutRows.length === 0) {
+                    const row = tableBody.insertRow();
+                    const cell = row.insertCell();
+                    cell.colSpan = 4;
+                    cell.textContent = 'No active contributors with recorded contributions were found.';
+                    cell.style.cssText = 'text-align:center;padding:24px;color:#6b7280;';
+                } else {
+                    payoutRows.forEach(member => {
+                        const row = tableBody.insertRow();
+                        [member.name, formatPayoutAmount(member.contribution), formatPayoutAmount(member.interest), formatPayoutAmount(member.payout)]
+                            .forEach((value, index) => {
+                                const cell = row.insertCell();
+                                cell.textContent = value;
+                                if (index === 3) cell.className = 'payout-total-cell';
+                            });
+                    });
+                }
+            }
+
+            const chartCanvas = document.getElementById('payoutInterestChart');
+            const payoutTab = document.getElementById('payout-tab');
+            if (!chartCanvas || !payoutTab?.classList.contains('active')) return;
+
+            const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40',
+                '#FF6384', '#C9CBCF', '#4BC0C0', '#9966FF', '#FF9F40'];
+            const chartData = {
+                labels: payoutRows.map(member => member.name),
+                datasets: [{
+                    data: payoutRows.map(member => member.sharePercentage),
+                    actualInterestAmounts: payoutRows.map(member => member.interest),
+                    backgroundColor: payoutRows.map((_, index) => colors[index % colors.length]),
+                    borderColor: '#ffffff',
+                    borderWidth: 2
+                }]
+            };
+
+            if (payoutInterestChart) {
+                payoutInterestChart.data = chartData;
+                payoutInterestChart.update();
+                payoutInterestChart.resize();
+            } else {
+                payoutInterestChart = new Chart(chartCanvas.getContext('2d'), {
+                    type: 'doughnut',
+                    data: chartData,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    padding: 20,
+                                    usePointStyle: true,
+                                    pointStyle: 'circle'
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: context => {
+                                        const actualInterest = context.dataset.actualInterestAmounts[context.dataIndex] || 0;
+                                        return `${context.label}: ${formatPayoutAmount(actualInterest)} (${Number(context.raw).toFixed(1)}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
             }
         }
 
@@ -3398,10 +3945,6 @@
                 e.preventDefault();
                 await addNewMember();
             });
-
-            // DB Explorer
-            document.getElementById('refreshTables')?.addEventListener('click', loadDatabaseTables);
-            document.getElementById('downloadSelectedTable')?.addEventListener('click', downloadCurrentTable);
 
             // Investment Tracking
             document.getElementById('refreshInvestmentTable')?.addEventListener('click', loadInvestmentTrackingTable);
@@ -4918,18 +5461,6 @@
             window.URL.revokeObjectURL(url);
         }
 
-        // Initialize contact submissions when tab is clicked
-        document.addEventListener('DOMContentLoaded', function () {
-            // Add contact tab click handler
-            const contactTab = document.querySelector('[data-tab="contacts"]');
-            if (contactTab) {
-                contactTab.addEventListener('click', function () {
-                    setTimeout(() => {
-                        loadContactSubmissions();
-                    }, 500);
-                });
-            }
-        });
     </script>
 
 
