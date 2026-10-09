@@ -951,6 +951,43 @@
         }
 
         /* Payout tab */
+        #payout-tab {
+            position: relative;
+            isolation: isolate;
+            overflow: hidden;
+            padding: clamp(18px, 3vw, 34px);
+            border-radius: 20px;
+            background:
+                radial-gradient(ellipse at 8% 5%, rgba(37, 99, 235, 0.16), transparent 34%),
+                radial-gradient(ellipse at 94% 24%, rgba(16, 185, 129, 0.14), transparent 32%),
+                linear-gradient(145deg, #f8fafc 0%, #eef4ff 48%, #ecfdf5 100%);
+        }
+
+        #payout-tab::before,
+        #payout-tab::after {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            width: 280px;
+            height: 280px;
+            border: 1px solid rgba(37, 99, 235, 0.09);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        #payout-tab::before {
+            top: 170px;
+            left: -185px;
+            box-shadow: 0 0 0 28px rgba(37, 99, 235, 0.025), 0 0 0 58px rgba(37, 99, 235, 0.02);
+        }
+
+        #payout-tab::after {
+            right: -190px;
+            bottom: 35px;
+            border-color: rgba(16, 185, 129, 0.1);
+            box-shadow: 0 0 0 30px rgba(16, 185, 129, 0.025), 0 0 0 62px rgba(16, 185, 129, 0.02);
+        }
+
         .payout-overview-grid {
             display: grid;
             grid-template-columns: minmax(0, 1fr) minmax(320px, 0.9fr);
