@@ -19,8 +19,23 @@
     <meta name="apple-mobile-web-app-title" content="Friends in Finance">
     <meta name="application-name" content="Friends in Finance">
     
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Friends in Finance Group</title>
+
+    <script>
+        window.ADMIN_DASHBOARD_CACHE_BUSTER = Date.now();
+        const originalFetch = window.fetch;
+        window.fetch = function(url, options = {}) {
+            if (typeof url === 'string' && !url.includes('cacheBuster=')) {
+                const separator = url.includes('?') ? '&' : '?';
+                url = url + separator + 'cacheBuster=' + window.ADMIN_DASHBOARD_CACHE_BUSTER;
+            }
+            return originalFetch.call(this, url, options);
+        };
+    </script>
 
     <!-- Chart.js for visualizations -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
